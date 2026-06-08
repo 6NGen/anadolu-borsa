@@ -39,3 +39,6 @@ Thumbs.db
 # === Yerel / gecici ===
 .claude/settings.local.json
 proje_yapisi.txt
+
+# === Ekran goruntuleri ===
+ss_*.png
