@@ -1,176 +1,69 @@
 import { supabaseServer } from "@/lib/supabase";
-import { RENKLER, emoji, HAYVAN_RENK } from "@/lib/theme";
-import PariteGrafik, { PariteNokta } from "@/components/PariteGrafik";
+import PariteClient, { Girdi, Urun } from "@/components/PariteClient";
 
 export const revalidate = 3600;
 
-interface PariteRow {
-  tarih: string;
-  girdi_turu: string;
-  girdi_fiyat: number;
-  urun_norm: string;
-  urun_fiyat: number;
-  parite: number;
-  ters_parite: number;
-}
+// Ürün tarihsel serileri TÜİK tahminidir (DB'de geçmiş ürün fiyatı yok);
+// 2026 ucu aşağıda canlı Supabase verisiyle değiştirilir.
+const TUIK_URUN: Record<string, Omit<Urun, "guncel"> & { norm: string; tip: "yem" | "hayvan" }> = {
+  sut: {
+    ad: "Çiğ Süt", ikon: "🥛", renk: "#E8F0E0", birim: "TL/litre", norm: "SUT", tip: "hayvan",
+    hist: [{ y: "1995", f: 0.08 }, { y: "2002", f: 0.28 }, { y: "2005", f: 0.50 }, { y: "2010", f: 0.80 }, { y: "2015", f: 1.10 }, { y: "2019", f: 1.80 }, { y: "2021", f: 2.60 }, { y: "2022", f: 5.20 }, { y: "2023", f: 11.0 }, { y: "2024", f: 14.5 }, { y: "2025", f: 16.5 }, { y: "2026", f: 18.0 }],
+  },
+  arpa: {
+    ad: "Arpa", ikon: "🌾", renk: "#D4A843", birim: "TL/kg", norm: "ARPA", tip: "yem",
+    hist: [{ y: "1995", f: 0.03 }, { y: "2002", f: 0.12 }, { y: "2005", f: 0.25 }, { y: "2010", f: 0.42 }, { y: "2015", f: 0.55 }, { y: "2019", f: 0.90 }, { y: "2021", f: 2.10 }, { y: "2022", f: 5.50 }, { y: "2023", f: 8.50 }, { y: "2024", f: 12.5 }, { y: "2025", f: 13.8 }, { y: "2026", f: 14.60 }],
+  },
+  kuzu: {
+    ad: "Kuzu", ikon: "🐑", renk: "#6890D8", birim: "TL/kg", norm: "KUZU", tip: "hayvan",
+    hist: [{ y: "1995", f: 0.80 }, { y: "2002", f: 3.50 }, { y: "2005", f: 6.00 }, { y: "2010", f: 11.0 }, { y: "2015", f: 18.0 }, { y: "2019", f: 28.0 }, { y: "2021", f: 45.0 }, { y: "2022", f: 90.0 }, { y: "2023", f: 180 }, { y: "2024", f: 350 }, { y: "2025", f: 400 }, { y: "2026", f: 480 }],
+  },
+  bugday: {
+    ad: "Buğday", ikon: "🌿", renk: "#B8612A", birim: "TL/kg", norm: "BUGDAY", tip: "yem",
+    hist: [{ y: "1995", f: 0.04 }, { y: "2002", f: 0.14 }, { y: "2005", f: 0.28 }, { y: "2010", f: 0.46 }, { y: "2015", f: 0.60 }, { y: "2019", f: 0.95 }, { y: "2021", f: 2.20 }, { y: "2022", f: 6.00 }, { y: "2023", f: 9.00 }, { y: "2024", f: 13.0 }, { y: "2025", f: 14.5 }, { y: "2026", f: 15.20 }],
+  },
+  misir: {
+    ad: "Mısır", ikon: "🌽", renk: "#E8C040", birim: "TL/kg", norm: "MISIR", tip: "yem",
+    hist: [{ y: "1995", f: 0.03 }, { y: "2002", f: 0.11 }, { y: "2005", f: 0.24 }, { y: "2010", f: 0.40 }, { y: "2015", f: 0.52 }, { y: "2019", f: 0.88 }, { y: "2021", f: 2.00 }, { y: "2022", f: 5.20 }, { y: "2023", f: 8.20 }, { y: "2024", f: 11.5 }, { y: "2025", f: 12.8 }, { y: "2026", f: 13.0 }],
+  },
+};
 
-function HeroKart({ urun, birim, guncel, renk }: { urun: string; birim: string; guncel: PariteRow; renk: string }) {
-  return (
-    <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderLeft: `3px solid ${renk}`, borderRadius: "6px", padding: "18px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-        <span style={{ fontSize: "22px" }}>⛽</span>
-        <span style={{ fontSize: "16px", color: RENKLER.muted }}>/</span>
-        <span style={{ fontSize: "22px" }}>{emoji(urun)}</span>
-        <span style={{ fontSize: "11px", color: RENKLER.muted, letterSpacing: "0.1em", marginLeft: "4px" }}>MAZOT / {urun}</span>
-      </div>
-      <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-        <span style={{ fontSize: "42px", color: renk, fontWeight: 700, lineHeight: 1, fontFamily: "var(--font-mono)" }}>{Number(guncel.parite).toFixed(3)}</span>
-        <span style={{ fontSize: "12px", color: RENKLER.muted }}>{birim}</span>
-      </div>
-      <div style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "8px", paddingTop: "8px", borderTop: `1px solid ${RENKLER.border}` }}>
-        1 birim {urun.toLowerCase()} = <span style={{ color: RENKLER.text }}>{Number(guncel.ters_parite).toFixed(3)}</span> litre mazot
-      </div>
-    </div>
-  );
-}
-
-function PariteTablo({ baslik, urunEtiket, rows }: { baslik: string; urunEtiket: string; rows: PariteRow[] }) {
-  if (rows.length === 0) return null;
-  return (
-    <div style={{ marginBottom: "24px" }}>
-      <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>{baslik}</div>
-      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", overflow: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
-          <thead>
-            <tr style={{ borderBottom: `1px solid ${RENKLER.border}` }}>
-              {["Tarih", "Mazot (TL/lt)", urunEtiket, "Parite", "Ters Parite"].map((h) => (
-                <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "10px", color: RENKLER.muted, fontWeight: 600, whiteSpace: "nowrap" }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={i} style={{ borderBottom: `1px solid ${RENKLER.border}` }}>
-                <td style={{ padding: "9px 14px", color: RENKLER.muted }}>{row.tarih?.slice(0, 10)}</td>
-                <td style={{ padding: "9px 14px", color: "#F0A050" }}>{Number(row.girdi_fiyat).toFixed(2)}</td>
-                <td style={{ padding: "9px 14px", color: RENKLER.text }}>{Number(row.urun_fiyat).toFixed(2)}</td>
-                <td style={{ padding: "9px 14px", color: RENKLER.green, fontWeight: 700 }}>{Number(row.parite).toFixed(3)}</td>
-                <td style={{ padding: "9px 14px", color: RENKLER.muted }}>{Number(row.ters_parite).toFixed(3)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
+// Elektrik verisi DB'de yok → tahmini seri, pasif ("yakında").
+const ELEKTRIK_HIST = [
+  { y: "2010", f: 0.14 }, { y: "2015", f: 0.22 }, { y: "2018", f: 0.35 }, { y: "2020", f: 0.48 },
+  { y: "2022", f: 0.85 }, { y: "2023", f: 1.60 }, { y: "2024", f: 2.10 }, { y: "2025", f: 2.45 }, { y: "2026", f: 2.80 },
+];
 
 export default async function ParitePage() {
-  const { data: parite } = await supabaseServer
-    .from("parite_guncel")
-    .select("*")
-    .order("tarih", { ascending: false })
-    .limit(60);
+  const [{ data: mazotRows }, { data: yem }, { data: hayvan }] = await Promise.all([
+    supabaseServer.from("girdi_fiyat").select("fiyat, gecerlilik_tarihi").eq("girdi_turu", "mazot").order("gecerlilik_tarihi"),
+    supabaseServer.from("son_fiyatlar").select("urun_norm, ortalama"),
+    supabaseServer.from("son_hayvan_fiyatlari").select("hayvan_norm, fiyat"),
+  ]);
 
-  const tum = (parite ?? []) as PariteRow[];
+  // Mazot: gerçek tarihsel seri + güncel
+  const mazotHist = (mazotRows ?? [])
+    .filter((r) => r.fiyat != null && r.gecerlilik_tarihi)
+    .map((r) => ({ y: String(r.gecerlilik_tarihi).slice(0, 4), f: Number(r.fiyat) }));
+  const mazotGuncel = mazotHist.at(-1)?.f ?? 67.02;
 
-  const sutGuncel = tum.find((p) => p.urun_norm === "SUT");
-  const kuzuGuncel = tum.find((p) => p.urun_norm === "KUZU");
-  const guncelMazot = sutGuncel?.girdi_fiyat ?? kuzuGuncel?.girdi_fiyat ?? null;
-  const guncelTarih = (sutGuncel ?? kuzuGuncel)?.tarih?.slice(0, 10) ?? "";
+  // Güncel ürün fiyatları (norm → fiyat)
+  const guncelMap: Record<string, number> = {};
+  for (const r of yem ?? []) if (r.ortalama != null) guncelMap[r.urun_norm] = Number(r.ortalama);
+  for (const r of hayvan ?? []) if (r.fiyat != null && !(r.hayvan_norm in guncelMap)) guncelMap[r.hayvan_norm] = Number(r.fiyat);
 
-  const sutParite = tum.filter((p) => p.urun_norm === "SUT").slice(0, 12).reverse();
-  const kuzuParite = tum.filter((p) => p.urun_norm === "KUZU").slice(0, 12).reverse();
+  const girdiler: Record<string, Girdi> = {
+    mazot: { ad: "Motorin", ikon: "⛽", renk: "#E86040", birim: "TL/litre", hist: mazotHist.length ? mazotHist : [{ y: "2026", f: mazotGuncel }], guncel: mazotGuncel, aktif: true },
+    elektrik: { ad: "Elektrik", ikon: "⚡", renk: "#E8C840", birim: "TL/kWh", hist: ELEKTRIK_HIST, guncel: 2.80, aktif: false },
+  };
 
-  // Grafik: tarihe göre pivot (Mazot/Süt ve Mazot/Kuzu tek grafik)
-  const tarihler = Array.from(new Set(tum.map((p) => p.tarih))).sort();
-  const grafikVeri: PariteNokta[] = tarihler.map((t) => ({
-    tarih: t,
-    sut: tum.find((p) => p.tarih === t && p.urun_norm === "SUT")?.parite ?? null,
-    kuzu: tum.find((p) => p.tarih === t && p.urun_norm === "KUZU")?.parite ?? null,
-  }));
+  // Ürünler: TÜİK tarihsel taban, 2026 ucu canlı veriyle değiştirilir
+  const urunler: Record<string, Urun> = {};
+  for (const [k, v] of Object.entries(TUIK_URUN)) {
+    const canli = guncelMap[v.norm] ?? v.hist.at(-1)!.f;
+    const hist = v.hist.map((p) => (p.y === "2026" ? { ...p, f: canli } : p));
+    urunler[k] = { ad: v.ad, ikon: v.ikon, renk: v.renk, birim: v.birim, hist, guncel: canli };
+  }
 
-  // Matris: güncel parite × ters parite
-  const matrisSatir = [sutGuncel, kuzuGuncel].filter(Boolean) as PariteRow[];
-
-  return (
-    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
-      <div style={{ marginBottom: "20px" }}>
-        <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>PARİTE ENDEKSİ</h1>
-        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "4px" }}>
-          Mazot/Süt ve Mazot/Kuzu satın alma gücü paritesi {guncelTarih && `· ${guncelTarih}`}
-        </p>
-      </div>
-
-      {/* Hero widget'lar */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "12px", marginBottom: "24px" }}>
-        {guncelMazot != null && (
-          <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderLeft: "3px solid #F0A050", borderRadius: "6px", padding: "18px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-              <span style={{ fontSize: "22px" }}>⛽</span>
-              <span style={{ fontSize: "11px", color: RENKLER.muted, letterSpacing: "0.1em" }}>MAZOT (EPDK)</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
-              <span style={{ fontSize: "42px", color: "#F0A050", fontWeight: 700, lineHeight: 1, fontFamily: "var(--font-mono)" }}>{Number(guncelMazot).toFixed(2)}</span>
-              <span style={{ fontSize: "12px", color: RENKLER.muted }}>TL/litre</span>
-            </div>
-            <div style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "8px", paddingTop: "8px", borderTop: `1px solid ${RENKLER.border}` }}>
-              Pompa fiyatı · {guncelTarih}
-            </div>
-          </div>
-        )}
-        {sutGuncel && <HeroKart urun="SÜT" birim="litre süt" guncel={sutGuncel} renk={HAYVAN_RENK.SUT} />}
-        {kuzuGuncel && <HeroKart urun="KUZU" birim="kg kuzu" guncel={kuzuGuncel} renk={HAYVAN_RENK.KUZU} />}
-      </div>
-
-      {/* Grafik */}
-      {grafikVeri.length > 1 && (
-        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px", marginBottom: "24px" }}>
-          <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>PARİTE TARİHSEL TREND (mazot fiyatına göre)</div>
-          <PariteGrafik data={grafikVeri} />
-        </div>
-      )}
-
-      {/* Matris */}
-      {matrisSatir.length > 0 && (
-        <div style={{ marginBottom: "24px" }}>
-          <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>PARİTE MATRİSİ</div>
-          <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", overflow: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
-              <thead>
-                <tr style={{ borderBottom: `1px solid ${RENKLER.border}` }}>
-                  {["Ürün", "Güncel Fiyat", "Mazot Fiyatı", "Parite (mazot→ürün)", "Ters Parite (ürün→mazot)"].map((h) => (
-                    <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: "10px", color: RENKLER.muted, fontWeight: 600, whiteSpace: "nowrap" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {matrisSatir.map((r) => (
-                  <tr key={r.urun_norm} style={{ borderBottom: `1px solid ${RENKLER.border}` }}>
-                    <td style={{ padding: "10px 14px", color: RENKLER.text, fontWeight: 600 }}>
-                      <span style={{ marginRight: "6px" }}>{emoji(r.urun_norm)}</span>{r.urun_norm}
-                    </td>
-                    <td style={{ padding: "10px 14px", color: HAYVAN_RENK[r.urun_norm] ?? RENKLER.text }}>{Number(r.urun_fiyat).toFixed(2)}</td>
-                    <td style={{ padding: "10px 14px", color: "#F0A050" }}>{Number(r.girdi_fiyat).toFixed(2)}</td>
-                    <td style={{ padding: "10px 14px", color: RENKLER.green, fontWeight: 700 }}>{Number(r.parite).toFixed(3)}</td>
-                    <td style={{ padding: "10px 14px", color: RENKLER.muted }}>{Number(r.ters_parite).toFixed(3)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Tarihsel tablolar */}
-      <PariteTablo baslik="MAZOT / SÜT TARİHSEL PARİTE" urunEtiket="Süt (TL/lt)" rows={sutParite} />
-      <PariteTablo baslik="MAZOT / KUZU TARİHSEL PARİTE" urunEtiket="Kuzu (TL/kg)" rows={kuzuParite} />
-
-      {tum.length === 0 && (
-        <div style={{ padding: "40px", textAlign: "center", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
-          Parite verisi yok. ESK süt verileri çekildikten sonra hesaplanır.
-        </div>
-      )}
-    </main>
-  );
+  return <PariteClient girdiler={girdiler} urunler={urunler} mazotGuncelVar={mazotHist.length > 1} />;
 }

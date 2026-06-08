@@ -35,3 +35,7 @@ npm-debug.log*
 Thumbs.db
 .idea/
 .vscode/
+
+# === Yerel / gecici ===
+.claude/settings.local.json
+proje_yapisi.txt
