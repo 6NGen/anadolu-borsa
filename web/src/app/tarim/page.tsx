@@ -24,7 +24,7 @@ export default async function TarimPage() {
           Henüz veri yok. Scraper çalıştıktan sonra fiyatlar burada görünür.
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "16px" }}>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4">
           <TarimClient sonFiyatlar={sonFiyatlar ?? []} grafik={grafik ?? []} />
           <div>
             <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>BORSA vs PİYASA</div>

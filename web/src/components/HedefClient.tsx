@@ -95,7 +95,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
       {/* Panel */}
       <div style={{ background: "#0A1810", border: "1px solid #1A4028", borderRadius: 16, padding: 20, marginBottom: 20 }}>
         <div style={{ fontSize: 9, color: "#4A9060", letterSpacing: 2, marginBottom: 16 }}>🎯 ÜRETİCİ HEDEF PANELİ — KONYA</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 16 }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 9, color: C.mut, marginBottom: 4 }}>ÜRÜN</div>
             <select value={urun} onChange={(e) => setUrun(e.target.value)} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 12, fontFamily: "monospace", outline: "none" }}>
@@ -125,7 +125,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
         </div>
 
         <div style={{ borderTop: `1px solid ${C.brd}`, paddingTop: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <div style={{ fontSize: 9, color: C.mut, marginBottom: 3 }}>{miktar} {miktarBirimi} {u.ad.toUpperCase()} =</div>
               <div style={{ fontSize: 32, fontWeight: 800, color: v.renk, letterSpacing: -1 }}>

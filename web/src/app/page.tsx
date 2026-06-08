@@ -26,7 +26,7 @@ export default async function Dashboard() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", padding: "12px 16px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
         <div>
           <span style={{ fontFamily: "var(--font-syne)", fontSize: "18px", fontWeight: 700, color: RENKLER.green, letterSpacing: "0.08em" }}>ANADOLU BORSA</span>
-          <span style={{ marginLeft: "10px", fontSize: "10px", color: RENKLER.muted }}>Türkiye Tarım & Hayvancılık Fiyat Platformu</span>
+          <span className="hidden sm:inline" style={{ marginLeft: "10px", fontSize: "10px", color: RENKLER.muted }}>Türkiye Tarım & Hayvancılık Fiyat Platformu</span>
         </div>
         <SaatGosterg />
       </div>
@@ -61,7 +61,7 @@ export default async function Dashboard() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "16px" }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
         <div>
           {/* Sinyal motoru */}
           <SinyalMotoru />
