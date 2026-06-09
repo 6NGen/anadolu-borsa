@@ -2,6 +2,7 @@
 Anadolu Borsa — Ana Scraper
 Calistirilacak: python scraper/scraper.py
 Ortam: scraper/.env dosyasindan SUPABASE_URL ve SUPABASE_SERVICE_KEY okunur
+CI: ayni degiskenler GitHub Secrets'tan gelir (Settings > Secrets > Actions).
 """
 
 import json
