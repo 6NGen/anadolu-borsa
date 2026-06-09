@@ -4,11 +4,6 @@ on:
   schedule:
     - cron: "0 20 * * 1-6"   # Her gun 23:00 TSI (Pazartesi-Cumartesi)
   workflow_dispatch:           # Elle tetiklenebilir
-  push:                        # scraper degisikliginde otomatik calistir (test icin)
-    branches: [main]
-    paths:
-      - "scraper/**"
-      - ".github/workflows/scraper.yml"
 
 jobs:
   scrape:
