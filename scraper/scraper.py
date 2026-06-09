@@ -17,10 +17,22 @@ from supabase import create_client
 
 load_dotenv(override=False)
 
-supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_SERVICE_KEY"),
-)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+
+_eksik = [ad for ad, deg in (
+    ("SUPABASE_URL", SUPABASE_URL),
+    ("SUPABASE_SERVICE_KEY", SUPABASE_SERVICE_KEY),
+) if not deg]
+if _eksik:
+    raise SystemExit(
+        f"[HATA] Ortam degiskeni eksik: {', '.join(_eksik)}.\n"
+        "  - Yerelde: scraper/.env dosyasina ekleyin.\n"
+        "  - GitHub Actions: repo Settings > Secrets and variables > Actions altina "
+        "ayni isimlerle ekleyin."
+    )
+
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 
 # --- NORMALIZE ---
