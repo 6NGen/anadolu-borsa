@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from supabase import create_client
 
-load_dotenv()
+load_dotenv(override=False)
 
 supabase = create_client(
     os.getenv("SUPABASE_URL"),
