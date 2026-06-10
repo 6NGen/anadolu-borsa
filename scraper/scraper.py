@@ -9,32 +9,50 @@ Not: SUPABASE_URL ve SUPABASE_SERVICE_KEY ikisi de Secrets'ta tanimli olmali.
 import json
 import time
 import os
-from datetime import date, datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-from supabase import create_client
 
 load_dotenv(override=False)
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+# Tarihler her zaman Turkiye gunune gore (GitHub Actions runner'i UTC'de calisir;
+# 23:00 TSI = 20:00 UTC ayni gune denk gelir ama buna sans eseri guvenmeyelim).
+# tzdata yoksa (Windows) sabit UTC+3 kullan: Turkiye 2016'dan beri DST uygulamiyor.
+try:
+    from zoneinfo import ZoneInfo
+    TR_TZ = ZoneInfo("Europe/Istanbul")
+except Exception:
+    TR_TZ = timezone(timedelta(hours=3), name="TRT")
 
-_eksik = [ad for ad, deg in (
-    ("SUPABASE_URL", SUPABASE_URL),
-    ("SUPABASE_SERVICE_KEY", SUPABASE_SERVICE_KEY),
-) if not deg]
-if _eksik:
-    raise SystemExit(
-        f"[HATA] Ortam degiskeni eksik: {', '.join(_eksik)}.\n"
-        "  - Yerelde: scraper/.env dosyasina ekleyin.\n"
-        "  - GitHub Actions: repo Settings > Secrets and variables > Actions altina "
-        "ayni isimlerle ekleyin."
-    )
 
-supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+def bugun_tr() -> str:
+    return datetime.now(TR_TZ).date().isoformat()
+
+
+# Supabase istemcisi lazy olusturulur: modul import'u (testler dahil) env gerektirmez,
+# guard ilk DB erisiminde calisir.
+_supabase = None
+
+
+def get_supabase():
+    global _supabase
+    if _supabase is None:
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_SERVICE_KEY")
+        eksik = [ad for ad, deg in (("SUPABASE_URL", url), ("SUPABASE_SERVICE_KEY", key)) if not deg]
+        if eksik:
+            raise SystemExit(
+                f"[HATA] Ortam degiskeni eksik: {', '.join(eksik)}.\n"
+                "  - Yerelde: scraper/.env dosyasina ekleyin.\n"
+                "  - GitHub Actions: repo Settings > Secrets and variables > Actions altina "
+                "ayni isimlerle ekleyin."
+            )
+        from supabase import create_client
+        _supabase = create_client(url, key)
+    return _supabase
 
 
 # --- NORMALIZE ---
@@ -69,10 +87,34 @@ def urun_norm_bul(ad: str) -> str | None:
 
 
 def parse_fiyat(s) -> float | None:
-    try:
-        return float(str(s).replace(".", "").replace(",", ".").strip())
-    except Exception:
+    """Turkce/karisik sayi formatlarini cozumler.
+
+    Kurallar:
+      - Hem '.' hem ',' varsa: '.' binlik, ',' ondalik  -> '15.206,000' = 15206.0
+      - Yalniz ',' varsa: ondalik                        -> '11,550'     = 11.55
+      - Yalniz tek '.' varsa: noktadan sonra tam 3 hane VE oncesi <=3 hane ise
+        binlik ('12.000' = 12000), aksi halde ondalik ('14.50' = 14.5)
+      - Birden cok '.' varsa: binlik                     -> '1.234.567'  = 1234567
+    Eski surum her noktayi binlik sayip '14.50' girdisini 1450 yapiyordu (10x hata).
+    """
+    s = str(s).strip().replace("\xa0", "").replace(" ", "")
+    if not s:
         return None
+    neg = s.startswith("-")
+    s = s.lstrip("+-")
+    if "," in s:
+        s = s.replace(".", "").replace(",", ".")
+    elif s.count(".") == 1:
+        bas, son = s.split(".")
+        if len(son) == 3 and 0 < len(bas) <= 3:
+            s = bas + son
+    elif s.count(".") > 1:
+        s = s.replace(".", "")
+    try:
+        v = float(s)
+    except ValueError:
+        return None
+    return -v if neg else v
 
 
 def ton_to_kg(v: float | None) -> float | None:
@@ -86,27 +128,48 @@ def ton_to_kg(v: float | None) -> float | None:
     return round(v / 1000, 4) if v >= 1000 else round(v, 4)
 
 
+# Sanity bound'lar: kaynak HTML'i degisir/bozulursa absurt degerin DB'ye
+# yazilmasini engeller; sinir disi deger None olur (kayit atilir veya alan bos kalir).
+YEM_FIYAT_SINIR = (0.5, 500.0)       # TL/kg
+HAYVAN_FIYAT_SINIR = (20.0, 5000.0)  # TL/kg karkas
+
+
+def sinirla(v: float | None, sinir: tuple[float, float]) -> float | None:
+    if v is None:
+        return None
+    alt, ust = sinir
+    return v if alt <= v <= ust else None
+
+
 # --- LOG ---
 def log_yaz(kaynak: str, durum: str, kayit_sayisi: int = 0, hata=None):
-    supabase.table("scraper_log").insert({
-        "kaynak":       kaynak,
-        "durum":        durum,
-        "kayit_sayisi": kayit_sayisi,
-        "hata_mesaji":  str(hata) if hata else None,
-    }).execute()
+    # Log yazimi hicbir zaman scraper'i durdurmamali (ag hatasi vb.)
+    try:
+        get_supabase().table("scraper_log").insert({
+            "kaynak":       kaynak,
+            "durum":        durum,
+            "kayit_sayisi": kayit_sayisi,
+            "hata_mesaji":  str(hata) if hata else None,
+        }).execute()
+    except Exception as e:
+        print(f"[UYARI] scraper_log yazilamadi ({kaynak}): {e}")
 
 
 # --- FALLBACK KONTROL ---
 def fallback_kontrol(kaynak: str, gun_esik: int = 3):
     """3 gun ust uste hata varsa kritik uyari yaz."""
-    result = (
-        supabase.table("scraper_log")
-        .select("*")
-        .eq("kaynak", kaynak)
-        .order("calisma_tarihi", desc=True)
-        .limit(gun_esik)
-        .execute()
-    )
+    try:
+        result = (
+            get_supabase().table("scraper_log")
+            .select("*")
+            .eq("kaynak", kaynak)
+            .order("calisma_tarihi", desc=True)
+            .limit(gun_esik)
+            .execute()
+        )
+    except Exception as e:
+        print(f"[UYARI] fallback kontrolu yapilamadi ({kaynak}): {e}")
+        return
     hatalar = [r for r in (result.data or []) if r.get("durum") == "hata"]
     if len(hatalar) >= gun_esik:
         print(f"[KRITIK] {kaynak} {gun_esik} gundir calısmiyor!")
@@ -127,7 +190,7 @@ def yem_kaydet(veriler: list):
     if not veriler:
         return
     veriler = _dedup(veriler, ["borsa", "urun_norm", "cekilme_tarihi"])
-    supabase.table("fiyat_snapshot").upsert(
+    get_supabase().table("fiyat_snapshot").upsert(
         veriler, on_conflict="borsa,urun_norm,cekilme_tarihi"
     ).execute()
 
@@ -136,7 +199,7 @@ def hayvan_kaydet(veriler: list):
     if not veriler:
         return
     veriler = _dedup(veriler, ["kaynak", "hayvan_norm", "cekilme_tarihi"])
-    supabase.table("hayvan_fiyat_snapshot").upsert(
+    get_supabase().table("hayvan_fiyat_snapshot").upsert(
         veriler, on_conflict="kaynak,hayvan_norm,cekilme_tarihi"
     ).execute()
 
@@ -168,17 +231,21 @@ def tobb_scrape(borsa_adi: str, borsa_kod: str) -> list:
             norm = urun_norm_bul(h[0])
             if not norm:
                 continue
+            ortalama = sinirla(ton_to_kg(parse_fiyat(h[5])) if len(h) > 5 else None, YEM_FIYAT_SINIR)
+            if ortalama is None:
+                # Site yapisi degisti/bozuk deger geldi: sessizce yazma, atla
+                continue
             sonuclar.append({
                 "borsa":          borsa_adi,
                 "urun":           h[0],
                 "urun_norm":      norm,
                 "birim":          h[1] if len(h) > 1 else "KG",
                 "son_tarih":      None,
-                "en_az":          ton_to_kg(parse_fiyat(h[3])) if len(h) > 3 else None,
-                "en_cok":         ton_to_kg(parse_fiyat(h[4])) if len(h) > 4 else None,
-                "ortalama":       ton_to_kg(parse_fiyat(h[5])) if len(h) > 5 else None,
+                "en_az":          sinirla(ton_to_kg(parse_fiyat(h[3])) if len(h) > 3 else None, YEM_FIYAT_SINIR),
+                "en_cok":         sinirla(ton_to_kg(parse_fiyat(h[4])) if len(h) > 4 else None, YEM_FIYAT_SINIR),
+                "ortalama":       ortalama,
                 "islem_miktari":  parse_fiyat(h[6]) if len(h) > 6 else None,
-                "cekilme_tarihi": date.today().isoformat(),
+                "cekilme_tarihi": bugun_tr(),
             })
         log_yaz(f"TOBB_{borsa_adi}", "basarili", len(sonuclar))
         print(f"[OK] TOBB {borsa_adi}: {len(sonuclar)} urun")
@@ -213,17 +280,20 @@ def ktb_scrape() -> list:
                     norm = urun_norm_bul(h[0])
                     if not norm:
                         continue
+                    ortalama = sinirla(ton_to_kg(parse_fiyat(h[2])) if len(h) > 2 else None, YEM_FIYAT_SINIR)
+                    if ortalama is None:
+                        continue
                     sonuclar.append({
                         "borsa":          "KTB_KONYA",
                         "urun":           h[0],
                         "urun_norm":      norm,
                         "birim":          "KG",
                         "son_tarih":      None,
-                        "en_az":          ton_to_kg(parse_fiyat(h[2])) if len(h) > 2 else None,
-                        "en_cok":         ton_to_kg(parse_fiyat(h[3])) if len(h) > 3 else None,
-                        "ortalama":       ton_to_kg(parse_fiyat(h[2])) if len(h) > 2 else None,
+                        "en_az":          ortalama,
+                        "en_cok":         sinirla(ton_to_kg(parse_fiyat(h[3])) if len(h) > 3 else None, YEM_FIYAT_SINIR),
+                        "ortalama":       ortalama,
                         "islem_miktari":  None,
-                        "cekilme_tarihi": date.today().isoformat(),
+                        "cekilme_tarihi": bugun_tr(),
                     })
             log_yaz("KTB_KONYA", "basarili", len(sonuclar))
             print(f"[OK] KTB: {len(sonuclar)} urun")
@@ -260,7 +330,7 @@ def esk_karkas_scrape() -> list:
                 norm = next((v for k, v in HAYVAN_MAP.items() if k in n), None)
                 if not norm:
                     continue
-                fiyat = parse_fiyat(h[-1])
+                fiyat = sinirla(parse_fiyat(h[-1]), HAYVAN_FIYAT_SINIR)
                 if not fiyat:
                     continue
                 kat = "buyukbas" if norm in ["TOSUN", "INEK", "MANDA", "DANA"] else "kucukbas"
@@ -272,7 +342,7 @@ def esk_karkas_scrape() -> list:
                     "bolge":          None,
                     "fiyat":          fiyat,
                     "birim":          "TL/kg karkas",
-                    "cekilme_tarihi": date.today().isoformat(),
+                    "cekilme_tarihi": bugun_tr(),
                 })
         log_yaz("ESK_KARKAS", "basarili", len(sonuclar))
         print(f"[OK] ESK karkas: {len(sonuclar)} hayvan")
@@ -342,7 +412,7 @@ def esk_sut_scrape() -> list:
                     "bolge":          None,
                     "fiyat":          fiyat,
                     "birim":          "TL/litre",
-                    "cekilme_tarihi": date.today().isoformat(),
+                    "cekilme_tarihi": bugun_tr(),
                 }]
                 log_yaz("ESK_SUT", "basarili", 1)
                 print(f"[OK] ESK sut ({url}): {fiyat} TL/litre")
@@ -372,7 +442,7 @@ def esk_sut_scrape() -> list:
                             "bolge":          None,
                             "fiyat":          fiyat,
                             "birim":          "TL/litre",
-                            "cekilme_tarihi": date.today().isoformat(),
+                            "cekilme_tarihi": bugun_tr(),
                         }]
                         log_yaz("ESK_SUT", "basarili", 1)
                         print(f"[OK] ESK sut (Playwright): {fiyat} TL/litre")
@@ -405,7 +475,7 @@ def ukon_scrape() -> list:
             h = [td.get_text(strip=True) for td in satir.find_all("td")]
             if len(h) < 3:
                 continue
-            fiyat = parse_fiyat(h[2])
+            fiyat = sinirla(parse_fiyat(h[2]), HAYVAN_FIYAT_SINIR)
             if not fiyat:
                 continue
             n = normalize(h[0])
@@ -420,7 +490,7 @@ def ukon_scrape() -> list:
                 "bolge":          h[1] if len(h) > 1 else None,
                 "fiyat":          fiyat,
                 "birim":          "TL/kg karkas",
-                "cekilme_tarihi": date.today().isoformat(),
+                "cekilme_tarihi": bugun_tr(),
             })
         log_yaz("UKON", "basarili", len(sonuclar))
         print(f"[OK] UKON: {len(sonuclar)} fiyat")
@@ -449,7 +519,7 @@ def ukon_playwright() -> list:
                     h = [td.get_text(strip=True) for td in satir.find_all("td")]
                     if len(h) < 3:
                         continue
-                    fiyat = parse_fiyat(h[2])
+                    fiyat = sinirla(parse_fiyat(h[2]), HAYVAN_FIYAT_SINIR)
                     if not fiyat:
                         continue
                     n = normalize(h[0])
@@ -464,7 +534,7 @@ def ukon_playwright() -> list:
                         "bolge":          h[1] if len(h) > 1 else None,
                         "fiyat":          fiyat,
                         "birim":          "TL/kg karkas",
-                        "cekilme_tarihi": date.today().isoformat(),
+                        "cekilme_tarihi": bugun_tr(),
                     })
         except Exception:
             pass
@@ -485,7 +555,7 @@ def hava_guncelle():
         tum_hava.extend(kayitlar)
         time.sleep(0.3)
     if tum_hava:
-        supabase.table("hava_durumu").upsert(
+        get_supabase().table("hava_durumu").upsert(
             tum_hava, on_conflict="il,tahmin_tarihi"
         ).execute()
         print(f"[OK] Hava durumu: {len(tum_hava)} kayit")

@@ -3,4 +3,4 @@ beautifulsoup4>=4.12.3
 playwright>=1.49.0
 supabase==2.31.0
 python-dotenv>=1.0.1
-tabula-py>=2.9.0
+tzdata>=2024.1

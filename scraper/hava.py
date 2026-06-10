@@ -26,6 +26,7 @@ def hava_cek(il: str, lat: float, lon: float, denemeler: int = 2) -> list[dict]:
                 params=params,
                 timeout=20,
             )
+            resp.raise_for_status()  # 429/5xx HTML sayfasini sessizce bos veri sanma
             data = resp.json().get("daily", {})
             return [
                 {
