@@ -18,6 +18,19 @@ export default function FiyatBildirPage() {
   async function gonder(e: React.FormEvent) {
     e.preventDefault();
     if (!fiyat || !il) { setMesaj("Fiyat ve il zorunludur."); setDurum("hata"); return; }
+
+    const fiyatSayi = parseFloat(fiyat.replace(",", "."));
+    if (!Number.isFinite(fiyatSayi) || fiyatSayi <= 0 || fiyatSayi > 10000) {
+      setMesaj("Geçerli bir fiyat girin (0 ile 10.000 TL/kg arası).");
+      setDurum("hata");
+      return;
+    }
+    const ilTemiz = il.toUpperCase().trim();
+    if (ilTemiz.length < 2 || ilTemiz.length > 30 || !/^[A-ZÇĞİÖŞÜ\s]+$/.test(ilTemiz)) {
+      setMesaj("Geçerli bir il adı girin (yalnızca harf).");
+      setDurum("hata");
+      return;
+    }
     setDurum("gonderiliyor");
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -25,9 +38,9 @@ export default function FiyatBildirPage() {
 
     const { error } = await supabase.from("kullanici_fiyat").insert({
       urun_norm:    urun,
-      fiyat:        parseFloat(fiyat.replace(",", ".")),
-      il:           il.toUpperCase().trim(),
-      ilce:         ilce.trim() || null,
+      fiyat:        fiyatSayi,
+      il:           ilTemiz,
+      ilce:         ilce.trim().slice(0, 50) || null,
       kaynak_turu:  kaynak,
       kullanici_id: user.id,
     });
