@@ -1,7 +1,10 @@
 "use client";
 import { useState } from "react";
 import FiyatGrafik from "./FiyatGrafik";
+import VeriTazelik from "./VeriTazelik";
 import { HAYVAN_RENK, RENKLER } from "@/lib/theme";
+import { formatFiyat } from "@/lib/format";
+import { distinctGun } from "@/lib/guncel";
 
 interface HayvanFiyat {
   kaynak: string;
@@ -15,6 +18,7 @@ interface HayvanFiyat {
 }
 
 interface GrafikVeri {
+  kaynak: string;
   hayvan_norm: string;
   cekilme_tarihi: string;
   fiyat: number | null;
@@ -28,11 +32,13 @@ interface Props {
 export default function HayvanClient({ fiyatlar, grafik }: Props) {
   const [secilen, setSecilen] = useState<string>(fiyatlar[0]?.hayvan_norm ?? "TOSUN");
 
-  const grafikVeri = grafik
-    .filter((g) => g.hayvan_norm === secilen)
-    .map((g) => ({ tarih: g.cekilme_tarihi, ortalama: g.fiyat ?? 0, en_az: g.fiyat ?? 0, en_cok: g.fiyat ?? 0 }));
-
   const sf = fiyatlar.find((f) => f.hayvan_norm === secilen);
+
+  // Grafik yalnız seçili fiyatın KAYNAĞININ serisini çizer (ESK/UKON karışmaz)
+  const seri = grafik.filter((g) => g.hayvan_norm === secilen && (!sf || g.kaynak === sf.kaynak));
+  const grafikVeri = seri.map((g) => ({ tarih: g.cekilme_tarihi, ortalama: g.fiyat ?? 0, en_az: g.fiyat ?? 0, en_cok: g.fiyat ?? 0 }));
+  const gunSayisi = distinctGun(seri);
+
   const renk = HAYVAN_RENK[secilen] ?? RENKLER.red;
 
   return (
@@ -54,16 +60,19 @@ export default function HayvanClient({ fiyatlar, grafik }: Props) {
       </div>
 
       {sf && (
-        <div style={{ display: "flex", gap: "16px", alignItems: "baseline", marginBottom: "16px" }}>
-          <span style={{ fontSize: "36px", color: renk, fontWeight: 700, lineHeight: 1 }}>{sf.fiyat?.toFixed(2) ?? "—"}</span>
+        <div style={{ display: "flex", gap: "16px", alignItems: "baseline", marginBottom: "16px", flexWrap: "wrap" }}>
+          <span style={{ fontSize: "36px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(sf.fiyat)}</span>
           <span style={{ fontSize: "13px", color: RENKLER.muted }}>{sf.birim}</span>
           <span style={{ fontSize: "11px", color: RENKLER.muted }}>{sf.kaynak} · {sf.cekilme_tarihi}</span>
+          <VeriTazelik tarih={sf.cekilme_tarihi} />
         </div>
       )}
 
       <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "12px" }}>
-        <div style={{ fontSize: "10px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>30 GÜN TARİHÇE</div>
-        <FiyatGrafik data={grafikVeri} renk={renk} birim={sf?.birim ?? "TL/kg"} urun_ad={sf?.hayvan ?? secilen} />
+        <div style={{ fontSize: "10px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>
+          30 GÜN TARİHÇE · {gunSayisi}/30 gün{sf ? ` · ${sf.kaynak}` : ""}
+        </div>
+        <FiyatGrafik data={grafikVeri} renk={renk} birim={sf?.birim ?? "TL/kg"} urun_ad={sf?.hayvan ?? secilen} kaynakEtiket={sf?.kaynak} />
       </div>
     </div>
   );
