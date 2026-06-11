@@ -1,53 +1,23 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { RENKLER } from "@/lib/theme";
+import { ILLER } from "@/lib/iller";
+
+// TODO(PART5-auth): Telefon OTP girişi implement edilince bu sayfa OTP akışıyla
+// açılacak. gonder() içindeki insert mantığı korunacak; AUTH_HAZIR true yapılıp
+// supabase.auth üzerinden user.id alınacak. Şimdilik form görünür ama submit kapalı —
+// kullanıcıya yanlışlıkla "çalışmayan buton" gösterilmez (UI denetimi 3.1).
+const AUTH_HAZIR = false;
 
 const URUNLER = ["ARPA", "BUGDAY", "MISIR", "SAMAN", "YONCA", "YULAF", "CAVDAR"];
 const KAYNAKLAR = ["pazar", "tuccar", "fabrika", "kooperatif"] as const;
 
 export default function FiyatBildirPage() {
-  const [urun,    setUrun]    = useState("ARPA");
-  const [fiyat,   setFiyat]   = useState("");
-  const [il,      setIl]      = useState("");
-  const [ilce,    setIlce]    = useState("");
-  const [kaynak,  setKaynak]  = useState<typeof KAYNAKLAR[number]>("pazar");
-  const [durum,   setDurum]   = useState<"bos" | "gonderiliyor" | "basarili" | "hata">("bos");
-  const [mesaj,   setMesaj]   = useState("");
-
-  async function gonder(e: React.FormEvent) {
-    e.preventDefault();
-    if (!fiyat || !il) { setMesaj("Fiyat ve il zorunludur."); setDurum("hata"); return; }
-
-    const fiyatSayi = parseFloat(fiyat.replace(",", "."));
-    if (!Number.isFinite(fiyatSayi) || fiyatSayi <= 0 || fiyatSayi > 10000) {
-      setMesaj("Geçerli bir fiyat girin (0 ile 10.000 TL/kg arası).");
-      setDurum("hata");
-      return;
-    }
-    const ilTemiz = il.toUpperCase().trim();
-    if (ilTemiz.length < 2 || ilTemiz.length > 30 || !/^[A-ZÇĞİÖŞÜ\s]+$/.test(ilTemiz)) {
-      setMesaj("Geçerli bir il adı girin (yalnızca harf).");
-      setDurum("hata");
-      return;
-    }
-    setDurum("gonderiliyor");
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setMesaj("Fiyat bildirmek için giriş yapmalısınız."); setDurum("hata"); return; }
-
-    const { error } = await supabase.from("kullanici_fiyat").insert({
-      urun_norm:    urun,
-      fiyat:        fiyatSayi,
-      il:           ilTemiz,
-      ilce:         ilce.trim().slice(0, 50) || null,
-      kaynak_turu:  kaynak,
-      kullanici_id: user.id,
-    });
-
-    if (error) { setMesaj(error.message); setDurum("hata"); }
-    else { setMesaj("Fiyat başarıyla bildirildi. Teşekkürler!"); setDurum("basarili"); setFiyat(""); setIlce(""); }
-  }
+  const [urun,   setUrun]   = useState("ARPA");
+  const [fiyat,  setFiyat]  = useState("");
+  const [il,     setIl]     = useState("KONYA");
+  const [ilce,   setIlce]   = useState("");
+  const [kaynak, setKaynak] = useState<typeof KAYNAKLAR[number]>("pazar");
 
   return (
     <main style={{ maxWidth: "600px", margin: "32px auto", padding: "16px" }}>
@@ -56,7 +26,7 @@ export default function FiyatBildirPage() {
         <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "4px" }}>Piyasa fiyatını bildirerek gerçek veri oluştur. En az 3 bildirim sonrası görünür.</p>
       </div>
 
-      <form onSubmit={gonder} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+      <form onSubmit={(e) => e.preventDefault()} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
         {/* Ürün */}
         <div>
           <label style={{ fontSize: "10px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.1em" }}>ÜRÜN</label>
@@ -70,27 +40,27 @@ export default function FiyatBildirPage() {
           </div>
         </div>
 
-        {/* Fiyat */}
+        {/* Fiyat — hem "14,50" hem "14.50" kabul edilir (gönderimde parseFiyatGirdi kullanılacak) */}
         <div>
           <label style={{ fontSize: "10px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.1em" }}>FİYAT (TL/KG)</label>
           <input
-            type="number" step="0.01" min="0" required
+            type="text" inputMode="decimal"
             value={fiyat} onChange={(e) => setFiyat(e.target.value)}
-            placeholder="Örn: 14.50"
+            placeholder="Örn: 14,50"
             style={{ width: "100%", padding: "9px 12px", background: "#080E09", border: `1px solid ${RENKLER.border}`, color: RENKLER.text, fontSize: "14px", borderRadius: "3px", outline: "none", fontFamily: "var(--font-mono)" }}
           />
         </div>
 
-        {/* İl */}
+        {/* İl: 81 il sabit listesi (3.2) — serbest metin GROUP BY'ı bozuyordu */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
           <div>
             <label style={{ fontSize: "10px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.1em" }}>İL</label>
-            <input
-              type="text" required
+            <select
               value={il} onChange={(e) => setIl(e.target.value)}
-              placeholder="KONYA"
-              style={{ width: "100%", padding: "9px 12px", background: "#080E09", border: `1px solid ${RENKLER.border}`, color: RENKLER.text, fontSize: "12px", borderRadius: "3px", outline: "none", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}
-            />
+              style={{ width: "100%", padding: "9px 12px", background: "#080E09", border: `1px solid ${RENKLER.border}`, color: RENKLER.text, fontSize: "12px", borderRadius: "3px", outline: "none", fontFamily: "var(--font-mono)" }}
+            >
+              {ILLER.map((i) => <option key={i} value={i}>{i}</option>)}
+            </select>
           </div>
           <div>
             <label style={{ fontSize: "10px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.1em" }}>İLÇE (opsiyonel)</label>
@@ -106,7 +76,7 @@ export default function FiyatBildirPage() {
         {/* Kaynak */}
         <div>
           <label style={{ fontSize: "10px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.1em" }}>KAYNAK</label>
-          <div style={{ display: "flex", gap: "6px" }}>
+          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
             {KAYNAKLAR.map((k) => (
               <button key={k} type="button" onClick={() => setKaynak(k)}
                 style={{ padding: "5px 10px", fontSize: "11px", background: kaynak === k ? RENKLER.surface : "#080E09", color: kaynak === k ? RENKLER.text : RENKLER.muted, border: `1px solid ${kaynak === k ? RENKLER.green : RENKLER.border}`, borderRadius: "3px", cursor: "pointer" }}>
@@ -116,24 +86,19 @@ export default function FiyatBildirPage() {
           </div>
         </div>
 
-        {/* Gönder */}
+        {/* 3.1: auth gelene kadar submit kapalı — çıkmaz sokak yok */}
         <button
           type="submit"
-          disabled={durum === "gonderiliyor"}
-          style={{ padding: "10px", fontSize: "12px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "3px", cursor: durum === "gonderiliyor" ? "not-allowed" : "pointer", fontWeight: 600, fontFamily: "var(--font-mono)", letterSpacing: "0.05em" }}
+          disabled={!AUTH_HAZIR}
+          style={{ padding: "10px", fontSize: "12px", background: AUTH_HAZIR ? RENKLER.green : "#1A3020", color: AUTH_HAZIR ? "#000" : RENKLER.muted, border: "none", borderRadius: "3px", cursor: AUTH_HAZIR ? "pointer" : "not-allowed", fontWeight: 600, fontFamily: "var(--font-mono)", letterSpacing: "0.05em" }}
         >
-          {durum === "gonderiliyor" ? "GÖNDERİLİYOR…" : "FİYAT BİLDİR"}
+          🔒 YAKINDA: TELEFONLA GİRİŞ
         </button>
-
-        {mesaj && (
-          <div style={{ padding: "10px 12px", background: "#080E09", border: `1px solid ${durum === "basarili" ? RENKLER.pos : RENKLER.neg}`, borderRadius: "3px", fontSize: "11px", color: durum === "basarili" ? RENKLER.pos : RENKLER.neg }}>
-            {mesaj}
-          </div>
-        )}
       </form>
 
-      <div style={{ marginTop: "12px", padding: "12px", fontSize: "10px", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
-        Giriş yapmadan bildirim yapamazsınız. Supabase Auth ile e-posta veya Google ile giriş yapın.
+      <div style={{ marginTop: "12px", padding: "12px", fontSize: "10px", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", lineHeight: 1.6 }}>
+        Fiyat bildirimi yakında telefon numaranızla giriş yaparak yapılabilecek.
+        Bildirimler topluluk ortalamasına katılır ve borsa fiyatlarıyla karşılaştırılır.
       </div>
     </main>
   );

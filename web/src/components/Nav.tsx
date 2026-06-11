@@ -5,7 +5,7 @@ import { useState } from "react";
 import { RENKLER } from "@/lib/theme";
 
 const LINKS = [
-  { href: "/", label: "Ana" },
+  { href: "/", label: "Anasayfa" },
   { href: "/tarim", label: "Tarım" },
   { href: "/hayvan", label: "Hayvan" },
   { href: "/parite", label: "Parite" },
