@@ -2,7 +2,9 @@ import { supabaseServer } from "@/lib/supabase";
 import UrunKarti from "@/components/UrunKarti";
 import HavaDurumu from "@/components/HavaDurumu";
 import SaatGosterg from "@/components/SaatGosterg";
+import VeriTazelik from "@/components/VeriTazelik";
 import { RENKLER, HAYVAN_RENK } from "@/lib/theme";
+import { formatFiyat } from "@/lib/format";
 import KurbanSayaci from "@/components/KurbanSayaci";
 import SinyalMotoru from "@/components/SinyalMotoru";
 import Link from "next/link";
@@ -15,9 +17,10 @@ export default async function Dashboard() {
     supabaseServer.from("son_hayvan_fiyatlari").select("*").order("hayvan_norm"),
   ]);
 
+  // 3.3: her ticker öğesi TEK string — parça kopması/yetim birim olmaz
   const tickerItems = [
-    ...(sonFiyatlar ?? []).map((f) => `${f.urun_norm}  ${f.ortalama?.toFixed(2) ?? "—"} TL/KG`),
-    ...(sonHayvan ?? []).map((h) => `${h.hayvan_norm}  ${h.fiyat?.toFixed(2) ?? "—"} ${h.birim ?? "TL/kg"}`),
+    ...(sonFiyatlar ?? []).map((f) => `${f.urun_norm} ${formatFiyat(f.ortalama)} TL/KG`),
+    ...(sonHayvan ?? []).map((h) => `${h.hayvan_norm} ${formatFiyat(h.fiyat)} ${h.birim ?? "TL/kg"}`),
   ];
 
   return (
@@ -97,9 +100,12 @@ export default async function Dashboard() {
                       <div>
                         <div style={{ fontSize: "9px", color: RENKLER.muted, letterSpacing: "0.12em" }}>{h.hayvan_norm}</div>
                         <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "2px 0" }}>{h.hayvan}</div>
-                        <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>{h.fiyat?.toFixed(2) ?? "—"}</div>
+                        <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(h.fiyat)}</div>
                         <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "2px" }}>{h.birim}</div>
-                        <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}` }}>{h.kaynak} · {h.cekilme_tarihi}</div>
+                        <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
+                          <span>{h.kaynak} · {h.cekilme_tarihi}</span>
+                          <VeriTazelik tarih={h.cekilme_tarihi} />
+                        </div>
                       </div>
                     </div>
                   );

@@ -45,8 +45,4 @@ export const EMOJI: Record<string, string> = {
 
 export const emoji = (k: string) => EMOJI[k] ?? EMOJI[k?.toUpperCase()] ?? "📦";
 
-// Ortalama karkas ağırlığı (kg/baş) — "baş hesabı" ve sürü değeri için tahmini değerler
-export const KARKAS_KG: Record<string, number> = {
-  TOSUN: 225, DANA: 180, INEK: 250, MANDA: 250,
-  KUZU: 17, TOKLU: 22, KOYUN: 25, OGLAK: 12,
-};
+// Karkas ağırlıkları lib/karkas.ts'e taşındı (tek kaynak — 2.3 düzeltmesi).

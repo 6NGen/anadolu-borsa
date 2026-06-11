@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { RENKLER } from "@/lib/theme";
+import { formatFiyat } from "@/lib/format";
+import VeriTazelik from "./VeriTazelik";
 
 interface Props {
   urun_norm: string;
@@ -15,6 +17,8 @@ interface Props {
 }
 
 export default function UrunKarti({ urun_norm, urun_ad, renk, ortalama, en_az, en_cok, borsa, tarih, birim }: Props) {
+  // 2.7: min === max ise ↓↑ satırı bilgi taşımıyor — hiç basma
+  const aralikGoster = en_az != null && en_cok != null && en_az !== en_cok;
   return (
     <Link href={`/urun/${urun_norm.toLowerCase()}`} style={{ textDecoration: "none", display: "block" }}>
       <div
@@ -27,16 +31,17 @@ export default function UrunKarti({ urun_norm, urun_ad, renk, ortalama, en_az, e
           <div style={{ fontSize: "9px", color: RENKLER.muted, letterSpacing: "0.12em" }}>{urun_norm}</div>
           <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "2px 0" }}>{urun_ad}</div>
           <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>
-            {ortalama != null ? ortalama.toFixed(2) : "—"}
+            {formatFiyat(ortalama)}
           </div>
           <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "2px" }}>{birim}</div>
-          {en_az != null && en_cok != null && (
+          {aralikGoster && (
             <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "4px" }}>
-              ↓{en_az.toFixed(2)} ↑{en_cok.toFixed(2)}
+              ↓{formatFiyat(en_az)} ↑{formatFiyat(en_cok)}
             </div>
           )}
-          <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}` }}>
-            {borsa} · {tarih}
+          <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
+            <span>{borsa} · {tarih}</span>
+            <VeriTazelik tarih={tarih} />
           </div>
         </div>
       </div>

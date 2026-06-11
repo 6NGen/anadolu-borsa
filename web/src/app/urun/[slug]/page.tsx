@@ -3,6 +3,7 @@ import { supabaseServer } from "@/lib/supabase";
 import UrunKarti from "@/components/UrunKarti";
 import FiyatGrafik from "@/components/FiyatGrafik";
 import { RENKLER, YEM_RENK, HAYVAN_RENK } from "@/lib/theme";
+import { formatFiyat } from "@/lib/format";
 
 export const revalidate = 3600;
 
@@ -13,10 +14,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!data) return { title: "Anadolu Borsa" };
   return {
     title: `${data.urun_ad} Fiyatı ${new Date().getFullYear()} | Anadolu Borsa`,
-    description: `Güncel ${data.urun_ad} fiyatı: ${data.ortalama} TL/kg. Konya Ticaret Borsası ve TOBB verisi. Günlük güncellenir.`,
+    description: `Güncel ${data.urun_ad} fiyatı: ${formatFiyat(data.ortalama)} TL/kg. Konya Ticaret Borsası ve TOBB verisi. Günlük güncellenir.`,
     openGraph: {
       title: `${data.urun_ad} Fiyatı`,
-      description: `${data.ortalama} TL/kg — ${data.cekilme_tarihi}`,
+      description: `${formatFiyat(data.ortalama)} TL/kg — ${data.cekilme_tarihi}`,
     },
   };
 }
@@ -80,7 +81,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
       <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", fontSize: "13px", color: RENKLER.muted, lineHeight: 1.8 }}>
         <h2 style={{ fontSize: "14px", color: RENKLER.text, marginBottom: "12px" }}>{guncel?.urun_ad ?? norm} Fiyatı Hakkında</h2>
         <p>
-          Güncel {guncel?.urun_ad ?? norm} fiyatı <strong style={{ color: RENKLER.green }}>{guncel?.ortalama ?? "—"} TL/kg</strong> olarak TOBB ve Konya Ticaret Borsası verilerine göre güncellenmektedir.
+          Güncel {guncel?.urun_ad ?? norm} fiyatı <strong style={{ color: RENKLER.green }}>{formatFiyat(guncel?.ortalama)} TL/kg</strong> olarak TOBB ve Konya Ticaret Borsası verilerine göre güncellenmektedir.
           Son veri tarihi: {guncel?.cekilme_tarihi ?? "—"}.
         </p>
         <p style={{ marginTop: "10px" }}>
