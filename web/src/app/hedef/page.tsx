@@ -1,17 +1,12 @@
 import { supabaseServer } from "@/lib/supabase";
 import { YEM_RENK, HAYVAN_RENK } from "@/lib/theme";
+import { KARKAS_KG, HAYVAN_AD, karkasLabel } from "@/lib/karkas";
 import HedefClient, { UrunItem, VarlikItem } from "@/components/HedefClient";
 
 export const revalidate = 3600;
 
-// Karkas ağırlıkları (kullanıcı spec'i): baş hesabı için
-const HAYVAN_KARKAS: Record<string, { karkasKg: number; label: string; ad: string }> = {
-  TOSUN: { karkasKg: 225, label: "baş (ort. 450kg, %50 karkas)", ad: "Tosun" },
-  INEK: { karkasKg: 250, label: "baş (ort. 500kg, %50 karkas)", ad: "İnek" },
-  KUZU: { karkasKg: 17, label: "baş (ort. 35kg, %50 karkas)", ad: "Kuzu" },
-  TOKLU: { karkasKg: 22, label: "baş (ort. 45kg, %50 karkas)", ad: "Toklu" },
-  KOYUN: { karkasKg: 25, label: "baş (ort. 50kg, %50 karkas)", ad: "Koyun" },
-};
+// Baş hesabında kullanılacak hayvanlar (karkas kg tek kaynaktan: lib/karkas)
+const HEDEF_HAYVANLAR = ["TOSUN", "INEK", "KUZU", "TOKLU", "KOYUN"];
 
 // Varlık fiyatları + tarihsel seri — hedef_varlik_fiyat anon RLS ile bloklu
 // olduğundan DB seed değerleriyle birebir aynı sabitleri kullanıyoruz.
@@ -39,10 +34,17 @@ export default async function HedefPage() {
   // Hayvan (canlı, karkas tanımlı olanlar): baş hesabı
   const gorulen = new Set<string>();
   for (const r of hayvan ?? []) {
-    const k = HAYVAN_KARKAS[r.hayvan_norm];
-    if (r.fiyat == null || !k || gorulen.has(r.hayvan_norm)) continue;
+    if (r.fiyat == null || !HEDEF_HAYVANLAR.includes(r.hayvan_norm) || gorulen.has(r.hayvan_norm)) continue;
     gorulen.add(r.hayvan_norm);
-    urunler.push({ norm: r.hayvan_norm, ad: k.ad, renk: HAYVAN_RENK[r.hayvan_norm] ?? "#E05840", son: Number(r.fiyat), tip: "hayvan", karkasKg: k.karkasKg, karkasLabel: k.label });
+    urunler.push({
+      norm: r.hayvan_norm,
+      ad: HAYVAN_AD[r.hayvan_norm] ?? r.hayvan_norm,
+      renk: HAYVAN_RENK[r.hayvan_norm] ?? "#E05840",
+      son: Number(r.fiyat),
+      tip: "hayvan",
+      karkasKg: KARKAS_KG[r.hayvan_norm],
+      karkasLabel: karkasLabel(r.hayvan_norm),
+    });
   }
 
   return <HedefClient urunler={urunler} varliklar={VARLIKLAR} />;

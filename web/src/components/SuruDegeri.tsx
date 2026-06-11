@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
-import { RENKLER, HAYVAN_RENK, KARKAS_KG, emoji } from "@/lib/theme";
+import { RENKLER, HAYVAN_RENK, emoji } from "@/lib/theme";
+import { KARKAS_KG, karkasDipnot } from "@/lib/karkas";
+import { formatFiyat } from "@/lib/format";
 
 interface HayvanFiyat {
   hayvan_norm: string;
@@ -48,11 +50,11 @@ export default function SuruDegeri({ fiyatlar }: { fiyatlar: HayvanFiyat[] }) {
                 style={{ width: "100%", padding: "6px 8px", fontSize: "13px", background: RENKLER.bg, color: RENKLER.text, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", fontFamily: "var(--font-mono)" }}
               />
               <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "5px" }}>
-                ~{Math.round(t.basFiyat).toLocaleString("tr-TR")} TL/baş
+                ~{formatFiyat(Math.round(t.basFiyat), 0)} TL/baş
               </div>
               {(adet[t.norm] ?? 0) > 0 && (
                 <div style={{ fontSize: "11px", color: renk, fontWeight: 600, marginTop: "3px" }}>
-                  = {Math.round((adet[t.norm] ?? 0) * t.basFiyat).toLocaleString("tr-TR")} TL
+                  = {formatFiyat(Math.round((adet[t.norm] ?? 0) * t.basFiyat), 0)} TL
                 </div>
               )}
             </div>
@@ -63,11 +65,12 @@ export default function SuruDegeri({ fiyatlar }: { fiyatlar: HayvanFiyat[] }) {
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", paddingTop: "12px", borderTop: `1px solid ${RENKLER.border}` }}>
         <span style={{ fontSize: "11px", color: RENKLER.muted }}>{toplamBas} baş · tahmini sürü değeri</span>
         <span style={{ fontSize: "28px", color: RENKLER.green, fontWeight: 700, fontFamily: "var(--font-mono)" }}>
-          {Math.round(toplam).toLocaleString("tr-TR")} <span style={{ fontSize: "13px", color: RENKLER.muted }}>TL</span>
+          {formatFiyat(Math.round(toplam), 0)} <span style={{ fontSize: "13px", color: RENKLER.muted }}>TL</span>
         </span>
       </div>
+      {/* 2.3: dipnot koddan üretilir — sabit metin hesapla çelişemez */}
       <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "8px" }}>
-        * Ortalama karkas ağırlığı (KUZU ~22kg, TOSUN ~280kg vb.) ve güncel ESK/UKON karkas fiyatı üzerinden tahmindir.
+        * {karkasDipnot(["KUZU", "TOSUN"])}
       </div>
     </div>
   );

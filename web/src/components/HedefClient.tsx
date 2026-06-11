@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { formatFiyat } from "@/lib/format";
 
 export interface UrunItem {
   norm: string;
@@ -70,9 +71,10 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
 
   const toplamGelir = u.son * miktar * olcek;
   const miktarBirimi = hayvanMi ? "baş" : "ton";
+  // 3.5: çarpanlar okunur sırada — miktar × birim dönüşümü × birim fiyat
   const aciklamaMetni = hayvanMi
-    ? `${miktar} baş × ${karkasKg} kg karkas × ${u.son} ₺/kg = ${toplamGelir.toLocaleString("tr-TR")} ₺`
-    : `${miktar} ton × ${u.son} ₺/kg × 1000 = ${toplamGelir.toLocaleString("tr-TR")} ₺`;
+    ? `${miktar} baş × ${karkasKg} kg karkas × ${formatFiyat(u.son)} ₺/kg = ${formatFiyat(Math.round(toplamGelir), 0)} ₺`
+    : `${miktar} ton × 1.000 kg × ${formatFiyat(u.son)} ₺/kg = ${formatFiyat(Math.round(toplamGelir), 0)} ₺`;
 
   const karsilik = varlik === "traktor"
     ? (toplamGelir / v.fiyat * 100).toFixed(2)
@@ -129,7 +131,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             <div>
               <div style={{ fontSize: 9, color: C.mut, marginBottom: 3 }}>{miktar} {miktarBirimi} {u.ad.toUpperCase()} =</div>
               <div style={{ fontSize: 32, fontWeight: 800, color: v.renk, letterSpacing: -1 }}>
-                {Number(karsilik).toLocaleString("tr-TR")}
+                {formatFiyat(Number(karsilik), varlik === "traktor" ? 2 : 1)}
                 <span style={{ fontSize: 14, color: C.mut, marginLeft: 5, fontWeight: 400 }}>{karsilikBirim} {v.ad.toLowerCase()}</span>
               </div>
             </div>
@@ -137,7 +139,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
               <div>
                 <div style={{ fontSize: 9, color: C.mut, marginBottom: 3 }}>1 {v.ad.toUpperCase()} İÇİN</div>
                 <div style={{ fontSize: 32, fontWeight: 800, color: "#E86040", letterSpacing: -1 }}>
-                  {Number(kacBirim).toLocaleString("tr-TR")}
+                  {formatFiyat(Number(kacBirim), hayvanMi ? 0 : 1)}
                   <span style={{ fontSize: 14, color: C.mut, marginLeft: 5, fontWeight: 400 }}>{miktarBirimi} {u.ad.toLowerCase()}</span>
                 </div>
               </div>
@@ -152,8 +154,8 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
         {Object.entries(varliklar).map(([k, val]) => {
           const birimGelir = u.son * olcek; // 1 ton/baş gelir
           const etiket = k === "traktor"
-            ? `${(val.fiyat / birimGelir).toFixed(hayvanMi ? 0 : 1)} ${miktarBirimi} gerekli`
-            : `1 ${miktarBirimi} = ${(birimGelir / val.fiyat).toFixed(1)} m²`;
+            ? `${formatFiyat(val.fiyat / birimGelir, hayvanMi ? 0 : 1)} ${miktarBirimi} gerekli`
+            : `1 ${miktarBirimi} = ${formatFiyat(birimGelir / val.fiyat, 1)} m²`;
           return (
             <Kart key={k} renk={val.renk} onClick={() => setVarlik(k)}>
               <div style={{ fontSize: 16, marginBottom: 4 }}>{val.ikon}</div>
@@ -175,12 +177,13 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             <CartesianGrid stroke="#142018" strokeDasharray="4 4" vertical={false} />
             <XAxis dataKey="y" tick={{ fill: C.mut, fontSize: 9 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: C.mut, fontSize: 9 }} axisLine={false} tickLine={false} />
-            <Tooltip content={<TT sfx={` ${miktarBirimi}`} />} />
+            {/* 3.6: hover'daki gri bant (varsayılan cursor) kaldırıldı — ikinci bar gibi okunuyordu */}
+          <Tooltip content={<TT sfx={` ${miktarBirimi}`} />} cursor={{ fill: "transparent" }} />
             <Bar dataKey="deger" fill={v.renk} radius={[4, 4, 0, 0]} name={miktarBirimi} />
           </BarChart>
         </ResponsiveContainer>
         <div style={{ fontSize: 8, color: C.mut, marginTop: 8 }}>
-          Güncel ürün fiyatı canlı (Supabase) · Varlık fiyatları Konya referans serisi (TÜİK/manuel)
+          Güncel ürün fiyatı canlı borsa verisidir (TOBB/ESK) · Varlık fiyatları Konya referans serisi (TÜİK/manuel)
         </div>
       </div>
     </div>
