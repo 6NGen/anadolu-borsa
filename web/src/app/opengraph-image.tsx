@@ -17,7 +17,7 @@ export default async function Image() {
         <div style={{ display: "flex", fontSize: 76, fontWeight: 700, color: C.yesil, letterSpacing: 8 }}>{SITE_AD}</div>
         <div style={{ display: "flex", fontSize: 28, color: C.txt }}>Türkiye Tarım &amp; Hayvancılık Fiyat Platformu</div>
         <div style={{ display: "flex", fontSize: 22, color: C.mut, border: `2px solid ${C.brd}`, borderRadius: 14, padding: "14px 28px", gap: 22 }}>
-          <div style={{ display: "flex" }}>TOBB · ESK · KTB canlı verisi</div>
+          <div style={{ display: "flex" }}>TOBB · ESK · USK canlı verisi</div>
           <div style={{ display: "flex" }}>·</div>
           <div style={{ display: "flex" }}>Parite endeksi · Günlük güncel</div>
         </div>

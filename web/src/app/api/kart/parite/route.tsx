@@ -21,7 +21,7 @@ export async function GET(request: Request) {
   }
   const { tanim, urun, mazot, parite } = veri;
   const birimKisa = tanim.birim.replace("TL/", "");
-  const kaynakTemiz = urun.kaynak.replace("_SUT", ""); // ESK_SUT → ESK (teknik kod kullanıcıya gösterilmez)
+  const kaynakTemiz = urun.kaynak.replace("_SUT", ""); // eski ESK_SUT kayıtları → ESK (yeni süt kayıtları zaten "USK")
 
   return new ImageResponse(
     (

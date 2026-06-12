@@ -7,6 +7,7 @@ Not: SUPABASE_URL ve SUPABASE_SERVICE_KEY ikisi de Secrets'ta tanimli olmali.
 """
 
 import json
+import re
 import time
 import os
 from datetime import datetime, timezone, timedelta
@@ -354,59 +355,96 @@ def esk_karkas_scrape() -> list:
         return []
 
 
-# --- ESK SCRAPER (Cig Sut) ---
-ESK_SUT_URLS = [
-    "https://www.esk.gov.tr/tr/11932/Cig-Sut-Alim-Fiyatlari",
-    "https://www.esk.gov.tr/tr/Hizmetler/Cig-Sut-Alim-Fiyatlari",
-    "https://www.esk.gov.tr/tr/11861/Fiyatlarimiz",
-    "https://www.esk.gov.tr/tr/Hizmetler",
-]
+# --- USK SCRAPER (Cig Sut Tavsiye Fiyati) ---
+# ESK cig sut sayfalarini yayindan kaldirdi (2026-06 itibariyla hepsi 404).
+# Resmi referans: Ulusal Sut Konseyi (USK) cig sut tavsiye fiyati duyurulari.
+# Fiyat donemseldir (yilda 2-3 kez belirlenir); gunluk calisma o gun gecerli
+# degeri yeniden yazar — tazelik rozeti ve tarihsel seri icin istenen davranis.
+USK_SITE = "https://ulusalsutkonseyi.org.tr"
+USK_KATEGORI_URL = f"{USK_SITE}/kategori/cig-sut-fiyatlari/"
+SUT_FIYAT_SINIR = (5.0, 200.0)  # TL/litre
 
-def _sut_fiyat_bul(soup) -> float | None:
-    """Herhangi bir HTML yapısından süt fiyatı çıkar."""
-    # 1. Tablo yaklaşımı
-    for tablo in soup.find_all("table"):
-        for satir in tablo.find_all("tr"):
-            metin = satir.get_text(" ", strip=True).lower()
-            if "süt" in metin or "sut" in metin or "litre" in metin:
-                tds = satir.find_all("td")
-                for td in reversed(tds):
-                    f = parse_fiyat(td.get_text(strip=True))
-                    if f and 5 < f < 200:
-                        return f
-    # 2. Serbest metin: "X TL/litre" veya "litre: X"
-    import re
-    metin = soup.get_text(" ")
+
+def _usk_fiyat_ayikla(metin: str) -> float | None:
+    """USK duyuru metninden tavsiye fiyatini cikar.
+
+    Ornek duyuru cumlesi: "...cig inek sutu tavsiye satis fiyati ureticinin
+    eline litre basina net gececek sekilde (cig sut destegi haric) 24,30 TL
+    olarak oy birligi ile belirlenmistir."
+    """
+    duz = normalize(metin)  # buyuk harf + TR karakter sadelestirme
     for pat in [
-        r"[çc]i[gğ]\s*s[üu]t[^\d]{0,30}(\d{1,3}[,\.]\d{1,4})\s*(?:TL|tl)",
-        r"(\d{1,3}[,\.]\d{1,4})\s*TL\s*/\s*litre",
-        r"litre\s*[:\-]?\s*(\d{1,3}[,\.]\d{1,4})",
+        r"TAVSIYE\s+(?:SATIS\s+)?FIYATI[^0-9]{0,250}?(\d{1,3},\d{1,4})\s*TL",
+        r"(\d{1,3},\d{1,4})\s*TL\s+OLARAK",
+        r"LITRE[^0-9]{0,100}?(\d{1,3},\d{1,4})\s*TL",
     ]:
-        m = re.search(pat, metin, re.IGNORECASE)
+        m = re.search(pat, duz)
         if m:
-            f = parse_fiyat(m.group(1))
-            if f and 5 < f < 200:
+            f = sinirla(parse_fiyat(m.group(1)), SUT_FIYAT_SINIR)
+            if f:
                 return f
     return None
 
 
-def esk_sut_scrape() -> list:
+def _usk_tablo_fiyat(soup) -> float | None:
+    """Yillik fiyat sayfasindaki donem tablosundan guncel fiyati cek.
+
+    Tablo yapisi: DONEM | CIG INEK SUTU TAVSIYE FIYATI (TL/Lt) | ...
+    Satirlar kronolojik; en alttaki (acik uclu donem) gecerli fiyattir.
+    """
+    for tablo in soup.find_all("table"):
+        satirlar = tablo.find_all("tr")
+        if not satirlar:
+            continue
+        baslik = [normalize(b.get_text(" ", strip=True)) for b in satirlar[0].find_all(["td", "th"])]
+        fiyat_idx = next((i for i, b in enumerate(baslik) if "TAVSIYE FIYATI" in b), None)
+        if fiyat_idx is None:
+            continue
+        son = None
+        for tr in satirlar[1:]:
+            h = [td.get_text(" ", strip=True) for td in tr.find_all(["td", "th"])]
+            if len(h) <= fiyat_idx:
+                continue
+            f = sinirla(parse_fiyat(h[fiyat_idx]), SUT_FIYAT_SINIR)
+            if f:
+                son = f
+        if son:
+            return son
+    return None
+
+
+def usk_sut_scrape() -> list:
     """Parite hesabi icin ZORUNLU. SUT norm kodu ile hayvan_fiyat_snapshot'a yazilir."""
     headers = {"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"}
+    try:
+        resp = requests.get(USK_KATEGORI_URL, headers=headers, timeout=20)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
 
-    # 1. requests ile dene
-    for url in ESK_SUT_URLS:
-        try:
-            resp = requests.get(url, headers=headers, timeout=15)
-            if resp.status_code != 200:
+        # Kategori sayfasinda en yeni yil/duyuru sayfalari ustte; sirayi koruyarak topla
+        linkler: list[str] = []
+        for a in soup.find_all("a", href=True):
+            href = a["href"]
+            if "tavsiye-fiyat" not in href:
                 continue
-            resp.encoding = "utf-8"
-            soup = BeautifulSoup(resp.text, "html.parser")
-            fiyat = _sut_fiyat_bul(soup)
+            if href.startswith("/"):
+                href = USK_SITE + href
+            if href not in linkler:
+                linkler.append(href)
+
+        for link in linkler[:3]:
+            try:
+                r = requests.get(link, headers=headers, timeout=20)
+                r.raise_for_status()
+                sayfa = BeautifulSoup(r.text, "html.parser")
+                # 1) donem tablosu (yillik sayfalar), 2) duyuru cumlesi (haber sayfalari)
+                fiyat = _usk_tablo_fiyat(sayfa) or _usk_fiyat_ayikla(sayfa.get_text(" ", strip=True))
+            except Exception:
+                continue
             if fiyat:
                 kayit = [{
-                    "kaynak":         "ESK_SUT",
-                    "hayvan":         "Cig Sut",
+                    "kaynak":         "USK",
+                    "hayvan":         "Cig Sut (USK tavsiye)",
                     "hayvan_norm":    "SUT",
                     "kategori":       "sut",
                     "bolge":          None,
@@ -414,49 +452,16 @@ def esk_sut_scrape() -> list:
                     "birim":          "TL/litre",
                     "cekilme_tarihi": bugun_tr(),
                 }]
-                log_yaz("ESK_SUT", "basarili", 1)
-                print(f"[OK] ESK sut ({url}): {fiyat} TL/litre")
+                log_yaz("USK_SUT", "basarili", 1)
+                print(f"[OK] USK sut ({link}): {fiyat} TL/litre")
                 return kayit
-        except Exception:
-            continue
 
-    # 2. Playwright ile dene
-    try:
-        from playwright.sync_api import sync_playwright
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            pg = browser.new_page()
-            for url in ESK_SUT_URLS:
-                try:
-                    pg.goto(url, timeout=20000)
-                    pg.wait_for_load_state("networkidle", timeout=10000)
-                    soup = BeautifulSoup(pg.content(), "html.parser")
-                    fiyat = _sut_fiyat_bul(soup)
-                    if fiyat:
-                        browser.close()
-                        kayit = [{
-                            "kaynak":         "ESK_SUT",
-                            "hayvan":         "Cig Sut",
-                            "hayvan_norm":    "SUT",
-                            "kategori":       "sut",
-                            "bolge":          None,
-                            "fiyat":          fiyat,
-                            "birim":          "TL/litre",
-                            "cekilme_tarihi": bugun_tr(),
-                        }]
-                        log_yaz("ESK_SUT", "basarili", 1)
-                        print(f"[OK] ESK sut (Playwright): {fiyat} TL/litre")
-                        return kayit
-                except Exception:
-                    continue
-            browser.close()
-    except ImportError:
-        pass
-
-    log_yaz("ESK_SUT", "hata", hata="Sut fiyati bulunamadi (tum URL'ler denendi)")
-    fallback_kontrol("ESK_SUT")
-    print("[HATA] ESK sut: fiyat bulunamadi")
-    return []
+        raise ValueError(f"duyurularda fiyat bulunamadi ({len(linkler)} link denendi)")
+    except Exception as e:
+        log_yaz("USK_SUT", "hata", hata=e)
+        fallback_kontrol("USK_SUT")
+        print(f"[HATA] USK sut: {e}")
+        return []
 
 
 # --- UKON SCRAPER ---
@@ -580,7 +585,7 @@ def main():
     hayvan_veriler = []
     hayvan_veriler.extend(esk_karkas_scrape())
     time.sleep(1)
-    hayvan_veriler.extend(esk_sut_scrape())
+    hayvan_veriler.extend(usk_sut_scrape())
     time.sleep(1)
     hayvan_veriler.extend(ukon_scrape())
     if hayvan_veriler:

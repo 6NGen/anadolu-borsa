@@ -367,7 +367,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
       </div>
 
       <div style={{ fontSize: 8, color: "#2A4030", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>
-        Güncel fiyatlar canlı borsa verisidir (TOBB/KTB hububat · ESK süt-karkas) — kaynak ve tarih her kartta yazar.<br />
+        Güncel fiyatlar canlı borsa verisidir (TOBB/KTB hububat · ESK karkas · USK çiğ süt) — kaynak ve tarih her kartta yazar.<br />
         Tarihsel ürün serileri TÜİK tahminidir · Elektrik tahmini (yakında canlı).
       </div>
     </div>

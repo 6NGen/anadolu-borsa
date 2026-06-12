@@ -97,3 +97,56 @@ class TestUrunNormBul:
     ])
     def test_eslesme(self, ad, beklenen):
         assert urun_norm_bul(ad) == beklenen
+
+
+class TestUskFiyatAyikla:
+    """USK cig sut tavsiye fiyati duyuru metni ayiklamasi."""
+
+    def test_gercek_duyuru_cumlesi(self):
+        # 2026 Mayis duyurusundan gercek cumle (sadelestirilmis)
+        from scraper import _usk_fiyat_ayikla
+        metin = ("%3,6 yağlı, %3,2 proteinli çiğ inek sütü tavsiye satış fiyatı "
+                 "üreticinin eline litre başına net geçecek şekilde "
+                 "(çiğ süt desteği hariç) 24,30 TL olarak oy birliği ile belirlenmiştir.")
+        assert _usk_fiyat_ayikla(metin) == pytest.approx(24.30)
+
+    def test_tavsiye_fiyati_kalibi(self):
+        from scraper import _usk_fiyat_ayikla
+        assert _usk_fiyat_ayikla("Çiğ süt tavsiye fiyatı 22,22 TL olarak açıklandı.") == pytest.approx(22.22)
+
+    def test_litre_kalibi(self):
+        from scraper import _usk_fiyat_ayikla
+        assert _usk_fiyat_ayikla("1 litre çiğ süt için 19,60 TL ödenecek.") == pytest.approx(19.60)
+
+    def test_fiyatsiz_metin(self):
+        from scraper import _usk_fiyat_ayikla
+        assert _usk_fiyat_ayikla("Ulusal Süt Konseyi yönetim kurulu toplandı.") is None
+
+    def test_sinir_disi_deger_reddedilir(self):
+        from scraper import _usk_fiyat_ayikla
+        # 1,50 TL gibi absurt dusuk deger SUT_FIYAT_SINIR disinda kalir
+        assert _usk_fiyat_ayikla("tavsiye fiyatı 1,50 TL olarak") is None
+
+
+class TestUskTabloFiyat:
+    """USK yillik sayfa donem tablosu: en alttaki (acik uclu) donem gecerli."""
+
+    HTML = """
+    <table>
+      <tr><th>DÖNEM</th><th>ÇİĞ İNEK SÜTÜ TAVSİYE FİYATI (TL/Lt)*</th><th>Fark</th></tr>
+      <tr><td>1 Ocak 2026 – 21 Ocak 2026</td><td>19,60</td><td>± 29 Kuruş</td></tr>
+      <tr><td>22 Ocak 2026 – 30 Nisan 2026</td><td>22,22</td><td>± 33 Kuruş</td></tr>
+      <tr><td>1 Mayıs 2026 –</td><td>24,30</td><td>± 36 Kuruş</td></tr>
+    </table>"""
+
+    def test_son_donem_secilir(self):
+        from bs4 import BeautifulSoup
+        from scraper import _usk_tablo_fiyat
+        soup = BeautifulSoup(self.HTML, "html.parser")
+        assert _usk_tablo_fiyat(soup) == pytest.approx(24.30)
+
+    def test_tavsiye_kolonu_olmayan_tablo(self):
+        from bs4 import BeautifulSoup
+        from scraper import _usk_tablo_fiyat
+        soup = BeautifulSoup("<table><tr><th>AD</th></tr><tr><td>X</td></tr></table>", "html.parser")
+        assert _usk_tablo_fiyat(soup) is None
