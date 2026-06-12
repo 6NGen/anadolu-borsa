@@ -107,10 +107,10 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
 
   const paylasMetni = `${G.ikon} ${G.ad} / ${U.ikon} ${U.ad} paritesi\nBugün: 1 ${G.birim.replace("TL/", "")} ${G.ad.toLowerCase()} = ${formatFiyat(guncel, 2)} ${U.birim.replace("TL/", "")} ${U.ad.toLowerCase()}\n${U.kaynak ?? ""} · ${kisaTarih(U.tarih)}\nhttps://borsanadolu.6ngen.com/parite`;
 
-  const handlePaylas = useCallback((kanal: "whatsapp" | "twitter" | "png") => {
+  const handlePaylas = useCallback((kanal: "whatsapp" | "x" | "png") => {
     const metin = encodeURIComponent(paylasMetni);
     if (kanal === "whatsapp") window.open(`https://wa.me/?text=${metin}`, "_blank");
-    else if (kanal === "twitter") window.open(`https://twitter.com/intent/tweet?text=${metin}`, "_blank");
+    else if (kanal === "x") window.open(`https://x.com/intent/post?text=${metin}`, "_blank");
     // PNG: sunucuda üretilen 1080×1080 canlı kart (api/kart/parite)
     else window.open(`/api/kart/parite?urun=${urun}`, "_blank");
   }, [paylasMetni, urun]);
@@ -357,7 +357,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
           <span style={{ color: C.mut, fontSize: 10 }}>{U.kaynak} · {kisaTarih(U.tarih)} · borsanadolu.6ngen.com/parite</span>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {([["📱 WhatsApp", "#25D366", "whatsapp"], ["🐦 Twitter", "#1DA1F2", "twitter"], ["📷 PNG İndir", "#E86040", "png"]] as const).map(([lbl, renk, kanal]) => (
+          {([["📱 WhatsApp", "#25D366", "whatsapp"], ["𝕏 X", "#E7E9EA", "x"], ["📷 PNG İndir", "#E86040", "png"]] as const).map(([lbl, renk, kanal]) => (
             <button key={lbl} onClick={() => handlePaylas(kanal)} style={{
               background: "transparent", border: `1px solid ${renk}`, color: renk,
               padding: "8px 18px", borderRadius: 20, cursor: "pointer", fontSize: 11, fontFamily: "monospace",

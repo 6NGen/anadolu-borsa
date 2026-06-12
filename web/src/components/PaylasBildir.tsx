@@ -25,9 +25,9 @@ export default function PaylasBildir({ children, baslik }: Props) {
     a.click();
   }
 
-  function twitterPaylas() {
+  function xPaylas() {
     const text = encodeURIComponent(`${baslik} | Anadolu Borsa — anadoluborsa.com`);
-    window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
+    window.open(`https://x.com/intent/post?text=${text}`, "_blank");
   }
 
   function whatsappPaylas() {
@@ -47,8 +47,8 @@ export default function PaylasBildir({ children, baslik }: Props) {
         <button onClick={whatsappPaylas} style={{ flex: 1, padding: "7px", fontSize: "11px", background: "#25D366", color: "#fff", border: "none", borderRadius: "3px", cursor: "pointer" }}>
           WhatsApp
         </button>
-        <button onClick={twitterPaylas} style={{ flex: 1, padding: "7px", fontSize: "11px", background: "#1DA1F2", color: "#fff", border: "none", borderRadius: "3px", cursor: "pointer" }}>
-          Twitter
+        <button onClick={xPaylas} style={{ flex: 1, padding: "7px", fontSize: "11px", background: "#000", color: "#E7E9EA", border: `1px solid ${RENKLER.border}`, borderRadius: "3px", cursor: "pointer" }}>
+          𝕏 X
         </button>
         <button onClick={indir} style={{ flex: 1, padding: "7px", fontSize: "11px", background: RENKLER.surface, color: RENKLER.text, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", cursor: "pointer" }}>
           İndir

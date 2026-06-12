@@ -1,4 +1,4 @@
-// Kök OG görseli: link önizlemesi (WhatsApp/Twitter) — marka kartı.
+// Kök OG görseli: link önizlemesi (WhatsApp/X) — marka kartı.
 import { ImageResponse } from "next/og";
 import { ogFontConfig } from "@/lib/og-font";
 import { SITE_AD } from "@/lib/urun-tanim";
