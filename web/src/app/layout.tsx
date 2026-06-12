@@ -15,6 +15,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://borsanadolu.6ngen.com"),
   title: "Anadolu Borsa — Türkiye Tarım ve Hayvancılık Fiyatları",
   description: "Güncel tarım ürünleri ve hayvancılık fiyatları. TOBB, KTB, ESK verileri. Günlük güncellenir.",
 };

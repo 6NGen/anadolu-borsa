@@ -105,14 +105,15 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
     deg: +((d.p - hist[i].p) / hist[i].p * 100).toFixed(1),
   }));
 
-  const paylasMetni = `${G.ikon} ${G.ad} / ${U.ikon} ${U.ad} paritesi\nBugün: 1 ${G.birim.replace("TL/", "")} ${G.ad.toLowerCase()} = ${formatFiyat(guncel, 2)} ${U.birim.replace("TL/", "")} ${U.ad.toLowerCase()}\n${U.kaynak ?? ""} · ${kisaTarih(U.tarih)}\nanadoluborsa.com/parite`;
+  const paylasMetni = `${G.ikon} ${G.ad} / ${U.ikon} ${U.ad} paritesi\nBugün: 1 ${G.birim.replace("TL/", "")} ${G.ad.toLowerCase()} = ${formatFiyat(guncel, 2)} ${U.birim.replace("TL/", "")} ${U.ad.toLowerCase()}\n${U.kaynak ?? ""} · ${kisaTarih(U.tarih)}\nhttps://borsanadolu.6ngen.com/parite`;
 
   const handlePaylas = useCallback((kanal: "whatsapp" | "twitter" | "png") => {
     const metin = encodeURIComponent(paylasMetni);
     if (kanal === "whatsapp") window.open(`https://wa.me/?text=${metin}`, "_blank");
     else if (kanal === "twitter") window.open(`https://twitter.com/intent/tweet?text=${metin}`, "_blank");
-    else alert("PNG indirme yakında.\n\n" + paylasMetni);
-  }, [paylasMetni]);
+    // PNG: sunucuda üretilen 1080×1080 canlı kart (api/kart/parite)
+    else window.open(`/api/kart/parite?urun=${urun}`, "_blank");
+  }, [paylasMetni, urun]);
 
   const aktifGirdiler = Object.entries(girdiler).filter(([, v]) => v.aktif);
   const canliUrunler = Object.entries(urunler).filter(([, v]) => v.canli);
@@ -353,7 +354,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
           <div style={{ fontSize: 9, color: C.mut, marginBottom: 6, letterSpacing: 2 }}>ÖNİZLEME</div>
           <span style={{ color: G.renk, fontWeight: 700 }}>{G.ikon} {G.ad} / {U.ikon} {U.ad}</span><br />
           <span style={{ color: C.txt }}>1 {G.birim.replace("TL/", "")} {G.ad.toLowerCase()} = <b style={{ color: G.renk }}>{formatFiyat(guncel, 2)}</b> {U.birim.replace("TL/", "")} {U.ad.toLowerCase()}</span><br />
-          <span style={{ color: C.mut, fontSize: 10 }}>{U.kaynak} · {kisaTarih(U.tarih)} · anadoluborsa.com/parite</span>
+          <span style={{ color: C.mut, fontSize: 10 }}>{U.kaynak} · {kisaTarih(U.tarih)} · borsanadolu.6ngen.com/parite</span>
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {([["📱 WhatsApp", "#25D366", "whatsapp"], ["🐦 Twitter", "#1DA1F2", "twitter"], ["📷 PNG İndir", "#E86040", "png"]] as const).map(([lbl, renk, kanal]) => (
