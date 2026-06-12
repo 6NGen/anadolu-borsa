@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase";
 import { YEM_RENK, HAYVAN_RENK } from "@/lib/theme";
 import { KARKAS_KG, HAYVAN_AD, karkasLabel } from "@/lib/karkas";
 import HedefClient, { UrunItem, VarlikItem } from "@/components/HedefClient";
 
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "Hedef Hesabı — 1 Traktör Kaç Ton Arpa? | Anadolu Borsa",
+  description: "Güncel fiyatlarla hedef hesabı: traktör, araç ve diğer varlıklar kaç ton ürün ya da kaç baş hayvan ediyor?",
+};
 
 // Baş hesabında kullanılacak hayvanlar (karkas kg tek kaynaktan: lib/karkas)
 const HEDEF_HAYVANLAR = ["TOSUN", "INEK", "KUZU", "TOKLU", "KOYUN"];

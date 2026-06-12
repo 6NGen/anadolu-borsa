@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase";
 import TarimClient from "@/components/TarimClient";
 import PiyasaKarti from "@/components/PiyasaKarti";
 import { RENKLER } from "@/lib/theme";
 
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "Tarım Ürünleri Fiyatları — Arpa, Buğday, Mısır | Anadolu Borsa",
+  description: "Arpa, buğday, mısır ve diğer hububat fiyatları — TOBB ve KTB borsa verileri, son 30 gün grafikli. Günlük güncellenir.",
+};
 
 export default async function TarimPage() {
   const [{ data: sonFiyatlar }, { data: grafik }, { data: piyasa }] = await Promise.all([

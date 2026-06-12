@@ -17,8 +17,8 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://borsanadolu.6ngen.com"),
-  title: "Anadolu Borsa — Türkiye Tarım ve Hayvancılık Fiyatları",
-  description: "Güncel tarım ürünleri ve hayvancılık fiyatları. TOBB, KTB, ESK verileri. Günlük güncellenir.",
+  title: "Anadolu Borsa — Arpa, Buğday, Canlı Hayvan ve Süt Fiyatları",
+  description: "Arpa, buğday, canlı hayvan ve süt fiyatları — günlük, kaynaklı, tek ekranda. TOBB, KTB, ESK, USK verileri.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

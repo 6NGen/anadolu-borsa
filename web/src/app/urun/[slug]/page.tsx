@@ -12,9 +12,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const norm = slug.toUpperCase();
   const { data } = await supabaseServer.from("son_fiyatlar").select("*").eq("urun_norm", norm).single();
   if (!data) return { title: "Anadolu Borsa" };
+  // SEO M6: fiyat başlıkta — arama sonucunda görünür, revalidate ile günlük tazelenir
   return {
-    title: `${data.urun_ad} Fiyatı ${new Date().getFullYear()} | Anadolu Borsa`,
-    description: `Güncel ${data.urun_ad} fiyatı: ${formatFiyat(data.ortalama)} TL/kg. Konya Ticaret Borsası ve TOBB verisi. Günlük güncellenir.`,
+    title: `${data.urun_ad} Fiyatı Bugün — ${formatFiyat(data.ortalama)} ₺/kg | Anadolu Borsa`,
+    description: `Güncel ${data.urun_ad} fiyatı: ${formatFiyat(data.ortalama)} TL/kg (${data.borsa}, ${data.cekilme_tarihi}). TOBB ve Konya Ticaret Borsası verisi. Günlük güncellenir.`,
     openGraph: {
       title: `${data.urun_ad} Fiyatı`,
       description: `${formatFiyat(data.ortalama)} TL/kg — ${data.cekilme_tarihi}`,
@@ -50,8 +51,30 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
     );
   }
 
+  // SEO M6: schema.org Product+Offer (JSON-LD) — ürün adı, güncel fiyat, tarih, kaynak.
+  // Yalnız canlı fiyat varsa basılır; tahmini değerle yapılandırılmış veri üretilmez.
+  const jsonLd = guncel?.ortalama != null && {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: `${guncel.urun_ad ?? norm} (borsa fiyatı)`,
+    description: `Güncel ${guncel.urun_ad ?? norm} borsa fiyatı — kaynak: ${guncel.borsa}`,
+    url: `https://borsanadolu.6ngen.com/urun/${slug}`,
+    offers: {
+      "@type": "Offer",
+      price: Number(guncel.ortalama),
+      priceCurrency: "TRY",
+      availability: "https://schema.org/InStock",
+    },
+  };
+
   return (
     <main style={{ maxWidth: "900px", margin: "32px auto", padding: "16px" }}>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+        />
+      )}
       {/* Breadcrumb */}
       <div style={{ fontSize: "10px", color: RENKLER.muted, marginBottom: "16px" }}>
         Anadolu Borsa / {meta?.kategori ?? "ürün"} / {norm}

@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase";
 import { enGuncelYem, enGuncelHayvan, distinctGun, gunlukSeri } from "@/lib/guncel";
 import PariteClient, { Girdi, Urun } from "@/components/PariteClient";
 
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "Mazot / Süt Paritesi — 1 Litre Motorin Kaç Litre Süt? | Anadolu Borsa",
+  description: "Çiftçi satın alma gücü endeksi: 1 litre motorin kaç litre çiğ süt, kaç kg arpa ediyor? Günlük, kaynaklı parite.",
+};
 
 // Ürün TARİHSEL serileri TÜİK tahminidir (DB'de geçmiş ürün fiyatı yok);
 // GÜNCEL fiyatlar her zaman canlı DB'den gelir (son_30_gun / son_30_gun_hayvan).
