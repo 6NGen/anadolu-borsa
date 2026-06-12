@@ -17,5 +17,11 @@ export const PARITE_URUNLER: Record<string, UrunTanim> = {
   misir:  { ad: "Mısır",   ikon: "🌽", renk: "#E8C040", birim: "TL/kg",    norm: "MISIR",  tip: "yem" },
 };
 
+// Yem normları için Türkçe görünen ad (fiyat kartı vb. — norm büyük harf ASCII'dir)
+export const YEM_AD: Record<string, string> = {
+  ARPA: "Arpa", BUGDAY: "Buğday", MISIR: "Mısır", SAMAN: "Saman",
+  YONCA: "Yonca", YULAF: "Yulaf", CAVDAR: "Çavdar",
+};
+
 export const SITE_URL = "https://borsanadolu.6ngen.com";
 export const SITE_AD = "ANADOLU BORSA";

@@ -6,6 +6,7 @@ import { pariteKartVeri } from "@/lib/kart-veri";
 import { ogFontConfig } from "@/lib/og-font";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { SITE_AD } from "@/lib/urun-tanim";
+import { kartUretilebilir, gunFarki, BAYAT_ESIK_GUN } from "@/lib/tazelik";
 
 export const revalidate = 3600;
 
@@ -18,6 +19,13 @@ export async function GET(request: Request) {
   const veri = await pariteKartVeri(urunKey);
   if (!veri) {
     return Response.json({ error: "Ürün için canlı veri yok" }, { status: 404 });
+  }
+  // KARAR 2026-06-12: veri >ESIK gün bayatsa kart üretilmez (eşik = VeriTazelik ⚠ ile aynı)
+  if (!kartUretilebilir(veri.urun.tarih)) {
+    return Response.json(
+      { error: `Veri bayat (${gunFarki(veri.urun.tarih)} gün önce) — kart üretilmiyor. Eşik: ${BAYAT_ESIK_GUN} gün.` },
+      { status: 409 }
+    );
   }
   const { tanim, urun, mazot, parite } = veri;
   const birimKisa = tanim.birim.replace("TL/", "");

@@ -5,6 +5,7 @@ import { pariteKartVeri } from "@/lib/kart-veri";
 import { ogFontConfig } from "@/lib/og-font";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { SITE_AD } from "@/lib/urun-tanim";
+import { kartUretilebilir } from "@/lib/tazelik";
 
 export const alt = "Mazot/Süt paritesi — Anadolu Borsa";
 export const size = { width: 1200, height: 630 };
@@ -17,8 +18,9 @@ export default async function Image() {
   const veri = await pariteKartVeri("sut");
   const fontlar = await ogFontConfig();
 
-  // Canlı veri yoksa marka kartına düş — asla statik sayı gösterme
-  if (!veri) {
+  // Canlı veri yoksa VEYA bayatsa (>ESIK gün, KARAR 2026-06-12) marka kartına düş —
+  // asla statik/bayat sayı gösterme (OG görseli 409 dönemez, fallback tek seçenek)
+  if (!veri || !kartUretilebilir(veri.urun.tarih)) {
     return new ImageResponse(
       (
         <div style={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center", background: C.bg, color: C.yesil, fontSize: 72, fontWeight: 700, fontFamily: "IBM Plex Mono", letterSpacing: 8 }}>

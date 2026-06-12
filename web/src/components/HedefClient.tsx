@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { formatFiyat } from "@/lib/format";
+import { kartUretilebilir } from "@/lib/tazelik";
+import PaylasButonlar from "./PaylasButonlar";
 
 export interface UrunItem {
   norm: string;
@@ -9,6 +11,7 @@ export interface UrunItem {
   renk: string;
   son: number;
   tip: "yem" | "hayvan";
+  tarih?: string | null;       // canlı fiyatın tarihi — kart bayatlık guard'ı
   karkasKg?: number;
   karkasLabel?: string;
 }
@@ -146,6 +149,14 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             )}
           </div>
           <div style={{ fontSize: 9, color: "#3A7040", marginTop: 8 }}>{aciklamaMetni} · {v.aciklama}</div>
+
+          {/* Paylaşım: "1 varlık = X ton/baş ürün" kartı — bayat veride PNG pasif (KARAR) */}
+          <div style={{ marginTop: 14 }}>
+            <PaylasButonlar
+              metin={`${v.ikon} 1 ${v.ad.toLowerCase()} = ${formatFiyat(v.fiyat / (u.son * olcek), hayvanMi ? 0 : 1)} ${miktarBirimi} ${u.ad.toLowerCase()}\n${u.ad} ${formatFiyat(u.son)} ₺/kg (canlı borsa)${hayvanMi ? ` · karkas ~${karkasKg} kg (tahmin)` : ""} · ${v.ad} ${formatFiyat(v.fiyat, 0)} ₺ (referans)\nhttps://borsanadolu.6ngen.com/hedef`}
+              pngUrl={kartUretilebilir(u.tarih) ? `/api/kart/hedef?urun=${u.norm}&varlik=${varlik}` : null}
+            />
+          </div>
         </div>
       </div>
 

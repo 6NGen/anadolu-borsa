@@ -1,8 +1,10 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { AreaChart, BarChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import { formatFiyat, kisaTarih } from "@/lib/format";
+import { kartUretilebilir } from "@/lib/tazelik";
 import VeriTazelik from "./VeriTazelik";
+import PaylasButonlar from "./PaylasButonlar";
 
 export interface Seri { y: string; f: number }
 export interface Girdi { ad: string; ikon: string; renk: string; birim: string; hist: Seri[]; guncel: number; aktif: boolean; tarih: string | null }
@@ -110,13 +112,8 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
 
   const paylasMetni = `${G.ikon} ${G.ad} / ${U.ikon} ${U.ad} paritesi\nBugün: 1 ${G.birim.replace("TL/", "")} ${G.ad.toLowerCase()} = ${formatFiyat(guncel, 2)} ${U.birim.replace("TL/", "")} ${U.ad.toLowerCase()}\n${U.kaynak ?? ""} · ${kisaTarih(U.tarih)}\nhttps://borsanadolu.6ngen.com/parite`;
 
-  const handlePaylas = useCallback((kanal: "whatsapp" | "x" | "png") => {
-    const metin = encodeURIComponent(paylasMetni);
-    if (kanal === "whatsapp") window.open(`https://wa.me/?text=${metin}`, "_blank");
-    else if (kanal === "x") window.open(`https://x.com/intent/post?text=${metin}`, "_blank");
-    // PNG: sunucuda üretilen 1080×1080 canlı kart (api/kart/parite)
-    else window.open(`/api/kart/parite?urun=${urun}`, "_blank");
-  }, [paylasMetni, urun]);
+  // KARAR 2026-06-12: veri >ESIK gün bayatsa PNG kart üretilmez — buton pasifleşir
+  const kartAktif = kartUretilebilir(U.tarih);
 
   const aktifGirdiler = Object.entries(girdiler).filter(([, v]) => v.aktif);
   const canliUrunler = Object.entries(urunler).filter(([, v]) => v.canli);
@@ -363,14 +360,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
           <span style={{ color: C.txt }}>1 {G.birim.replace("TL/", "")} {G.ad.toLowerCase()} = <b style={{ color: G.renk }}>{formatFiyat(guncel, 2)}</b> {U.birim.replace("TL/", "")} {U.ad.toLowerCase()}</span><br />
           <span style={{ color: C.mut, fontSize: 10 }}>{U.kaynak} · {kisaTarih(U.tarih)} · borsanadolu.6ngen.com/parite</span>
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {([["📱 WhatsApp", "#25D366", "whatsapp"], ["𝕏 X", "#E7E9EA", "x"], ["📷 PNG İndir", "#E86040", "png"]] as const).map(([lbl, renk, kanal]) => (
-            <button key={lbl} onClick={() => handlePaylas(kanal)} style={{
-              background: "transparent", border: `1px solid ${renk}`, color: renk,
-              padding: "8px 18px", borderRadius: 20, cursor: "pointer", fontSize: 11, fontFamily: "monospace",
-            }}>{lbl}</button>
-          ))}
-        </div>
+        <PaylasButonlar metin={paylasMetni} pngUrl={kartAktif ? `/api/kart/parite?urun=${urun}` : null} />
       </div>
 
       <div style={{ fontSize: 8, color: "#2A4030", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>

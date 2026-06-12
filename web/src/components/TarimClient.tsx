@@ -2,9 +2,11 @@
 import { useState } from "react";
 import FiyatGrafik from "./FiyatGrafik";
 import VeriTazelik from "./VeriTazelik";
+import PaylasButonlar from "./PaylasButonlar";
 import { YEM_RENK, RENKLER } from "@/lib/theme";
-import { formatFiyat } from "@/lib/format";
+import { formatFiyat, kisaTarih } from "@/lib/format";
 import { enGuncelYem, distinctGun } from "@/lib/guncel";
+import { kartUretilebilir } from "@/lib/tazelik";
 
 interface SonFiyat {
   urun_norm: string;
@@ -93,12 +95,21 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
 
       {/* Anlık fiyat — seçili borsanın en güncel değeri */}
       {guncelSatir && (
-        <div style={{ display: "flex", gap: "16px", alignItems: "baseline", marginBottom: "16px", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "36px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(guncelSatir.ortalama)}</span>
-          <span style={{ fontSize: "13px", color: RENKLER.muted }}>TL/KG</span>
-          <span style={{ fontSize: "11px", color: RENKLER.muted }}>{borsa} · {guncelSatir.cekilme_tarihi}</span>
-          <VeriTazelik tarih={guncelSatir.cekilme_tarihi} />
-        </div>
+        <>
+          <div style={{ display: "flex", gap: "16px", alignItems: "baseline", marginBottom: "10px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "36px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(guncelSatir.ortalama)}</span>
+            <span style={{ fontSize: "13px", color: RENKLER.muted }}>TL/KG</span>
+            <span style={{ fontSize: "11px", color: RENKLER.muted }}>{borsa} · {guncelSatir.cekilme_tarihi}</span>
+            <VeriTazelik tarih={guncelSatir.cekilme_tarihi} />
+          </div>
+          {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
+          <div style={{ marginBottom: "16px" }}>
+            <PaylasButonlar
+              metin={`🌾 ${sf?.urun_ad ?? secilen} ${formatFiyat(guncelSatir.ortalama)} TL/kg\n${borsa} · ${kisaTarih(guncelSatir.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/tarim`}
+              pngUrl={kartUretilebilir(guncelSatir.cekilme_tarihi) ? `/api/kart/fiyat?urun=${secilen}` : null}
+            />
+          </div>
+        </>
       )}
 
       {/* Grafik */}
