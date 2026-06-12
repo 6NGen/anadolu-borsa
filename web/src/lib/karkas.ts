@@ -1,7 +1,10 @@
 // Karkas ağırlıkları için TEK kaynak: hesap da dipnot da buradan okur.
-// TODO: TOSUN karkas kg doğrulanacak (225 mi 280 mi?) — kullanıcı karar verecek.
+// Karkas kg ırka/besiye göre 220-300 arası değişir; TOSUN için 250 orta değer
+// seçildi (ESK 1. Kalite ~250-260 bandı). Tahmin etiketi dipnotta her zaman var.
+// TODO(PART6): Sürü değeri hesaplayıcıda ağırlık KULLANICI AYARLI olacak —
+// "ortalama karkas: [250] kg" düzenlenebilir alan (auth'suz kişiselleştirme).
 export const KARKAS_KG: Record<string, number> = {
-  TOSUN: 225,
+  TOSUN: 250,
   DANA: 180,
   INEK: 250,
   MANDA: 250,
