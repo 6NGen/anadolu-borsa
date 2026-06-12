@@ -1,0 +1,26 @@
+name: Keepalive
+
+# GitHub, public repoda 60 gun commit olmazsa zamanlanmis workflow'lari
+# otomatik devre disi birakir -> scraper sessizce olur (alarm da olur).
+# Ayda 1 bos commit bu sayaci sifirlar.
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"   # her ayin 1'i, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bos commit at
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit --allow-empty -m "keepalive: scheduled workflows aktif kalsin [skip ci]"
+          git push
