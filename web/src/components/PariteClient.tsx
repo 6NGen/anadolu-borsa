@@ -5,7 +5,7 @@ import { formatFiyat, kisaTarih } from "@/lib/format";
 import VeriTazelik from "./VeriTazelik";
 
 export interface Seri { y: string; f: number }
-export interface Girdi { ad: string; ikon: string; renk: string; birim: string; hist: Seri[]; guncel: number; aktif: boolean }
+export interface Girdi { ad: string; ikon: string; renk: string; birim: string; hist: Seri[]; guncel: number; aktif: boolean; tarih: string | null }
 export interface Urun {
   ad: string; ikon: string; renk: string; birim: string;
   hist: Seri[];                 // TÜİK tahmini tarihsel seri (2026 ucu canlı)
@@ -105,6 +105,9 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
     deg: +((d.p - hist[i].p) / hist[i].p * 100).toFixed(1),
   }));
 
+  // M4: girdi (mazot) fiyatının yaşı — elle güncellendiği için 14+ günde uyarı gösterilir
+  const girdiGun = G.tarih ? Math.floor((Date.now() - new Date(G.tarih).getTime()) / 86400000) : null;
+
   const paylasMetni = `${G.ikon} ${G.ad} / ${U.ikon} ${U.ad} paritesi\nBugün: 1 ${G.birim.replace("TL/", "")} ${G.ad.toLowerCase()} = ${formatFiyat(guncel, 2)} ${U.birim.replace("TL/", "")} ${U.ad.toLowerCase()}\n${U.kaynak ?? ""} · ${kisaTarih(U.tarih)}\nhttps://borsanadolu.6ngen.com/parite`;
 
   const handlePaylas = useCallback((kanal: "whatsapp" | "x" | "png") => {
@@ -177,7 +180,11 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
               </div>
               {/* 1.1: hangi borsanın fiyatı kullanılıyorsa kaynak + tarih burada yazar */}
               <div style={{ fontSize: 10, color: "#3A7040", marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span>{G.ad}: {formatFiyat(G.guncel, 2)} {G.birim}</span>
+                <span>{G.ad}: {formatFiyat(G.guncel, 2)} {G.birim}{G.tarih ? ` · geçerlilik ${kisaTarih(G.tarih)}` : ""}</span>
+                {/* M4: mazot elle güncellenir — 14+ gün geçtiyse açıkça uyar */}
+                {girdiGun != null && girdiGun >= 14 && (
+                  <span style={{ color: "#E8C040" }}>⚠ {G.ad.toLowerCase()} fiyatı {girdiGun} gündür güncellenmedi — eski olabilir</span>
+                )}
                 <span>·</span>
                 <span>{U.ad}: {formatFiyat(U.guncel, 2)} {U.birim} · {U.kaynak} · {kisaTarih(U.tarih)}</span>
                 <VeriTazelik tarih={U.tarih} />

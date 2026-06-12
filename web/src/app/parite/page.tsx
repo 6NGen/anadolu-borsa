@@ -49,6 +49,8 @@ export default async function ParitePage() {
     .map((r) => ({ y: String(r.gecerlilik_tarihi).slice(0, 4), f: Number(r.fiyat) }));
   const mazotGuncel = mazotHist.at(-1)?.f ?? null;
   const mazotCanli = mazotHist.length > 1 && mazotGuncel != null;
+  // M4: geçerlilik tarihi UI'da gösterilir; 14+ gün eskiyse PariteClient uyarı basar
+  const mazotTarih = (mazotRows ?? []).at(-1)?.gecerlilik_tarihi ?? null;
 
   const girdiler: Record<string, Girdi> = {
     mazot: {
@@ -56,8 +58,9 @@ export default async function ParitePage() {
       hist: mazotCanli ? mazotHist : [],
       guncel: mazotGuncel ?? 0,
       aktif: mazotCanli,
+      tarih: mazotTarih ? String(mazotTarih) : null,
     },
-    elektrik: { ad: "Elektrik", ikon: "⚡", renk: "#E8C840", birim: "TL/kWh", hist: ELEKTRIK_HIST, guncel: 2.80, aktif: false },
+    elektrik: { ad: "Elektrik", ikon: "⚡", renk: "#E8C840", birim: "TL/kWh", hist: ELEKTRIK_HIST, guncel: 2.80, aktif: false, tarih: null },
   };
 
   const urunler: Record<string, Urun> = {};
