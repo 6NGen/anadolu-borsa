@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Syne } from "next/font/google";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const mono = IBM_Plex_Mono({
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ background: "#080E09", minHeight: "100vh" }}>
         <Nav />
         {children}
+        <Footer />
       </body>
     </html>
   );
