@@ -7,6 +7,7 @@ import { YEM_RENK, RENKLER } from "@/lib/theme";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { enGuncelYem, distinctGun } from "@/lib/guncel";
 import { kartUretilebilir } from "@/lib/tazelik";
+import { useBolgem, ilAscii } from "@/lib/bolgem";
 
 interface SonFiyat {
   urun_norm: string;
@@ -37,13 +38,16 @@ interface Props {
 export default function TarimClient({ sonFiyatlar, grafik }: Props) {
   const [secilen, setSecilen] = useState<string>(sonFiyatlar[0]?.urun_norm ?? "ARPA");
   const [borsaSecim, setBorsaSecim] = useState<string | null>(null);
+  const [bolgem] = useBolgem();
 
   // Seçili ürünün tüm satırları (30 gün, tüm borsalar)
   const urunSatirlari = grafik.filter((g) => g.urun_norm === secilen);
   const borsalar = [...new Set(urunSatirlari.map((g) => g.borsa))].sort();
 
-  // Varsayılan borsa: deterministik en güncel (parite sayfasıyla aynı kural → aynı sayı)
-  const varsayilanBorsa = enGuncelYem(urunSatirlari)?.kaynak ?? borsalar[0] ?? null;
+  // M1: kullanıcının bölgesinin borsası bu üründe varsa öne gelir.
+  // Yoksa deterministik en güncel (parite sayfasıyla aynı kural → aynı sayı).
+  const bolgeBorsa = bolgem ? borsalar.find((b) => b === ilAscii(bolgem)) ?? null : null;
+  const varsayilanBorsa = bolgeBorsa ?? enGuncelYem(urunSatirlari)?.kaynak ?? borsalar[0] ?? null;
   const borsa = borsaSecim && borsalar.includes(borsaSecim) ? borsaSecim : varsayilanBorsa;
 
   // 1.3: grafik SADECE seçili borsanın serisini çizer — borsalar karışmaz

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { RENKLER } from "@/lib/theme";
+import BolgemSecici from "./BolgemSecici";
 
 const LINKS = [
   { href: "/", label: "Anasayfa" },
@@ -41,8 +42,9 @@ export default function Nav() {
           })}
         </div>
 
-        {/* Sağ: CANLI + hamburger */}
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px" }}>
+        {/* Sağ: Bölgem + CANLI + hamburger */}
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "10px" }}>
+          <BolgemSecici />
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: RENKLER.pos, display: "inline-block", animation: "pulse 2s infinite" }} />
             <span className="hidden sm:inline" style={{ fontSize: "10px", color: RENKLER.muted }}>CANLI</span>

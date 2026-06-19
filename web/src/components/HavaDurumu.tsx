@@ -1,16 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { RENKLER } from "@/lib/theme";
-
-const ILLER: Record<string, { lat: number; lon: number }> = {
-  KONYA:     { lat: 37.87, lon: 32.49 },
-  ANKARA:    { lat: 39.92, lon: 32.85 },
-  IZMIR:     { lat: 38.41, lon: 27.13 },
-  ADANA:     { lat: 37.00, lon: 35.32 },
-  ESKISEHIR: { lat: 39.78, lon: 30.52 },
-  SAMSUN:    { lat: 41.29, lon: 36.33 },
-  BURSA:     { lat: 40.19, lon: 29.06 },
-};
+import { ILLER } from "@/lib/iller";
+import { IL_KOORDINAT } from "@/lib/il-koordinat";
+import { useBolgem } from "@/lib/bolgem";
 
 function weatherIcon(code: number): string {
   if (code === 0) return "☀";
@@ -32,12 +25,15 @@ interface DailyData {
 }
 
 export default function HavaDurumu() {
-  const [il, setIl] = useState("KONYA");
+  // İl, bölgem'den gelir (M1); seçimi değiştirmek bölgem'i günceller → tek kaynak.
+  // Koordinatı olmayan/null bölgem → KONYA varsayılan.
+  const [bolgem, setBolgem] = useBolgem();
+  const il = bolgem && IL_KOORDINAT[bolgem] ? bolgem : "KONYA";
   const [hava, setHava] = useState<DailyData | null>(null);
   const [yukleniyor, setYukleniyor] = useState(false);
 
   useEffect(() => {
-    const { lat, lon } = ILLER[il];
+    const { lat, lon } = IL_KOORDINAT[il];
     setYukleniyor(true);
     fetch(`/api/hava?lat=${lat}&lon=${lon}`)
       .then((r) => r.json())
@@ -52,10 +48,10 @@ export default function HavaDurumu() {
         <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em" }}>HAVA DURUMU</span>
         <select
           value={il}
-          onChange={(e) => setIl(e.target.value)}
+          onChange={(e) => setBolgem(e.target.value)}
           style={{ background: "#080E09", border: `1px solid ${RENKLER.border}`, color: RENKLER.text, fontSize: "10px", padding: "2px 6px", borderRadius: "3px", cursor: "pointer" }}
         >
-          {Object.keys(ILLER).map((k) => <option key={k} value={k}>{k}</option>)}
+          {ILLER.map((k) => <option key={k} value={k}>{k}</option>)}
         </select>
       </div>
 
