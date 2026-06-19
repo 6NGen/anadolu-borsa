@@ -78,6 +78,27 @@ export async function hedefKartVeri(normGirdi: string, varlikKey: string): Promi
   };
 }
 
+// --- Karşılaştırma kartı: RESMİ (borsa) vs PİYASA (kullanıcı bildirimi, min 3) ---
+export interface KarsilastirmaKartVeri {
+  urun: UrunKartVeri;                                  // borsa tarafı (canlı)
+  piyasa: { ortalama: number; bildirim: number; il: string };
+}
+
+export async function karsilastirmaKartVeri(normGirdi: string): Promise<KarsilastirmaKartVeri | null> {
+  const urun = await fiyatKartVeri(normGirdi);
+  if (!urun) return null;
+  // En çok bildirim alan il satırı en temsili — piyasa_fiyatlari zaten min 3 bildirim filtreli
+  const { data } = await supabaseServer
+    .from("piyasa_fiyatlari")
+    .select("urun_norm, il, agirlikli_ortalama, bildirim_sayisi")
+    .eq("urun_norm", urun.norm)
+    .order("bildirim_sayisi", { ascending: false })
+    .limit(1);
+  const p = data?.[0];
+  if (!p || p.agirlikli_ortalama == null) return null;
+  return { urun, piyasa: { ortalama: Number(p.agirlikli_ortalama), bildirim: Number(p.bildirim_sayisi), il: String(p.il) } };
+}
+
 export async function pariteKartVeri(urunKey: string): Promise<KartVeri | null> {
   const tanim = PARITE_URUNLER[urunKey];
   if (!tanim) return null;
