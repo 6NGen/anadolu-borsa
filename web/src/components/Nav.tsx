@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { RENKLER } from "@/lib/theme";
+import { useUser } from "@/lib/auth";
 import BolgemSecici from "./BolgemSecici";
 
 const LINKS = [
@@ -17,6 +18,7 @@ const LINKS = [
 export default function Nav() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const { user } = useUser();
   const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 
   return (
@@ -49,6 +51,10 @@ export default function Nav() {
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: RENKLER.pos, display: "inline-block", animation: "pulse 2s infinite" }} />
             <span className="hidden sm:inline" style={{ fontSize: "10px", color: RENKLER.muted }}>CANLI</span>
           </div>
+          {/* M2: giriş durumu — giriş yapılmışsa 👤, değilse Giriş linki */}
+          <Link href="/giris" title={user ? "Hesabım" : "Giriş yap"} style={{ fontSize: user ? "15px" : "11px", color: user ? RENKLER.text : RENKLER.green, textDecoration: "none", whiteSpace: "nowrap" }}>
+            {user ? "👤" : "Giriş"}
+          </Link>
           <button
             className="md:hidden"
             onClick={() => setOpen((o) => !o)}
