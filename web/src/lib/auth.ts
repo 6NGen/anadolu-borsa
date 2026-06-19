@@ -27,11 +27,11 @@ export async function cikisYap() {
   await supabase.auth.signOut();
 }
 
-// "0532...", "532...", "+90532..." → "+905XXXXXXXXX" (E.164); geçersizse null.
-export function telefonNormalize(ham: string): string | null {
-  let n = ham.replace(/\D/g, "");
-  if (n.startsWith("90")) n = n.slice(2);
-  if (n.startsWith("0")) n = n.slice(1);
-  if (n.length !== 10 || !n.startsWith("5")) return null;
-  return "+90" + n;
+// Google ile giriş — bedava. Supabase Dashboard'da Google provider açık olmalı.
+// Başarılı dönüşte detectSessionInUrl oturumu kurar, useUser yakalar.
+export async function googleGiris(donus = "/fiyat-bildir") {
+  await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: typeof window !== "undefined" ? window.location.origin + donus : undefined },
+  });
 }

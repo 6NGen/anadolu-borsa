@@ -25,15 +25,15 @@ export default function KvkkPage() {
 
       <h2 style={S.h2}>İŞLENEN VERİ</h2>
       <p style={S.p}>
-        Yalnızca <b>telefon numaranız</b>. Fiyat bildiriminde bulunduğunuzda girdiğiniz
-        ürün, il ve fiyat bilgileri topluluk ortalamasına katkı için tutulur; bu bilgiler
-        kimliğinizle birlikte kamuya gösterilmez.
+        Google ile giriş yaptığınızda hesabınızdan gelen <b>e-posta adresiniz</b> (ve görünen adınız).
+        Fiyat bildiriminde bulunduğunuzda girdiğiniz ürün, il ve fiyat bilgileri topluluk
+        ortalamasına katkı için tutulur; bu bilgiler kimliğinizle birlikte kamuya gösterilmez.
       </p>
 
       <h2 style={S.h2}>İŞLEME AMACI</h2>
       <p style={S.p}>
-        Telefon numarası yalnızca (1) tek kullanımlık kod (OTP) ile <b>kimlik doğrulama</b>
-        {" "}ve (2) kurduğunuz fiyat alarmlarına dair <b>bildirim gönderimi</b> amacıyla işlenir.
+        Hesap bilgileriniz yalnızca (1) <b>kimlik doğrulama</b> ve (2) kurduğunuz fiyat
+        alarmlarına dair <b>bildirim gönderimi</b> amacıyla işlenir.
         Pazarlama amacıyla kullanılmaz, üçüncü kişilerle paylaşılmaz, satılmaz.
       </p>
 
