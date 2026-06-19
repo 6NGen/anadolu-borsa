@@ -3,7 +3,7 @@ import { RENKLER } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni — Anadolu Borsa",
-  description: "Telefon numarası işleme amacı, saklama süresi ve silme talebi yöntemi.",
+  description: "Hesap bilgisi işleme amacı, saklama süresi ve silme talebi yöntemi.",
 };
 
 const S = {
@@ -39,8 +39,8 @@ export default function KvkkPage() {
 
       <h2 style={S.h2}>SAKLAMA SÜRESİ</h2>
       <p style={S.p}>
-        Hesabınız aktif olduğu sürece saklanır. Hesabınızı sildirdiğinizde telefon
-        numaranız ve hesabınıza bağlı kişisel veriler en geç 30 gün içinde kalıcı olarak silinir.
+        Hesabınız aktif olduğu sürece saklanır. Hesabınızı sildirdiğinizde e-posta
+        adresiniz ve hesabınıza bağlı kişisel veriler en geç 30 gün içinde kalıcı olarak silinir.
       </p>
 
       <h2 style={S.h2}>HAKLARINIZ VE SİLME TALEBİ</h2>

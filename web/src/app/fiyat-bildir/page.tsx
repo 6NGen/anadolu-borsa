@@ -122,7 +122,7 @@ export default function FiyatBildirPage() {
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Bulunduğun yerin gerçek piyasa fiyatını bildir.</p>
           <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "6px", lineHeight: 1.6 }}>Bildirimler topluluk ortalamasına katılır ve borsa fiyatıyla karşılaştırılır. En az 3 bildirim sonrası görünür.</p>
           <Link href="/giris" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: RENKLER.green, color: "#000", borderRadius: "3px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
-            Telefonla Giriş Yap
+            Google ile Giriş Yap
           </Link>
         </div>
       </main>
