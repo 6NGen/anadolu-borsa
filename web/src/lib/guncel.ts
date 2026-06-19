@@ -44,6 +44,30 @@ export function enGuncelHayvan(rows: HayvanSatir[]): GuncelFiyat | null {
   return { fiyat: r.fiyat!, kaynak: r.kaynak, tarih: r.cekilme_tarihi };
 }
 
+// son_hayvan_fiyatlari, her (kaynak, hayvan_norm) için bir satır döndürür
+// (view'da DISTINCT ON (kaynak, hayvan_norm)). Bir hayvanın kaynağı değişince
+// (ör. süt ESK_SUT → USK) eski kaynak da kalır → aynı hayvan iki kez listelenir
+// ve eski tarihli satır BAYAT fiyat gösterir. Burada hayvan_norm başına EN GÜNCEL
+// satıra indiriyoruz (tarih desc, eşitlikte kaynak adı alfabetik — deterministik,
+// enGuncelHayvan ile aynı kural). Not: aynı hayvanı birden çok CANLI kaynaktan
+// (ör. ESK + UKON) kıyaslamak istenirse bu birleştirme gözden geçirilmeli.
+export function tekHayvanKaynak<T extends { hayvan_norm: string; cekilme_tarihi: string; kaynak: string }>(
+  rows: T[]
+): T[] {
+  const enIyi = new Map<string, T>();
+  for (const r of rows) {
+    const v = enIyi.get(r.hayvan_norm);
+    if (
+      !v ||
+      r.cekilme_tarihi.localeCompare(v.cekilme_tarihi) > 0 ||
+      (r.cekilme_tarihi === v.cekilme_tarihi && r.kaynak.localeCompare(v.kaynak) < 0)
+    ) {
+      enIyi.set(r.hayvan_norm, r);
+    }
+  }
+  return [...enIyi.values()];
+}
+
 // 30 günlük pencerede kaç FARKLI gün veri var (satır sayısı değil!)
 export function distinctGun(rows: { cekilme_tarihi: string }[]): number {
   return new Set(rows.map((r) => r.cekilme_tarihi.slice(0, 10))).size;

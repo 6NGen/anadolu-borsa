@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase";
 import HayvanClient from "@/components/HayvanClient";
 import SuruDegeri from "@/components/SuruDegeri";
+import { tekHayvanKaynak } from "@/lib/guncel";
 import { RENKLER } from "@/lib/theme";
 
 export const revalidate = 3600;
@@ -12,10 +13,14 @@ export const metadata: Metadata = {
 };
 
 export default async function HayvanPage() {
-  const [{ data: fiyatlar }, { data: grafik }] = await Promise.all([
+  const [{ data: fiyatlarHam }, { data: grafik }] = await Promise.all([
     supabaseServer.from("son_hayvan_fiyatlari").select("*").order("hayvan_norm"),
     supabaseServer.from("son_30_gun_hayvan").select("*").order("cekilme_tarihi"),
   ]);
+
+  // Kaynağı değişen hayvanın (süt: ESK_SUT → USK) eski bayat kaydını ele —
+  // hayvan_norm başına tek (en güncel) satır kalsın. Grafik ham seriyi kullanır.
+  const fiyatlar = tekHayvanKaynak(fiyatlarHam ?? []);
 
   return (
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
@@ -24,14 +29,14 @@ export default async function HayvanPage() {
         <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "4px" }}>ESK karkas alım fiyatları + Çiğ süt · Günlük güncellenir</p>
       </div>
 
-      {(fiyatlar ?? []).length === 0 ? (
+      {fiyatlar.length === 0 ? (
         <div style={{ padding: "40px", textAlign: "center", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
           Henüz veri yok. Scraper çalıştıktan sonra fiyatlar burada görünür.
         </div>
       ) : (
         <>
-          <HayvanClient fiyatlar={fiyatlar ?? []} grafik={grafik ?? []} />
-          <SuruDegeri fiyatlar={fiyatlar ?? []} />
+          <HayvanClient fiyatlar={fiyatlar} grafik={grafik ?? []} />
+          <SuruDegeri fiyatlar={fiyatlar} />
         </>
       )}
     </main>
