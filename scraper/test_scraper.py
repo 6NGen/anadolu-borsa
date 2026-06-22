@@ -150,3 +150,19 @@ class TestUskTabloFiyat:
         from scraper import _usk_tablo_fiyat
         soup = BeautifulSoup("<table><tr><th>AD</th></tr><tr><td>X</td></tr></table>", "html.parser")
         assert _usk_tablo_fiyat(soup) is None
+
+
+class TestAlarmTetik:
+    """Fiyat alarmı tetik koşulu (yön + eşik)."""
+
+    def test_yukari_esige_ulasinca(self):
+        from alarm import _tetik
+        assert _tetik("yukari", 16.0, 16.0) is True   # eşik = fiyat
+        assert _tetik("yukari", 16.5, 16.0) is True   # üstünde
+        assert _tetik("yukari", 15.9, 16.0) is False  # altında
+
+    def test_asagi_esige_inince(self):
+        from alarm import _tetik
+        assert _tetik("asagi", 14.0, 14.0) is True
+        assert _tetik("asagi", 13.5, 14.0) is True
+        assert _tetik("asagi", 14.1, 14.0) is False

@@ -597,6 +597,13 @@ def main():
     except Exception as e:
         print(f"[HATA] Hava durumu: {e}")
 
+    # FIYAT ALARMLARI (M6b) — fiyatlar yazildiktan sonra; asla scraper'i durdurmaz
+    try:
+        from alarm import alarmlari_kontrol_et
+        alarmlari_kontrol_et(get_supabase())
+    except Exception as e:
+        print(f"[HATA] Alarm kontrol: {e}")
+
     # YEDEK JSON
     tum = yem_veriler + hayvan_veriler
     Path(__file__).parent.joinpath("fiyatlar_yedek.json").write_text(
