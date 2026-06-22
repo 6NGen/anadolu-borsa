@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/parite", label: "Parite" },
   { href: "/hedef", label: "Hedef" },
   { href: "/fiyat-bildir", label: "Fiyat Bildir" },
+  { href: "/alarmlar", label: "Alarm" },
 ];
 
 export default function Nav() {
