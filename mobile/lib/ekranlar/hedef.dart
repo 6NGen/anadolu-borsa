@@ -40,9 +40,10 @@ class _HedefEkranState extends State<HedefEkran> {
     return FutureBuilder<List<Fiyat>>(
       future: _veri,
       builder: (context, snap) {
-        if (!snap.hasData) return const Center(child: CircularProgressIndicator(color: C.green));
-        final liste = snap.data!.where((f) => f.fiyat != null && f.fiyat! > 0).toList();
-        if (liste.isEmpty) return const Center(child: Text('Veri yok', style: TextStyle(color: C.muted)));
+        if (snap.connectionState == ConnectionState.waiting) return yukleniyor();
+        if (snap.hasError) return hataKutusu(snap.error);
+        final liste = (snap.data ?? []).where((f) => f.fiyat != null && f.fiyat! > 0).toList();
+        if (liste.isEmpty) return Center(child: Text('Veri yok', style: TextStyle(color: C.muted)));
         final urun = _urun ?? liste.first.norm;
         final f = liste.firstWhere((x) => x.norm == urun, orElse: () => liste.first);
         final hayvanMi = _karkas.containsKey(f.norm);
@@ -62,21 +63,18 @@ class _HedefEkranState extends State<HedefEkran> {
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: C.surface, borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF1A4028)),
-              ),
+              decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: C.green.withValues(alpha: 0.4))),
               child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                Text('1 $_varlik =', style: const TextStyle(color: C.muted, fontSize: 13)),
+                Text('1 $_varlik =', style: TextStyle(color: C.muted, fontSize: 13)),
                 const SizedBox(height: 8),
                 Text(formatFiyat(kacBirim, hayvanMi ? 0 : 1), style: const TextStyle(color: Color(0xFFE86040), fontSize: 52, fontWeight: FontWeight.bold, height: 1)),
-                Text('$birimAd ${f.ad.toLowerCase()}', style: const TextStyle(color: C.text, fontSize: 16)),
+                Text('$birimAd ${f.ad.toLowerCase()}', style: TextStyle(color: C.text, fontSize: 16)),
               ]),
             ),
             const SizedBox(height: 12),
             Text(
               '${f.ad} ${formatFiyat(f.fiyat)} ${f.birim} (canlı)${hayvanMi ? ' · karkas ~${_karkas[f.norm]} kg (tahmin)' : ''}\n$_varlik ${formatFiyat(varlikFiyat, 0)} ₺ (referans/tahmin)',
-              style: const TextStyle(color: C.muted, fontSize: 10, height: 1.5),
+              style: TextStyle(color: C.muted, fontSize: 10, height: 1.5),
             ),
           ],
         );

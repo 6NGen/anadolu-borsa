@@ -15,11 +15,13 @@ class _AnaEkranState extends State<AnaEkran> {
   @override
   void initState() {
     super.initState();
-    _veri = Future.wait([yemFiyatlari(), hayvanFiyatlari()]);
+    _veri = _getir();
   }
 
+  Future<List<List<Fiyat>>> _getir() => Future.wait([yemFiyatlari(), hayvanFiyatlari()]);
+
   Future<void> _yenile() async {
-    setState(() => _veri = Future.wait([yemFiyatlari(), hayvanFiyatlari()]));
+    setState(() => _veri = _getir());
     await _veri;
   }
 
@@ -28,16 +30,16 @@ class _AnaEkranState extends State<AnaEkran> {
     return FutureBuilder<List<List<Fiyat>>>(
       future: _veri,
       builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: C.green));
-        }
+        if (snap.connectionState == ConnectionState.waiting) return yukleniyor();
         if (snap.hasError) {
-          return Center(child: Text('Veri alınamadı.\n${snap.error}', textAlign: TextAlign.center, style: const TextStyle(color: C.muted)));
+          return RefreshIndicator(
+            color: C.green, backgroundColor: C.surface, onRefresh: _yenile,
+            child: ListView(children: [SizedBox(height: 200, child: hataKutusu(snap.error))]),
+          );
         }
         final yem = snap.data![0], hayvan = snap.data![1];
         return RefreshIndicator(
-          color: C.green, backgroundColor: C.surface,
-          onRefresh: _yenile,
+          color: C.green, backgroundColor: C.surface, onRefresh: _yenile,
           child: ListView(
             padding: const EdgeInsets.all(14),
             children: [
@@ -47,7 +49,7 @@ class _AnaEkranState extends State<AnaEkran> {
               bolumBaslik('HAYVAN FİYATLARI'),
               ...hayvan.map((f) => FiyatKarti(f)),
               const SizedBox(height: 20),
-              const Center(child: Text('Aşağı çekerek yenile · Günlük güncellenir', style: TextStyle(color: C.muted, fontSize: 10))),
+              Center(child: Text('Aşağı çekerek yenile · Günlük güncellenir', style: TextStyle(color: C.muted, fontSize: 10))),
             ],
           ),
         );

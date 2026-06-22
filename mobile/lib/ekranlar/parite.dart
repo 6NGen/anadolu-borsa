@@ -33,9 +33,10 @@ class _PariteEkranState extends State<PariteEkran> {
     return FutureBuilder<_PariteVeri>(
       future: _veri,
       builder: (context, snap) {
-        if (!snap.hasData) return const Center(child: CircularProgressIndicator(color: C.green));
+        if (snap.connectionState == ConnectionState.waiting) return yukleniyor();
+        if (snap.hasError) return hataKutusu(snap.error);
         final v = snap.data!;
-        if (v.mazot == null) return const Center(child: Text('Mazot verisi yok', style: TextStyle(color: C.muted)));
+        if (v.mazot == null) return Center(child: Text('Mazot verisi yok', style: TextStyle(color: C.muted)));
 
         return ListView(
           padding: const EdgeInsets.all(14),
@@ -47,7 +48,7 @@ class _PariteEkranState extends State<PariteEkran> {
               child: Row(children: [
                 const Text('⛽', style: TextStyle(fontSize: 22)),
                 const SizedBox(width: 8),
-                Expanded(child: Text('1 litre motorin = ${formatFiyat(v.mazot)} ₺', style: const TextStyle(color: C.text, fontSize: 13))),
+                Expanded(child: Text('1 litre motorin = ${formatFiyat(v.mazot)} ₺', style: TextStyle(color: C.text, fontSize: 13))),
               ]),
             ),
             const SizedBox(height: 14),
@@ -61,18 +62,18 @@ class _PariteEkranState extends State<PariteEkran> {
                 decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(6), border: Border.all(color: C.border)),
                 child: Row(children: [
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('1 litre motorin =', style: const TextStyle(color: C.muted, fontSize: 11)),
-                    Text('${f.ad.toLowerCase()} · ${formatFiyat(f.fiyat)} ${f.birim}', style: const TextStyle(color: C.muted, fontSize: 10)),
+                    Text('1 litre motorin =', style: TextStyle(color: C.muted, fontSize: 11)),
+                    Text('${f.ad.toLowerCase()} · ${formatFiyat(f.fiyat)} ${f.birim}', style: TextStyle(color: C.muted, fontSize: 10)),
                   ])),
                   Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                     Text(formatFiyat(parite), style: TextStyle(color: renk, fontSize: 26, fontWeight: FontWeight.bold)),
-                    Text(birimKisa, style: const TextStyle(color: C.muted, fontSize: 10)),
+                    Text(birimKisa, style: TextStyle(color: C.muted, fontSize: 10)),
                   ]),
                 ]),
               );
             }),
             const SizedBox(height: 8),
-            const Text('Parite = mazot fiyatı ÷ ürün fiyatı · kaynak her kartta', style: TextStyle(color: C.muted, fontSize: 10)),
+            Text('Parite = mazot fiyatı ÷ ürün fiyatı · kaynak her kartta', style: TextStyle(color: C.muted, fontSize: 10)),
           ],
         );
       },

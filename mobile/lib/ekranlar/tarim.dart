@@ -33,9 +33,10 @@ class _TarimEkranState extends State<TarimEkran> {
     return FutureBuilder<List<Fiyat>>(
       future: _liste,
       builder: (context, snap) {
-        if (!snap.hasData) return const Center(child: CircularProgressIndicator(color: C.green));
-        final liste = snap.data!;
-        if (liste.isEmpty) return const Center(child: Text('Veri yok', style: TextStyle(color: C.muted)));
+        if (snap.connectionState == ConnectionState.waiting) return yukleniyor();
+        if (snap.hasError) return hataKutusu(snap.error);
+        final liste = snap.data ?? [];
+        if (liste.isEmpty) return Center(child: Text('Veri yok', style: TextStyle(color: C.muted)));
         final secili = _secili ?? liste.first.norm;
         if (_secili == null) {
           WidgetsBinding.instance.addPostFrameCallback((_) => _sec(secili));
@@ -51,9 +52,9 @@ class _TarimEkranState extends State<TarimEkran> {
             Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
               Text(formatFiyat(f.fiyat), style: TextStyle(color: renk, fontSize: 40, fontWeight: FontWeight.bold, height: 1)),
               const SizedBox(width: 8),
-              Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(f.birim, style: const TextStyle(color: C.muted, fontSize: 13))),
+              Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(f.birim, style: TextStyle(color: C.muted, fontSize: 13))),
             ]),
-            Text('${f.kaynak} · ${kisaTarih(f.tarih)}', style: const TextStyle(color: C.muted, fontSize: 11)),
+            Text('${f.kaynak} · ${kisaTarih(f.tarih)}', style: TextStyle(color: C.muted, fontSize: 11)),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
@@ -63,7 +64,7 @@ class _TarimEkranState extends State<TarimEkran> {
                 FutureBuilder<List<GrafikNoktasi>>(
                   future: _seri,
                   builder: (context, s) {
-                    if (!s.hasData) return const SizedBox(height: 180, child: Center(child: CircularProgressIndicator(color: C.green)));
+                    if (!s.hasData) return SizedBox(height: 180, child: yukleniyor());
                     return MiniGrafik(s.data!, renk);
                   },
                 ),
