@@ -4,7 +4,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/lib/auth";
 import { useBolgem } from "@/lib/bolgem";
-import { RENKLER } from "@/lib/theme";
+import { RENKLER, YEM_RENK, HAYVAN_RENK, emoji } from "@/lib/theme";
 import { ILLER } from "@/lib/iller";
 import { parseFiyatGirdi } from "@/lib/format";
 import { YEM_AD } from "@/lib/urun-tanim";
@@ -15,6 +15,7 @@ const HAYVAN = ["KOYUN", "KUZU", "TOSUN", "TOKLU", "INEK", "SUT"];
 const KAYNAKLAR = ["pazar", "tuccar", "fabrika", "kooperatif"] as const;
 
 const adGoster = (norm: string) => (norm === "SUT" ? "Süt" : YEM_AD[norm] ?? HAYVAN_AD[norm] ?? norm);
+const urunRenk = (norm: string) => YEM_RENK[norm] ?? HAYVAN_RENK[norm] ?? RENKLER.green;
 // Borsa fiyatıyla aynı birim: süt litre, diğer hayvan karkas kg, yem kg
 const birimEtiket = (norm: string) => (norm === "SUT" ? "TL/litre" : HAYVAN.includes(norm) ? "TL/kg karkas" : "TL/kg");
 
@@ -24,10 +25,18 @@ interface Bildirim {
 }
 
 const inputStil: React.CSSProperties = {
-  width: "100%", padding: "9px 12px", background: "#080E09", border: `1px solid ${RENKLER.border}`,
-  color: RENKLER.text, fontSize: "14px", borderRadius: "3px", outline: "none", fontFamily: "var(--font-mono)",
+  width: "100%", padding: "11px 13px", background: RENKLER.bg, border: `1px solid ${RENKLER.border}`,
+  color: RENKLER.text, fontSize: "14px", borderRadius: "8px", outline: "none", fontFamily: "var(--font-mono)",
 };
-const etiketStil: React.CSSProperties = { fontSize: "10px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.1em" };
+
+function Etiket({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
+      <span style={{ width: "3px", height: "11px", background: RENKLER.green, borderRadius: "2px" }} />
+      <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.12em", fontWeight: 600 }}>{children}</span>
+    </div>
+  );
+}
 
 export default function FiyatBildirPage() {
   const { user, yukleniyor } = useUser();
@@ -91,7 +100,6 @@ export default function FiyatBildirPage() {
       : await supabase.from("kullanici_fiyat").insert({ urun_norm: urun, fiyat: f, kullanici_id: user.id, ...govde });
     setMesgul(false);
     if (error) {
-      // Unique (kullanici_id, urun_norm, giris_tarihi): bugün zaten bildirilmiş
       if (error.code === "23505") { setHata("Bugün bu ürün için zaten bildirim yaptınız — aşağıdan düzenleyebilirsiniz."); await mevcutGetir(urun); return; }
       setHata(error.message); return;
     }
@@ -109,19 +117,19 @@ export default function FiyatBildirPage() {
 
   // ── Yükleniyor ──
   if (yukleniyor) {
-    return <main style={{ maxWidth: "600px", margin: "48px auto", padding: "16px", color: RENKLER.muted, fontFamily: "var(--font-mono)", fontSize: "12px" }}>Yükleniyor…</main>;
+    return <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", color: RENKLER.muted, fontFamily: "var(--font-mono)", fontSize: "12px" }}>Yükleniyor…</main>;
   }
 
   // ── Giriş yapılmamış: CTA ──
   if (!user) {
     return (
-      <main style={{ maxWidth: "600px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
-        <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>FİYAT BİLDİR</h1>
-        <div style={{ marginTop: "20px", padding: "24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", textAlign: "center" }}>
-          <div style={{ fontSize: "28px", marginBottom: "10px" }}>📍</div>
+      <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
+        <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>FİYAT BİLDİR</h1>
+        <div style={{ marginTop: "20px", padding: "28px 24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ fontSize: "30px", marginBottom: "12px" }}>📍</div>
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Bulunduğun yerin gerçek piyasa fiyatını bildir.</p>
-          <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "6px", lineHeight: 1.6 }}>Bildirimler topluluk ortalamasına katılır ve borsa fiyatıyla karşılaştırılır. En az 3 bildirim sonrası görünür.</p>
-          <Link href="/giris" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: RENKLER.green, color: "#000", borderRadius: "3px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
+          <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Bildirimler topluluk ortalamasına katılır ve borsa fiyatıyla karşılaştırılır. En az 3 bildirim sonrası görünür.</p>
+          <Link href="/giris" style={{ display: "inline-block", marginTop: "18px", padding: "11px 26px", background: RENKLER.green, color: "#06140C", borderRadius: "8px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
             Google ile Giriş Yap
           </Link>
         </div>
@@ -132,96 +140,116 @@ export default function FiyatBildirPage() {
   // ── Başarı ──
   if (durum === "basarili") {
     return (
-      <main style={{ maxWidth: "600px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)", textAlign: "center" }}>
-        <div style={{ fontSize: "32px", marginBottom: "10px" }}>✓</div>
-        <h1 style={{ fontSize: "15px", color: RENKLER.green, fontWeight: 700 }}>Teşekkürler</h1>
-        <p style={{ fontSize: "12px", color: RENKLER.text, marginTop: "8px", lineHeight: 1.6 }}>Bildirimin topluluk ortalamasına katıldı.</p>
-        {sayac != null && (
-          <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "10px" }}>
-            {adGoster(urun)} · {il} — bugün <b style={{ color: RENKLER.text }}>{sayac}/3</b> bildirim
-            <br />
-            <span style={{ fontSize: "10px" }}>{sayac >= 3 ? "Piyasa ortalaması artık görünür." : "3 bildirime ulaşınca piyasa ortalaması görünür."}</span>
-          </p>
-        )}
-        <div style={{ display: "flex", gap: "8px", marginTop: "20px", justifyContent: "center" }}>
-          <button onClick={() => { setDurum("form"); mevcutGetir(urun); }} style={{ padding: "10px 18px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "3px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Yeni Bildirim</button>
-          <Link href="/tarim" style={{ padding: "10px 18px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", textDecoration: "none", fontSize: "12px" }}>Borsaya Git</Link>
+      <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
+        <div style={{ padding: "32px 24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
+          <div style={{ width: "52px", height: "52px", margin: "0 auto 14px", borderRadius: "50%", background: `${RENKLER.green}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", color: RENKLER.green }}>✓</div>
+          <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700 }}>Teşekkürler</h1>
+          <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Bildirimin topluluk ortalamasına katıldı.</p>
+          {sayac != null && (
+            <div style={{ marginTop: "16px", padding: "12px", background: RENKLER.bg, border: `1px solid ${RENKLER.border}`, borderRadius: "8px" }}>
+              <div style={{ fontSize: "12px", color: RENKLER.muted }}>{adGoster(urun)} · {il}</div>
+              <div style={{ fontSize: "22px", color: urunRenk(urun), fontWeight: 800, margin: "2px 0" }}>{sayac}<span style={{ fontSize: "13px", color: RENKLER.muted }}> / 3 bildirim</span></div>
+              <div style={{ fontSize: "10px", color: RENKLER.muted }}>{sayac >= 3 ? "Piyasa ortalaması artık görünür." : "3 bildirime ulaşınca piyasa ortalaması görünür."}</div>
+            </div>
+          )}
+          <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
+            <button onClick={() => { setDurum("form"); mevcutGetir(urun); }} style={{ flex: 1, padding: "11px", background: RENKLER.green, color: "#06140C", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Yeni Bildirim</button>
+            <Link href="/tarim" style={{ flex: 1, padding: "11px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "8px", textDecoration: "none", fontSize: "12px", textAlign: "center" }}>Borsaya Git</Link>
+          </div>
         </div>
       </main>
     );
   }
 
   // ── Form (ekle / düzenle) ──
-  const urunButon = (u: string) => (
-    <button key={u} type="button" onClick={() => { setUrun(u); setHata(null); }}
-      style={{ padding: "5px 12px", fontSize: "11px", background: urun === u ? RENKLER.green : "#080E09", color: urun === u ? "#000" : RENKLER.muted, border: `1px solid ${urun === u ? RENKLER.green : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
-      {adGoster(u)}
-    </button>
-  );
+  const urunButon = (u: string) => {
+    const renk = urunRenk(u);
+    const aktif = urun === u;
+    return (
+      <button key={u} type="button" onClick={() => { setUrun(u); setHata(null); }}
+        style={{
+          display: "inline-flex", alignItems: "center", gap: "6px",
+          padding: "7px 13px", fontSize: "11.5px", fontFamily: "var(--font-mono)",
+          background: aktif ? `${renk}22` : "transparent",
+          color: aktif ? renk : RENKLER.muted,
+          border: `1px solid ${aktif ? renk : RENKLER.border}`,
+          borderRadius: "20px", cursor: "pointer", fontWeight: aktif ? 700 : 400,
+          transition: "all .15s",
+        }}>
+        <span style={{ fontSize: "13px" }}>{emoji(u)}</span>{adGoster(u)}
+      </button>
+    );
+  };
 
   return (
-    <main style={{ maxWidth: "600px", margin: "32px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
-      <div style={{ marginBottom: "20px" }}>
-        <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>FİYAT BİLDİR</h1>
-        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "4px" }}>Piyasa fiyatını bildirerek gerçek veri oluştur. En az 3 bildirim sonrası görünür.</p>
+    <main style={{ maxWidth: "560px", margin: "32px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
+      <div style={{ marginBottom: "18px" }}>
+        <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>FİYAT BİLDİR</h1>
+        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Piyasa fiyatını bildirerek gerçek veri oluştur. En az 3 bildirim sonrası görünür.</p>
       </div>
 
-      <form onSubmit={(e) => { e.preventDefault(); gonder(); }} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+      <form onSubmit={(e) => { e.preventDefault(); gonder(); }} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "22px", display: "flex", flexDirection: "column", gap: "18px" }}>
         {mevcut && (
-          <div style={{ fontSize: "11px", color: "#E8C040", background: "#1A1605", border: "1px solid #3A3010", borderRadius: "3px", padding: "8px 10px" }}>
-            ✎ Bugün {adGoster(urun)} için bildirimin var — düzenliyorsun.
+          <div style={{ fontSize: "11px", color: "#E8C040", background: "#19150622", border: "1px solid #3A301055", borderRadius: "8px", padding: "9px 11px", display: "flex", gap: "6px", alignItems: "center" }}>
+            <span>✎</span> Bugün <b style={{ color: "#E8C040" }}>{adGoster(urun)}</b> için bildirimin var — düzenliyorsun.
           </div>
         )}
 
-        {/* Ürün: YEM + HAYVAN grupları */}
+        {/* Ürün */}
         <div>
-          <label style={etiketStil}>ÜRÜN — YEM</label>
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "10px" }}>{YEM.map(urunButon)}</div>
-          <label style={etiketStil}>ÜRÜN — HAYVAN</label>
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>{HAYVAN.map(urunButon)}</div>
+          <Etiket>YEM</Etiket>
+          <div style={{ display: "flex", gap: "7px", flexWrap: "wrap", marginBottom: "14px" }}>{YEM.map(urunButon)}</div>
+          <Etiket>HAYVAN</Etiket>
+          <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>{HAYVAN.map(urunButon)}</div>
         </div>
 
-        {/* Fiyat — birim ürüne göre (süt litre, hayvan karkas kg, yem kg) */}
+        {/* Fiyat */}
         <div>
-          <label style={etiketStil}>FİYAT ({birimEtiket(urun)})</label>
-          <input type="text" inputMode="decimal" value={fiyat} onChange={(e) => setFiyat(e.target.value)} placeholder="Örn: 14,50" style={inputStil} />
+          <Etiket>FİYAT · {birimEtiket(urun)}</Etiket>
+          <div style={{ position: "relative" }}>
+            <input type="text" inputMode="decimal" value={fiyat} onChange={(e) => setFiyat(e.target.value)} placeholder="Örn: 14,50" style={{ ...inputStil, fontSize: "17px", fontWeight: 700, color: urunRenk(urun), paddingRight: "46px" }} />
+            <span style={{ position: "absolute", right: "13px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: RENKLER.muted }}>₺</span>
+          </div>
         </div>
 
         {/* İl + İlçe */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
           <div>
-            <label style={etiketStil}>İL</label>
+            <Etiket>İL</Etiket>
             <select value={il} onChange={(e) => { setIl(e.target.value); setIlDokunuldu(true); }} style={{ ...inputStil, fontSize: "12px" }}>
               {ILLER.map((i) => <option key={i} value={i}>{i}</option>)}
             </select>
           </div>
           <div>
-            <label style={etiketStil}>İLÇE (opsiyonel)</label>
+            <Etiket>İLÇE · opsiyonel</Etiket>
             <input type="text" value={ilce} onChange={(e) => setIlce(e.target.value)} placeholder="Karatay" style={{ ...inputStil, fontSize: "12px" }} />
           </div>
         </div>
 
         {/* Kaynak */}
         <div>
-          <label style={etiketStil}>KAYNAK</label>
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-            {KAYNAKLAR.map((k) => (
-              <button key={k} type="button" onClick={() => setKaynak(k)}
-                style={{ padding: "5px 10px", fontSize: "11px", background: kaynak === k ? RENKLER.surface : "#080E09", color: kaynak === k ? RENKLER.text : RENKLER.muted, border: `1px solid ${kaynak === k ? RENKLER.green : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
-                {k}
-              </button>
-            ))}
+          <Etiket>KAYNAK</Etiket>
+          <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
+            {KAYNAKLAR.map((k) => {
+              const aktif = kaynak === k;
+              return (
+                <button key={k} type="button" onClick={() => setKaynak(k)}
+                  style={{ padding: "7px 14px", fontSize: "11.5px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400, transition: "all .15s" }}>
+                  {k}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {hata && <div style={{ fontSize: "11px", color: RENKLER.red }}>{hata}</div>}
+        {hata && <div style={{ fontSize: "11px", color: RENKLER.red, background: `${RENKLER.red}14`, border: `1px solid ${RENKLER.red}33`, borderRadius: "8px", padding: "9px 11px" }}>{hata}</div>}
 
         <div style={{ display: "flex", gap: "8px" }}>
-          <button type="submit" disabled={mesgul} style={{ flex: 1, padding: "10px", fontSize: "12px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "3px", cursor: mesgul ? "wait" : "pointer", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+          <button type="submit" disabled={mesgul} style={{ flex: 1, padding: "13px", fontSize: "13px", background: RENKLER.green, color: "#06140C", border: "none", borderRadius: "8px", cursor: mesgul ? "wait" : "pointer", fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "0.03em" }}>
             {mesgul ? "…" : mevcut ? "Bildirimi Güncelle" : "Bildir"}
           </button>
           {mevcut && (
-            <button type="button" onClick={sil} disabled={mesgul} style={{ padding: "10px 16px", fontSize: "12px", background: "transparent", color: RENKLER.red, border: `1px solid ${RENKLER.red}40`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
+            <button type="button" onClick={sil} disabled={mesgul} style={{ padding: "13px 18px", fontSize: "12px", background: "transparent", color: RENKLER.red, border: `1px solid ${RENKLER.red}55`, borderRadius: "8px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
               Sil
             </button>
           )}
