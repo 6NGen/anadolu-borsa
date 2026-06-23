@@ -5,6 +5,13 @@ import SaatGosterg from "@/components/SaatGosterg";
 import VeriTazelik from "@/components/VeriTazelik";
 import { RENKLER, HAYVAN_RENK } from "@/lib/theme";
 import { formatFiyat } from "@/lib/format";
+import { tekHayvanKaynak } from "@/lib/guncel";
+
+// Kartlarda temiz, büyük harf Türkçe ad (ham "Cig Sut (USK tavsiye)" / "I. KALİTE (Tosun)" yerine)
+const HAYVAN_GORUNEN: Record<string, string> = {
+  TOSUN: "TOSUN", DANA: "DANA", INEK: "İNEK", MANDA: "MANDA",
+  KUZU: "KUZU", TOKLU: "TOKLU", KOYUN: "KOYUN", OGLAK: "OĞLAK", SUT: "ÇİĞ SÜT",
+};
 import KurbanSayaci from "@/components/KurbanSayaci";
 import SinyalMotoru from "@/components/SinyalMotoru";
 import Link from "next/link";
@@ -12,15 +19,19 @@ import Link from "next/link";
 export const revalidate = 300;
 
 export default async function Dashboard() {
-  const [{ data: sonFiyatlar }, { data: sonHayvan }] = await Promise.all([
+  const [{ data: sonFiyatlar }, { data: sonHayvanHam }] = await Promise.all([
     supabaseServer.from("son_fiyatlar").select("*").order("urun_norm"),
     supabaseServer.from("son_hayvan_fiyatlari").select("*").order("hayvan_norm"),
   ]);
 
+  // Kaynağı değişen hayvanın (süt: ESK_SUT → USK) eski bayat kaydını ele —
+  // hayvan_norm başına tek (en güncel) satır. Ticker ve kartlar bunu kullanır.
+  const sonHayvan = tekHayvanKaynak(sonHayvanHam ?? []);
+
   // 3.3: her ticker öğesi TEK string — parça kopması/yetim birim olmaz
   const tickerItems = [
     ...(sonFiyatlar ?? []).map((f) => `${f.urun_norm} ${formatFiyat(f.ortalama)} TL/KG`),
-    ...(sonHayvan ?? []).map((h) => `${h.hayvan_norm} ${formatFiyat(h.fiyat)} ${h.birim ?? "TL/kg"}`),
+    ...sonHayvan.map((h) => `${HAYVAN_GORUNEN[h.hayvan_norm] ?? h.hayvan_norm} ${formatFiyat(h.fiyat)} ${h.birim ?? "TL/kg"}`),
   ];
 
   return (
@@ -85,21 +96,20 @@ export default async function Dashboard() {
           )}
 
           {/* Hayvan */}
-          {(sonHayvan ?? []).length > 0 && (
+          {sonHayvan.length > 0 && (
             <section>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                 <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.12em" }}>HAYVAN FİYATLARI</span>
                 <Link href="/hayvan" style={{ fontSize: "10px", color: RENKLER.green, textDecoration: "none" }}>Grafik & Detay →</Link>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: "8px" }}>
-                {(sonHayvan ?? []).map((h) => {
+                {sonHayvan.map((h) => {
                   const renk = HAYVAN_RENK[h.hayvan_norm] ?? RENKLER.red;
                   return (
                     <div key={`${h.kaynak}-${h.hayvan_norm}`} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px", display: "flex", gap: "10px" }}>
                       <div style={{ width: "3px", background: renk, borderRadius: "2px", flexShrink: 0 }} />
                       <div>
-                        <div style={{ fontSize: "9px", color: RENKLER.muted, letterSpacing: "0.12em" }}>{h.hayvan_norm}</div>
-                        <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "2px 0" }}>{h.hayvan}</div>
+                        <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "0 0 2px" }}>{HAYVAN_GORUNEN[h.hayvan_norm] ?? h.hayvan}</div>
                         <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(h.fiyat)}</div>
                         <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "2px" }}>{h.birim}</div>
                         <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
@@ -114,7 +124,7 @@ export default async function Dashboard() {
             </section>
           )}
 
-          {(sonFiyatlar ?? []).length === 0 && (sonHayvan ?? []).length === 0 && (
+          {(sonFiyatlar ?? []).length === 0 && sonHayvan.length === 0 && (
             <div style={{ padding: "60px 20px", textAlign: "center", color: RENKLER.muted, fontSize: "13px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
               <div style={{ fontSize: "24px", marginBottom: "12px" }}>📊</div>
               Henüz fiyat verisi yok.<br />Scraper çalıştıktan sonra veriler burada görünür.
