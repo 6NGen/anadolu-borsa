@@ -67,7 +67,7 @@ class _HedefEkranState extends State<HedefEkran> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 Text('1 $_varlik =', style: TextStyle(color: C.muted, fontSize: 13)),
                 const SizedBox(height: 8),
-                Text(formatFiyat(kacBirim, hayvanMi ? 0 : 1), style: const TextStyle(color: Color(0xFFE86040), fontSize: 52, fontWeight: FontWeight.bold, height: 1)),
+                Text(formatFiyat(kacBirim, hayvanMi ? 0 : 1), style: TextStyle(color: C.orange, fontSize: 52, fontWeight: FontWeight.bold, height: 1)),
                 Text('$birimAd ${f.ad.toLowerCase()}', style: TextStyle(color: C.text, fontSize: 16)),
               ]),
             ),

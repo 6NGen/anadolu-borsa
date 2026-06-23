@@ -43,6 +43,7 @@ class _AnaEkranState extends State<AnaEkran> {
           child: ListView(
             padding: const EdgeInsets.all(14),
             children: [
+              markaBaslik('Türkiye tarım & hayvancılık fiyatları · günlük'),
               bolumBaslik('YEM FİYATLARI'),
               ...yem.map((f) => FiyatKarti(f)),
               const SizedBox(height: 12),

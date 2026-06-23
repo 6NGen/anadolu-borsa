@@ -25,8 +25,10 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
       );
 
   Future<void> _siteAc() async {
-    final uri = Uri.parse(siteUrl);
-    if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
+    // canLaunchUrl bazı cihazlarda yanlış false döner — doğrudan dene
+    try {
+      await launchUrl(Uri.parse(siteUrl), mode: LaunchMode.externalApplication);
+    } catch (_) {/* sessiz */}
   }
 
   @override

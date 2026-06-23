@@ -1,54 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Marka paleti. Açık/koyu temaya göre değerler değişir (paletUygula).
-// Not: değerler sabit (const) DEĞİL — bu yüzden bu renkleri kullanan
-// widget'larda `const` kullanılmaz.
+// Marka paleti — açık/koyu temaya göre değişir (paletUygula).
+// Değerler sabit DEĞİL; bu renkleri kullanan widget'larda `const` kullanılmaz.
 class C {
-  static Color bg = const Color(0xFF080E09);
-  static Color surface = const Color(0xFF0F1A12);
-  static Color border = const Color(0xFF1E3A22);
-  static Color muted = const Color(0xFF506A52);
-  static Color text = const Color(0xFFE8F5EA);
-  static Color green = const Color(0xFF68B890);
+  static Color bg = const Color(0xFF0A0F0B);
+  static Color surface = const Color(0xFF121C15);
+  static Color surface2 = const Color(0xFF17241A);
+  static Color border = const Color(0xFF223328);
+  static Color muted = const Color(0xFF6B8270);
+  static Color text = const Color(0xFFEAF3EC);
+  static Color green = const Color(0xFF6FD39A);
+  static Color orange = const Color(0xFFE8804C);
   static Color red = const Color(0xFFE87060);
   static Color pos = const Color(0xFF4AE870);
 }
 
 void paletUygula(bool acik) {
   if (acik) {
-    C.bg = const Color(0xFFF3F6F3);
+    C.bg = const Color(0xFFEFF3EF);
     C.surface = const Color(0xFFFFFFFF);
-    C.border = const Color(0xFFD6E0D8);
-    C.muted = const Color(0xFF5E6E60);
-    C.text = const Color(0xFF16201A);
-    C.green = const Color(0xFF2F9E6E);
+    C.surface2 = const Color(0xFFF4F7F4);
+    C.border = const Color(0xFFDCE4DD);
+    C.muted = const Color(0xFF6A7A6E);
+    C.text = const Color(0xFF14201A);
+    C.green = const Color(0xFF1F8A5B);
+    C.orange = const Color(0xFFD2622F);
     C.red = const Color(0xFFC0432F);
-    C.pos = const Color(0xFF2BA84A);
+    C.pos = const Color(0xFF1F9E4A);
   } else {
-    C.bg = const Color(0xFF080E09);
-    C.surface = const Color(0xFF0F1A12);
-    C.border = const Color(0xFF1E3A22);
-    C.muted = const Color(0xFF506A52);
-    C.text = const Color(0xFFE8F5EA);
-    C.green = const Color(0xFF68B890);
+    C.bg = const Color(0xFF0A0F0B);
+    C.surface = const Color(0xFF121C15);
+    C.surface2 = const Color(0xFF17241A);
+    C.border = const Color(0xFF223328);
+    C.muted = const Color(0xFF6B8270);
+    C.text = const Color(0xFFEAF3EC);
+    C.green = const Color(0xFF6FD39A);
+    C.orange = const Color(0xFFE8804C);
     C.red = const Color(0xFFE87060);
     C.pos = const Color(0xFF4AE870);
   }
 }
 
-// Ürün vurgu renkleri her iki temada da aynı
+// Ürün vurgu renkleri (her iki temada da okunur tonlar)
 const yemRenk = {
-  'ARPA': Color(0xFFE8A838), 'BUGDAY': Color(0xFFC4722A), 'MISIR': Color(0xFFF0D060),
-  'SAMAN': Color(0xFFA0B878), 'YONCA': Color(0xFF68B890), 'YULAF': Color(0xFFD4A0C0), 'CAVDAR': Color(0xFFB8907A),
+  'ARPA': Color(0xFFD79A2B), 'BUGDAY': Color(0xFFB5651D), 'MISIR': Color(0xFFD9B441),
+  'SAMAN': Color(0xFF8FA85F), 'YONCA': Color(0xFF4FA877), 'YULAF': Color(0xFFB98BB0), 'CAVDAR': Color(0xFFA67C5B),
 };
 const hayvanRenk = {
-  'TOSUN': Color(0xFFE87060), 'DANA': Color(0xFFF09080), 'INEK': Color(0xFFD05040),
-  'KUZU': Color(0xFF70A8E8), 'TOKLU': Color(0xFF5090D0), 'KOYUN': Color(0xFF4080C0),
-  'MANDA': Color(0xFFC07060), 'OGLAK': Color(0xFF80B870), 'SUT': Color(0xFFB0B090),
+  'TOSUN': Color(0xFFD9604F), 'DANA': Color(0xFFD97A6A), 'INEK': Color(0xFFC0432F),
+  'KUZU': Color(0xFF4F8AD9), 'TOKLU': Color(0xFF3E78C0), 'KOYUN': Color(0xFF3066B0),
+  'MANDA': Color(0xFFA85F4F), 'OGLAK': Color(0xFF5FA84F), 'SUT': Color(0xFF8AA0C8),
 };
-
 Color urunRenk(String norm) => yemRenk[norm] ?? hayvanRenk[norm] ?? C.green;
+
+const _emoji = {
+  'ARPA': '🌾', 'BUGDAY': '🌾', 'MISIR': '🌽', 'SAMAN': '🌿', 'YONCA': '🍀', 'YULAF': '🌾', 'CAVDAR': '🌾',
+  'TOSUN': '🐂', 'DANA': '🐄', 'INEK': '🐄', 'MANDA': '🐃', 'KUZU': '🐑', 'TOKLU': '🐑', 'KOYUN': '🐑', 'OGLAK': '🐐', 'SUT': '🥛',
+};
+String emoji(String norm) => _emoji[norm] ?? '📦';
 
 ThemeData anadoluTema(bool acik) {
   final base = acik ? ThemeData.light(useMaterial3: true) : ThemeData.dark(useMaterial3: true);
@@ -56,6 +66,7 @@ ThemeData anadoluTema(bool acik) {
     scaffoldBackgroundColor: C.bg,
     colorScheme: base.colorScheme.copyWith(primary: C.green, surface: C.surface, secondary: C.green),
     textTheme: GoogleFonts.ibmPlexMonoTextTheme(base.textTheme).apply(bodyColor: C.text, displayColor: C.text),
-    appBarTheme: AppBarTheme(backgroundColor: C.surface, elevation: 0, centerTitle: false),
+    appBarTheme: AppBarTheme(backgroundColor: C.bg, surfaceTintColor: Colors.transparent, elevation: 0, centerTitle: false),
+    dividerColor: C.border,
   );
 }

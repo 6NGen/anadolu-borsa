@@ -21,6 +21,14 @@ Future<void> main() async {
   runApp(AnadoluBorsaApp(baslangic: acik));
 }
 
+// Tarayıcıda link aç — canLaunchUrl bazı cihazlarda yanlış false döndüğü için
+// doğrudan deneyip hatayı yutuyoruz.
+Future<void> linkAc(String url) async {
+  try {
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+  } catch (_) {/* sessiz */}
+}
+
 class AnadoluBorsaApp extends StatefulWidget {
   final bool baslangic;
   const AnadoluBorsaApp({super.key, required this.baslangic});
@@ -59,61 +67,67 @@ class AnaKabuk extends StatefulWidget {
 
 class _AnaKabukState extends State<AnaKabuk> {
   int _sekme = 0;
+  static const _basliklar = ['ANA SAYFA', 'TARIM BORSASI', 'HAYVAN BORSASI', 'PARİTE', 'HEDEF'];
 
-  static const _ekranlar = [AnaEkran(), TarimEkran(), HayvanEkran(), PariteEkran(), HedefEkran()];
-  static const _basliklar = ['ANADOLU BORSA', 'TARIM BORSASI', 'HAYVAN BORSASI', 'PARİTE', 'HEDEF'];
-
-  Future<void> _bildir() async {
-    final uri = Uri.parse('$siteUrl/fiyat-bildir');
-    if (await canLaunchUrl(uri)) launchUrl(uri, mode: LaunchMode.externalApplication);
-  }
+  // Her build'de TAZE örnek (const DEĞİL) → tema değişince ekranlar yeniden
+  // çizilir; State korunur (aynı tip+konum), veri yeniden çekilmez.
+  // ignore: prefer_const_constructors
+  List<Widget> _ekranlarYap() => [AnaEkran(), TarimEkran(), HayvanEkran(), PariteEkran(), HedefEkran()];
 
   @override
   Widget build(BuildContext context) {
+    final ekranlar = _ekranlarYap();
     return Scaffold(
       appBar: AppBar(
-        title: Text(_basliklar[_sekme], style: TextStyle(color: C.green, fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 1)),
+        titleSpacing: 16,
+        title: Text(_basliklar[_sekme], style: TextStyle(color: C.text, fontWeight: FontWeight.w700, fontSize: 14, letterSpacing: 1)),
         actions: [
           IconButton(
-            icon: Icon(Icons.ios_share, color: C.muted, size: 20),
+            icon: Icon(Icons.ios_share_rounded, color: C.muted, size: 21),
             tooltip: 'Paylaş',
             onPressed: () => SharePlus.instance.share(
               ShareParams(text: 'Anadolu Borsa — güncel tarım ve hayvancılık fiyatları\n$siteUrl'),
             ),
           ),
           IconButton(
-            icon: Icon(Icons.settings_outlined, color: C.muted, size: 20),
+            icon: Icon(Icons.settings_outlined, color: C.muted, size: 21),
             tooltip: 'Ayarlar',
             onPressed: () => Navigator.push(context, MaterialPageRoute(
               builder: (_) => AyarlarEkran(acik: widget.acik, onTema: widget.onTema),
             )),
           ),
+          const SizedBox(width: 4),
         ],
       ),
-      body: IndexedStack(index: _sekme, children: _ekranlar),
+      body: IndexedStack(index: _sekme, children: ekranlar),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _bildir,
+        onPressed: () => linkAc('$siteUrl/fiyat-bildir'),
         backgroundColor: C.green,
-        foregroundColor: Colors.black,
-        icon: const Icon(Icons.add, size: 20),
-        label: const Text('Fiyat Bildir', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+        foregroundColor: Colors.white,
+        elevation: 2,
+        icon: const Icon(Icons.add_rounded, size: 22),
+        label: const Text('Fiyat Bildir', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _sekme,
-        onTap: (i) => setState(() => _sekme = i),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: C.surface,
-        selectedItemColor: C.green,
-        unselectedItemColor: C.muted,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Ana'),
-          BottomNavigationBarItem(icon: Icon(Icons.grass_outlined), label: 'Tarım'),
-          BottomNavigationBarItem(icon: Icon(Icons.pets_outlined), label: 'Hayvan'),
-          BottomNavigationBarItem(icon: Icon(Icons.sync_alt), label: 'Parite'),
-          BottomNavigationBarItem(icon: Icon(Icons.flag_outlined), label: 'Hedef'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(color: C.surface, border: Border(top: BorderSide(color: C.border))),
+        child: BottomNavigationBar(
+          currentIndex: _sekme,
+          onTap: (i) => setState(() => _sekme = i),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: C.surface,
+          elevation: 0,
+          selectedItemColor: C.green,
+          unselectedItemColor: C.muted,
+          selectedFontSize: 10.5,
+          unselectedFontSize: 10.5,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Ana'),
+            BottomNavigationBarItem(icon: Icon(Icons.grass_rounded), label: 'Tarım'),
+            BottomNavigationBarItem(icon: Icon(Icons.pets_rounded), label: 'Hayvan'),
+            BottomNavigationBarItem(icon: Icon(Icons.sync_alt_rounded), label: 'Parite'),
+            BottomNavigationBarItem(icon: Icon(Icons.flag_rounded), label: 'Hedef'),
+          ],
+        ),
       ),
     );
   }
