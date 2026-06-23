@@ -7,17 +7,59 @@ import { useBolgem } from "@/lib/bolgem";
 import { RENKLER, YEM_RENK, HAYVAN_RENK, emoji } from "@/lib/theme";
 import { ILLER } from "@/lib/iller";
 import { parseFiyatGirdi } from "@/lib/format";
-import { YEM_AD } from "@/lib/urun-tanim";
-import { HAYVAN_AD } from "@/lib/karkas";
 
-const YEM = ["ARPA", "BUGDAY", "MISIR", "SAMAN", "YONCA", "YULAF", "CAVDAR"];
+// Ürün grupları. Not: yonca/saman aslında KABA YEM (TL/kg değil balya/ton ile
+// satılır) — bu yüzden YEM tahıl grubundan ayrıldı. urun_norm değerleri aynı.
+const YEM = ["ARPA", "BUGDAY", "MISIR", "YULAF", "CAVDAR"];
+const KABAYEM = ["YONCA", "SAMAN", "KORUNGA", "KURUOT"];
+const GUBRE = ["DAP", "URE", "AN33", "KOMPOZE"];
 const HAYVAN = ["KOYUN", "KUZU", "TOSUN", "TOKLU", "INEK", "SUT"];
 const KAYNAKLAR = ["pazar", "tuccar", "fabrika", "kooperatif"] as const;
 
-const adGoster = (norm: string) => (norm === "SUT" ? "Süt" : YEM_AD[norm] ?? HAYVAN_AD[norm] ?? norm);
-const urunRenk = (norm: string) => YEM_RENK[norm] ?? HAYVAN_RENK[norm] ?? RENKLER.green;
-// Borsa fiyatıyla aynı birim: süt litre, diğer hayvan karkas kg, yem kg
-const birimEtiket = (norm: string) => (norm === "SUT" ? "TL/litre" : HAYVAN.includes(norm) ? "TL/kg karkas" : "TL/kg");
+const AD: Record<string, string> = {
+  ARPA: "Arpa", BUGDAY: "Buğday", MISIR: "Mısır", YULAF: "Yulaf", CAVDAR: "Çavdar",
+  YONCA: "Yonca", SAMAN: "Saman", KORUNGA: "Korunga", KURUOT: "Kuru Ot",
+  DAP: "DAP", URE: "Üre", AN33: "%33 AN", KOMPOZE: "Kompoze",
+  KOYUN: "Koyun", KUZU: "Kuzu", TOSUN: "Tosun", TOKLU: "Toklu", INEK: "İnek", SUT: "Süt",
+};
+const EK_EMOJI: Record<string, string> = { DAP: "🧪", URE: "🧪", AN33: "🧪", KOMPOZE: "🧪", KORUNGA: "🌿", KURUOT: "🌾" };
+const ikon = (n: string) => EK_EMOJI[n] ?? emoji(n);
+const adGoster = (n: string) => AD[n] ?? n;
+
+type Kategori = "YEM" | "KABAYEM" | "GUBRE" | "HAYVAN";
+function kategori(norm: string): Kategori {
+  if (GUBRE.includes(norm)) return "GUBRE";
+  if (KABAYEM.includes(norm)) return "KABAYEM";
+  if (HAYVAN.includes(norm)) return "HAYVAN";
+  return "YEM";
+}
+
+// Birim-esnek giriş: kaba yem/gübre farklı birimlerle satılır → TL/kg'a normalize.
+const BIRIM_SECENEK: Record<string, [string, string][]> = {
+  KABAYEM: [["balya", "balya"], ["ton", "ton"], ["kg", "kg"]],
+  GUBRE: [["cuval", "çuval · 50kg"], ["ton", "ton"], ["kg", "kg"]],
+};
+const varsayilanBirim = (norm: string) => (kategori(norm) === "GUBRE" ? "cuval" : kategori(norm) === "KABAYEM" ? "balya" : "kg");
+
+function tlPerKg(fiyat: number, birim: string, balyaKg: number): number {
+  if (birim === "ton") return fiyat / 1000;
+  if (birim === "cuval") return fiyat / 50;
+  if (birim === "balya") return balyaKg > 0 ? fiyat / balyaKg : NaN;
+  return fiyat; // kg
+}
+
+// Borsa fiyatıyla aynı birim
+const yemBirim = (norm: string) => {
+  const k = kategori(norm);
+  if (norm === "SUT") return "TL/litre";
+  if (k === "HAYVAN") return "TL/kg karkas";
+  return "TL/kg";
+};
+
+const urunRenk = (norm: string) => {
+  if (kategori(norm) === "GUBRE") return "#8FB8C8";
+  return YEM_RENK[norm] ?? HAYVAN_RENK[norm] ?? RENKLER.green;
+};
 
 interface Bildirim {
   id: number; urun_norm: string; fiyat: number; il: string;
@@ -44,25 +86,27 @@ export default function FiyatBildirPage() {
 
   const [urun, setUrun] = useState("ARPA");
   const [fiyat, setFiyat] = useState("");
+  const [birim, setBirim] = useState("kg");
+  const [balyaKg, setBalyaKg] = useState("");
   const [il, setIl] = useState("KONYA");
   const [ilDokunuldu, setIlDokunuldu] = useState(false);
   const [ilce, setIlce] = useState("");
   const [kaynak, setKaynak] = useState<typeof KAYNAKLAR[number]>("pazar");
 
-  const [mevcut, setMevcut] = useState<Bildirim | null>(null); // bugünkü kendi bildirimi → düzenleme
+  const [mevcut, setMevcut] = useState<Bildirim | null>(null);
   const [sayac, setSayac] = useState<number | null>(null);
   const [durum, setDurum] = useState<"form" | "basarili">("form");
   const [hata, setHata] = useState<string | null>(null);
   const [mesgul, setMesgul] = useState(false);
 
   const bugun = new Date().toISOString().slice(0, 10);
+  const kat = kategori(urun);
+  const birimliKategori = kat === "GUBRE" || kat === "KABAYEM";
 
-  // İl bölgem'den ön-dolu (kullanıcı elle değiştirmediyse)
   useEffect(() => {
     if (bolgem && !ilDokunuldu && (ILLER as readonly string[]).includes(bolgem)) setIl(bolgem);
   }, [bolgem, ilDokunuldu]);
 
-  // Seçili ürün için bugünkü kendi bildirimini getir → varsa düzenleme moduna geç
   const mevcutGetir = useCallback(async (urunNorm: string) => {
     if (!user) { setMevcut(null); return; }
     const { data } = await supabase.from("kullanici_fiyat")
@@ -71,7 +115,9 @@ export default function FiyatBildirPage() {
       .maybeSingle();
     if (data) {
       setMevcut(data as Bildirim);
+      // Kayıt TL/kg tutulur — düzenlemede birim kg gösterilir
       setFiyat(String(data.fiyat).replace(".", ","));
+      setBirim("kg");
       setIl(data.il); setIlce(data.ilce ?? ""); setKaynak(data.kaynak_turu as typeof KAYNAKLAR[number]);
     } else {
       setMevcut(null);
@@ -80,6 +126,17 @@ export default function FiyatBildirPage() {
   }, [user, bugun]);
 
   useEffect(() => { mevcutGetir(urun); }, [urun, mevcutGetir]);
+
+  function urunSec(u: string) {
+    setUrun(u);
+    setBirim(varsayilanBirim(u));
+    setBalyaKg("");
+    setHata(null);
+  }
+
+  // Normalize edilmiş TL/kg (gönderim + önizleme)
+  const hamFiyat = parseFiyatGirdi(fiyat);
+  const normalKg = birimliKategori ? tlPerKg(hamFiyat, birim, parseFiyatGirdi(balyaKg)) : hamFiyat;
 
   async function sayacGetir() {
     const { count } = await supabase.from("kullanici_fiyat")
@@ -90,14 +147,16 @@ export default function FiyatBildirPage() {
 
   async function gonder() {
     setHata(null);
-    const f = parseFiyatGirdi(fiyat);
-    if (!Number.isFinite(f) || f <= 0 || f > 10000) { setHata("Geçerli bir fiyat girin (0–10.000)."); return; }
+    if (!Number.isFinite(normalKg) || normalKg <= 0 || normalKg > 10000) {
+      setHata(birim === "balya" && !(parseFiyatGirdi(balyaKg) > 0) ? "Balya ağırlığını (kg) girin." : "Geçerli bir fiyat girin.");
+      return;
+    }
     if (!user) { setHata("Önce giriş yapın."); return; }
     setMesgul(true);
     const govde = { il, ilce: ilce.trim() || null, kaynak_turu: kaynak };
     const { error } = mevcut
-      ? await supabase.from("kullanici_fiyat").update({ fiyat: f, ...govde }).eq("id", mevcut.id)
-      : await supabase.from("kullanici_fiyat").insert({ urun_norm: urun, fiyat: f, kullanici_id: user.id, ...govde });
+      ? await supabase.from("kullanici_fiyat").update({ fiyat: normalKg, ...govde }).eq("id", mevcut.id)
+      : await supabase.from("kullanici_fiyat").insert({ urun_norm: urun, fiyat: normalKg, kullanici_id: user.id, ...govde });
     setMesgul(false);
     if (error) {
       if (error.code === "23505") { setHata("Bugün bu ürün için zaten bildirim yaptınız — aşağıdan düzenleyebilirsiniz."); await mevcutGetir(urun); return; }
@@ -115,12 +174,10 @@ export default function FiyatBildirPage() {
     setMevcut(null); setFiyat(""); setHata(null);
   }
 
-  // ── Yükleniyor ──
   if (yukleniyor) {
     return <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", color: RENKLER.muted, fontFamily: "var(--font-mono)", fontSize: "12px" }}>Yükleniyor…</main>;
   }
 
-  // ── Giriş yapılmamış: CTA ──
   if (!user) {
     return (
       <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
@@ -128,7 +185,7 @@ export default function FiyatBildirPage() {
         <div style={{ marginTop: "20px", padding: "28px 24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
           <div style={{ fontSize: "30px", marginBottom: "12px" }}>📍</div>
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Bulunduğun yerin gerçek piyasa fiyatını bildir.</p>
-          <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Bildirimler topluluk ortalamasına katılır ve borsa fiyatıyla karşılaştırılır. En az 3 bildirim sonrası görünür.</p>
+          <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Özellikle kaba yem ve gübrenin resmi kaynağı yok — senin bildirimin en değerlisi. En az 3 bildirim sonrası görünür.</p>
           <Link href="/giris" style={{ display: "inline-block", marginTop: "18px", padding: "11px 26px", background: RENKLER.green, color: "#06140C", borderRadius: "8px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
             Google ile Giriş Yap
           </Link>
@@ -137,7 +194,6 @@ export default function FiyatBildirPage() {
     );
   }
 
-  // ── Başarı ──
   if (durum === "basarili") {
     return (
       <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
@@ -161,25 +217,27 @@ export default function FiyatBildirPage() {
     );
   }
 
-  // ── Form (ekle / düzenle) ──
   const urunButon = (u: string) => {
     const renk = urunRenk(u);
     const aktif = urun === u;
     return (
-      <button key={u} type="button" onClick={() => { setUrun(u); setHata(null); }}
+      <button key={u} type="button" onClick={() => urunSec(u)}
         style={{
           display: "inline-flex", alignItems: "center", gap: "6px",
           padding: "7px 13px", fontSize: "11.5px", fontFamily: "var(--font-mono)",
           background: aktif ? `${renk}22` : "transparent",
           color: aktif ? renk : RENKLER.muted,
           border: `1px solid ${aktif ? renk : RENKLER.border}`,
-          borderRadius: "20px", cursor: "pointer", fontWeight: aktif ? 700 : 400,
-          transition: "all .15s",
+          borderRadius: "20px", cursor: "pointer", fontWeight: aktif ? 700 : 400, transition: "all .15s",
         }}>
-        <span style={{ fontSize: "13px" }}>{emoji(u)}</span>{adGoster(u)}
+        <span style={{ fontSize: "13px" }}>{ikon(u)}</span>{adGoster(u)}
       </button>
     );
   };
+
+  const fiyatEtiket = birimliKategori
+    ? `FİYAT · 1 ${(BIRIM_SECENEK[kat].find(([k]) => k === birim)?.[1] ?? birim)}`
+    : `FİYAT · ${yemBirim(urun)}`;
 
   return (
     <main style={{ maxWidth: "560px", margin: "32px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
@@ -195,21 +253,56 @@ export default function FiyatBildirPage() {
           </div>
         )}
 
-        {/* Ürün */}
+        {/* Ürün grupları */}
         <div>
-          <Etiket>YEM</Etiket>
+          <Etiket>TAHIL</Etiket>
           <div style={{ display: "flex", gap: "7px", flexWrap: "wrap", marginBottom: "14px" }}>{YEM.map(urunButon)}</div>
+          <Etiket>KABA YEM</Etiket>
+          <div style={{ display: "flex", gap: "7px", flexWrap: "wrap", marginBottom: "14px" }}>{KABAYEM.map(urunButon)}</div>
+          <Etiket>GÜBRE</Etiket>
+          <div style={{ display: "flex", gap: "7px", flexWrap: "wrap", marginBottom: "14px" }}>{GUBRE.map(urunButon)}</div>
           <Etiket>HAYVAN</Etiket>
           <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>{HAYVAN.map(urunButon)}</div>
         </div>
 
-        {/* Fiyat */}
-        <div>
-          <Etiket>FİYAT · {birimEtiket(urun)}</Etiket>
-          <div style={{ position: "relative" }}>
-            <input type="text" inputMode="decimal" value={fiyat} onChange={(e) => setFiyat(e.target.value)} placeholder="Örn: 14,50" style={{ ...inputStil, fontSize: "17px", fontWeight: 700, color: urunRenk(urun), paddingRight: "46px" }} />
-            <span style={{ position: "absolute", right: "13px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: RENKLER.muted }}>₺</span>
+        {/* Birim seçici (gübre/kaba yem) */}
+        {birimliKategori && (
+          <div>
+            <Etiket>BİRİM</Etiket>
+            <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
+              {BIRIM_SECENEK[kat].map(([k, ad]) => {
+                const aktif = birim === k;
+                return (
+                  <button key={k} type="button" onClick={() => setBirim(k)}
+                    style={{ padding: "7px 14px", fontSize: "11.5px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+                    {ad}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+        )}
+
+        {/* Fiyat (+ balya ağırlığı) */}
+        <div>
+          <Etiket>{fiyatEtiket}</Etiket>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <input type="text" inputMode="decimal" value={fiyat} onChange={(e) => setFiyat(e.target.value)} placeholder="Örn: 250" style={{ ...inputStil, fontSize: "17px", fontWeight: 700, color: urunRenk(urun), paddingRight: "30px" }} />
+              <span style={{ position: "absolute", right: "13px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: RENKLER.muted }}>₺</span>
+            </div>
+            {birim === "balya" && (
+              <div style={{ position: "relative", width: "140px" }}>
+                <input type="text" inputMode="decimal" value={balyaKg} onChange={(e) => setBalyaKg(e.target.value)} placeholder="balya kg" style={{ ...inputStil, fontSize: "13px" }} />
+                <span style={{ position: "absolute", right: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "10px", color: RENKLER.muted }}>kg</span>
+              </div>
+            )}
+          </div>
+          {birimliKategori && Number.isFinite(normalKg) && normalKg > 0 && (
+            <div style={{ fontSize: "11px", color: RENKLER.green, marginTop: "7px" }}>
+              ≈ {normalKg.toLocaleString("tr-TR", { maximumFractionDigits: 2 })} TL/kg <span style={{ color: RENKLER.muted }}>· topluluk ortalaması kg üzerinden hesaplanır</span>
+            </div>
+          )}
         </div>
 
         {/* İl + İlçe */}
@@ -234,7 +327,7 @@ export default function FiyatBildirPage() {
               const aktif = kaynak === k;
               return (
                 <button key={k} type="button" onClick={() => setKaynak(k)}
-                  style={{ padding: "7px 14px", fontSize: "11.5px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400, transition: "all .15s" }}>
+                  style={{ padding: "7px 14px", fontSize: "11.5px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
                   {k}
                 </button>
               );
