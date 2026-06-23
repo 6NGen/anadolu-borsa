@@ -143,7 +143,12 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
         <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "12px", marginBottom: "16px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
             <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em" }}>BORSALAR · {sf?.urun_ad ?? secilen}</span>
-            {fark != null && <span style={{ fontSize: "10px", color: RENKLER.muted }}>en düşük–yüksek fark: <b style={{ color: renk }}>%{formatFiyat(fark, 1)}</b></span>}
+            <span style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              {fark != null && <span style={{ fontSize: "10px", color: RENKLER.muted }}>fark: <b style={{ color: renk }}>%{formatFiyat(fark, 1)}</b></span>}
+              {kartUretilebilir(guncelSatir?.cekilme_tarihi) && (
+                <button onClick={() => window.open(`/api/kart/borsalar?urun=${secilen}`, "_blank")} style={{ background: "transparent", border: `1px solid ${RENKLER.border}`, color: RENKLER.muted, fontSize: "10px", padding: "3px 9px", borderRadius: "12px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>📷 Kart</button>
+              )}
+            </span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {borsaOzet.map((x) => (

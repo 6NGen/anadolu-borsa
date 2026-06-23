@@ -78,6 +78,41 @@ export async function hedefKartVeri(normGirdi: string, varlikKey: string): Promi
   };
 }
 
+// --- Borsalar kartı: aynı ürün, tüm borsalar yan yana (M2) ---
+export interface BorsalarKartVeri {
+  norm: string;
+  ad: string;
+  satirlar: { borsa: string; fiyat: number; hacim: number | null; tarih: string }[];
+  fark: number | null;     // en düşük–en yüksek % fark
+  enGuncelTarih: string;
+}
+
+export async function borsalarKartVeri(normGirdi: string): Promise<BorsalarKartVeri | null> {
+  const norm = normGirdi.trim().toUpperCase();
+  if (!/^[A-Z]{2,12}$/.test(norm)) return null;
+  // select("*") → islem_miktari migration_004'ten önce yoksa hata vermez (undefined)
+  const { data } = await supabaseServer.from("son_30_gun").select("*").eq("urun_norm", norm);
+  if (!data || data.length === 0) return null;
+
+  const enYeni = new Map<string, { borsa: string; fiyat: number; hacim: number | null; tarih: string }>();
+  for (const r of data as Record<string, unknown>[]) {
+    if (r.ortalama == null) continue;
+    const borsa = String(r.borsa);
+    const tarih = String(r.cekilme_tarihi);
+    const v = enYeni.get(borsa);
+    if (!v || tarih > v.tarih) {
+      enYeni.set(borsa, { borsa, fiyat: Number(r.ortalama), hacim: r.islem_miktari != null ? Number(r.islem_miktari) : null, tarih });
+    }
+  }
+  const satirlar = [...enYeni.values()].sort((a, b) => a.fiyat - b.fiyat);
+  if (satirlar.length < 2) return null; // tek borsa → karşılaştırma anlamsız
+
+  const fiyatlar = satirlar.map((s) => s.fiyat);
+  const fark = ((Math.max(...fiyatlar) - Math.min(...fiyatlar)) / Math.min(...fiyatlar)) * 100;
+  const enGuncelTarih = satirlar.reduce((en, s) => (s.tarih > en ? s.tarih : en), satirlar[0].tarih);
+  return { norm, ad: YEM_AD[norm] ?? norm, satirlar, fark, enGuncelTarih };
+}
+
 // --- Karşılaştırma kartı: RESMİ (borsa) vs PİYASA (kullanıcı bildirimi, min 3) ---
 export interface KarsilastirmaKartVeri {
   urun: UrunKartVeri;                                  // borsa tarafı (canlı)
