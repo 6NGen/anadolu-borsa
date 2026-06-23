@@ -136,6 +136,15 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
             <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "10px", lineHeight: 1.5 }}>
               Gelir = verim × {AD[urun].toLowerCase()} {formatFiyat(bf.fiyat)} ₺/kg ({bf.borsa} · {kisaTarih(bf.tarih)}). Verim TÜİK ortalamasıdır, düzenleyebilirsin. Maliyet kalemleri tahminidir — kendi değerlerini gir.
             </div>
+            <button
+              onClick={() => {
+                const p = new URLSearchParams({ urun, dekar: String(parseFiyatGirdi(dekar) || 1), verim, tohum, gubre, iscilik, diger });
+                window.open(`/api/kart/maliyet?${p.toString()}`, "_blank");
+              }}
+              style={{ marginTop: "12px", width: "100%", padding: "10px", background: "transparent", color: RENKLER.green, border: `1px solid ${RENKLER.green}55`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)", fontWeight: 700 }}
+            >
+              📷 Görsel Kart Oluştur
+            </button>
           </>
         )}
       </div>
