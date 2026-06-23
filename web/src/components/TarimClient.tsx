@@ -28,7 +28,12 @@ interface GrafikVeri {
   ortalama: number | null;
   en_az: number | null;
   en_cok: number | null;
+  islem_miktari?: number | null; // KG (migration_004 ile view'da); UI ton'a çevirir
 }
+
+const DUSUK_HACIM_KG = 20000; // <20 ton = düşük hacim
+const tonGoster = (kg?: number | null) =>
+  kg != null ? `${formatFiyat(kg / 1000, kg < 10000 ? 1 : 0)} ton` : null;
 
 interface Props {
   sonFiyatlar: SonFiyat[];
@@ -59,6 +64,17 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
   const guncelSatir = [...seri].sort((a, b) => b.cekilme_tarihi.localeCompare(a.cekilme_tarihi))[0];
   const sf = sonFiyatlar.find((f) => f.urun_norm === secilen);
   const renk = YEM_RENK[secilen] ?? RENKLER.green;
+
+  // M2: borsa karşılaştırması — her borsanın bu ürün için en güncel satırı
+  const borsaOzet = borsalar
+    .map((b) => {
+      const son = [...urunSatirlari.filter((g) => g.borsa === b)].sort((x, y) => y.cekilme_tarihi.localeCompare(x.cekilme_tarihi))[0];
+      return son && son.ortalama != null ? { borsa: b, fiyat: son.ortalama, tarih: son.cekilme_tarihi, hacim: son.islem_miktari ?? null } : null;
+    })
+    .filter((x): x is { borsa: string; fiyat: number; tarih: string; hacim: number | null } => x != null)
+    .sort((a, b) => a.fiyat - b.fiyat);
+  const fiyatDizi = borsaOzet.map((x) => x.fiyat);
+  const fark = fiyatDizi.length > 1 ? ((Math.max(...fiyatDizi) - Math.min(...fiyatDizi)) / Math.min(...fiyatDizi)) * 100 : null;
 
   return (
     <div>
@@ -105,6 +121,12 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
             <span style={{ fontSize: "13px", color: RENKLER.muted }}>TL/KG</span>
             <span style={{ fontSize: "11px", color: RENKLER.muted }}>{borsa} · {guncelSatir.cekilme_tarihi}</span>
             <VeriTazelik tarih={guncelSatir.cekilme_tarihi} />
+            {guncelSatir.islem_miktari != null && (
+              <span style={{ fontSize: "11px", color: RENKLER.muted }}>
+                · {tonGoster(guncelSatir.islem_miktari)} işlem
+                {guncelSatir.islem_miktari < DUSUK_HACIM_KG && <span style={{ color: "#E8C040", marginLeft: "6px" }}>⚠ düşük hacim</span>}
+              </span>
+            )}
           </div>
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
           <div style={{ marginBottom: "16px" }}>
@@ -114,6 +136,34 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
             />
           </div>
         </>
+      )}
+
+      {/* M2: Borsa karşılaştırması — aynı ürün, tüm borsalar */}
+      {borsaOzet.length > 1 && (
+        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "12px", marginBottom: "16px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em" }}>BORSALAR · {sf?.urun_ad ?? secilen}</span>
+            {fark != null && <span style={{ fontSize: "10px", color: RENKLER.muted }}>en düşük–yüksek fark: <b style={{ color: renk }}>%{formatFiyat(fark, 1)}</b></span>}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            {borsaOzet.map((x) => (
+              <div key={x.borsa} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", padding: "7px 9px", background: RENKLER.bg, borderRadius: "4px", border: x.borsa === borsa ? `1px solid ${renk}55` : `1px solid ${RENKLER.border}` }}>
+                <span style={{ color: RENKLER.text }}>{x.borsa} <span style={{ fontSize: "9px", color: RENKLER.muted }}>· {kisaTarih(x.tarih)}</span></span>
+                <span style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  {x.hacim != null && (
+                    <span style={{ fontSize: "9px", color: x.hacim < DUSUK_HACIM_KG ? "#E8C040" : RENKLER.muted }}>
+                      {tonGoster(x.hacim)}{x.hacim < DUSUK_HACIM_KG ? " ⚠" : ""}
+                    </span>
+                  )}
+                  <b style={{ color: renk, fontSize: "14px" }}>{formatFiyat(x.fiyat)} <span style={{ fontSize: "9px", color: RENKLER.muted, fontWeight: 400 }}>₺/kg</span></b>
+                </span>
+              </div>
+            ))}
+          </div>
+          <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.5 }}>
+            ⚠ düşük hacim = 20 tondan az işlemle oluşan fiyat; bölgeler arası fark bundan kaynaklanabilir.
+          </div>
+        </div>
       )}
 
       {/* Grafik */}
