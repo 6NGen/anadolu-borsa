@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/", label: "Anasayfa" },
   { href: "/tarim", label: "Tarım" },
   { href: "/hayvan", label: "Hayvan" },
+  { href: "/girdiler", label: "Girdiler" },
   { href: "/parite", label: "Parite" },
   { href: "/hedef", label: "Hedef" },
   { href: "/fiyat-bildir", label: "Fiyat Bildir" },
