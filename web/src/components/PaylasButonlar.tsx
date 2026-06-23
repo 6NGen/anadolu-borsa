@@ -14,7 +14,8 @@ export default function PaylasButonlar({ metin, pngUrl, pasifNot = "veri güncel
   const paylas = useCallback((kanal: "whatsapp" | "x" | "png") => {
     const m = encodeURIComponent(metin);
     if (kanal === "whatsapp") window.open(`https://wa.me/?text=${m}`, "_blank");
-    else if (kanal === "x") window.open(`https://x.com/intent/post?text=${m}`, "_blank");
+    // X paylaşım intent'i: intent/tweet kararlı çalışır (x.com'a yönlenir). intent/post açılmıyordu.
+    else if (kanal === "x") window.open(`https://twitter.com/intent/tweet?text=${m}`, "_blank");
     else if (pngUrl) window.open(pngUrl, "_blank");
   }, [metin, pngUrl]);
 
