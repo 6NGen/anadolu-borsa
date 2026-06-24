@@ -166,3 +166,29 @@ class TestAlarmTetik:
         assert _tetik("asagi", 14.0, 14.0) is True
         assert _tetik("asagi", 13.5, 14.0) is True
         assert _tetik("asagi", 14.1, 14.0) is False
+
+
+class TestAlarmTetikleyen:
+    """Hangi borsa tetikler: yukari->en yuksek, asagi->en dusuk."""
+
+    def test_yukari_en_yuksek_borsa(self):
+        from alarm import _tetikleyen
+        # arpa: Corum 11.10, Ilgin 12.50, Eskisehir 15.21; esik 12 yukari
+        f = [(11.10, "CORUM"), (12.50, "ILGIN"), (15.21, "ESKISEHIR")]
+        t = _tetikleyen("yukari", f, 12.0)
+        assert t == (15.21, "ESKISEHIR")  # en yuksek borsa tetikler
+
+    def test_yukari_hicbiri_asmaz(self):
+        from alarm import _tetikleyen
+        f = [(11.10, "CORUM"), (11.50, "ILGIN")]
+        assert _tetikleyen("yukari", f, 12.0) is None
+
+    def test_asagi_en_dusuk_borsa(self):
+        from alarm import _tetikleyen
+        f = [(11.10, "CORUM"), (12.50, "ILGIN"), (15.21, "ESKISEHIR")]
+        t = _tetikleyen("asagi", f, 11.5)
+        assert t == (11.10, "CORUM")  # en dusuk borsa tetikler
+
+    def test_bos_liste(self):
+        from alarm import _tetikleyen
+        assert _tetikleyen("yukari", [], 12.0) is None

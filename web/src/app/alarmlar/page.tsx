@@ -46,6 +46,16 @@ export default function AlarmlarPage() {
 
   useEffect(() => { alarmlariGetir(); }, [alarmlariGetir]);
 
+  // Sayfa açılışında bildirim izni ZATEN verildiyse butonu gösterme — sessizce token al.
+  useEffect(() => {
+    if (typeof Notification === "undefined") { setIzin("desteksiz"); return; }
+    if (Notification.permission === "granted") {
+      fcmTokenAl().then((t) => { if (t) { setToken(t); setIzin("verildi"); } });
+    } else if (Notification.permission === "denied") {
+      setIzin("reddedildi");
+    }
+  }, []);
+
   async function bildirimleriAc() {
     setHata(null);
     setIzinMesgul(true);
@@ -154,14 +164,23 @@ export default function AlarmlarPage() {
         <div style={{ marginTop: "20px" }}>
           <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>KURDUĞUN ALARMLAR</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-            {alarmlar.map((a) => (
-              <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", padding: "10px 12px" }}>
-                <span style={{ fontSize: "12px", color: RENKLER.text }}>
-                  {adGoster(a.urun_norm)} {a.yon === "yukari" ? "▲" : "▼"} {formatFiyat(a.esik_fiyat)} <span style={{ color: RENKLER.muted, fontSize: "10px" }}>{birim(a.urun_norm)}</span>
-                </span>
-                <button onClick={() => alarmSil(a.id)} style={{ background: "transparent", border: "none", color: RENKLER.red, fontSize: "11px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>Sil</button>
-              </div>
-            ))}
+            {alarmlar.map((a) => {
+              const pasif = !a.aktif; // tetiklenince scraper aktif=false yapar
+              return (
+                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: RENKLER.surface, border: `1px solid ${pasif ? RENKLER.border : RENKLER.green + "44"}`, borderRadius: "8px", padding: "10px 12px", opacity: pasif ? 0.65 : 1 }}>
+                  <span style={{ fontSize: "12px", color: RENKLER.text, display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                    <span>{adGoster(a.urun_norm)} {a.yon === "yukari" ? "▲" : "▼"} {formatFiyat(a.esik_fiyat)} <span style={{ color: RENKLER.muted, fontSize: "10px" }}>{birim(a.urun_norm)}</span></span>
+                    {pasif
+                      ? <span style={{ color: RENKLER.green, fontSize: "9px" }}>✓ tetiklendi</span>
+                      : <span style={{ color: RENKLER.muted, fontSize: "9px" }}>● aktif</span>}
+                  </span>
+                  <button onClick={() => alarmSil(a.id)} style={{ background: "transparent", border: "none", color: RENKLER.red, fontSize: "11px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>Sil</button>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.5 }}>
+            Tetiklenen alarm bir daha çalmaz (otomatik pasifleşir). Tekrar uyarı istersen Sil + yeniden kur.
           </div>
         </div>
       )}

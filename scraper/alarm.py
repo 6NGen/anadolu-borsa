@@ -24,28 +24,50 @@ def _erisim_token(sa_info: dict) -> str:
 
 
 def _guncel_fiyatlar(supabase) -> dict:
-    """{urun_norm: fiyat} — yem (son_fiyatlar) + hayvan (son_hayvan_fiyatlari, norm basina en guncel)."""
-    fiyatlar: dict = {}
-    yem = supabase.table("son_fiyatlar").select("urun_norm, ortalama").execute().data or []
-    for r in yem:
-        if r.get("ortalama") is not None:
-            fiyatlar[r["urun_norm"]] = float(r["ortalama"])
+    """norm -> [(fiyat, kaynak), ...] — her borsa/kaynagin EN GUNCEL degeri.
+    Arpa gibi borsadan borsaya cok degisen urunlerde alarm hangi borsanin
+    tetikledigini bilmeli (Corum 11.10 / Eskisehir 15.21 / Ilgin 12.50)."""
+    sonuc: dict = {}
 
-    en_yeni: dict = {}  # norm -> (tarih, fiyat) — view kaynak basina satir doner, en guncel tarihi tut
-    hay = supabase.table("son_hayvan_fiyatlari").select("hayvan_norm, fiyat, cekilme_tarihi").execute().data or []
+    # YEM: son_30_gun (borsa kolonu var) — (norm, borsa) basina en guncel
+    eny: dict = {}
+    yem = supabase.table("son_30_gun").select("urun_norm, borsa, cekilme_tarihi, ortalama").execute().data or []
+    for r in yem:
+        if r.get("ortalama") is None:
+            continue
+        k = (r["urun_norm"], r["borsa"]); t = r.get("cekilme_tarihi") or ""
+        if k not in eny or t > eny[k][0]:
+            eny[k] = (t, float(r["ortalama"]))
+    for (norm, borsa), (_t, f) in eny.items():
+        sonuc.setdefault(norm, []).append((f, borsa))
+
+    # HAYVAN: son_hayvan_fiyatlari — norm basina en guncel kaynak
+    enh: dict = {}
+    hay = supabase.table("son_hayvan_fiyatlari").select("hayvan_norm, kaynak, fiyat, cekilme_tarihi").execute().data or []
     for r in hay:
         if r.get("fiyat") is None:
             continue
         n, t = r["hayvan_norm"], r.get("cekilme_tarihi") or ""
-        if n not in en_yeni or t > en_yeni[n][0]:
-            en_yeni[n] = (t, float(r["fiyat"]))
-    for n, (_t, f) in en_yeni.items():
-        fiyatlar[n] = f
-    return fiyatlar
+        kaynak = (r.get("kaynak") or "").replace("_SUT", "")
+        if n not in enh or t > enh[n][0]:
+            enh[n] = (t, float(r["fiyat"]), kaynak)
+    for n, (_t, f, kaynak) in enh.items():
+        sonuc.setdefault(n, []).append((f, kaynak))
+
+    return sonuc
 
 
 def _tetik(yon: str, fiyat: float, esik: float) -> bool:
     return (yon == "yukari" and fiyat >= esik) or (yon == "asagi" and fiyat <= esik)
+
+
+def _tetikleyen(yon: str, fiyatlar: list, esik: float):
+    """yon yonunde esigi asan EN ALAKALI (yukari->en yuksek borsa, asagi->en
+    dusuk borsa) (fiyat, kaynak); asan yoksa None. fiyatlar: [(fiyat, kaynak)]."""
+    if not fiyatlar:
+        return None
+    aday = max(fiyatlar, key=lambda x: x[0]) if yon == "yukari" else min(fiyatlar, key=lambda x: x[0])
+    return aday if _tetik(yon, aday[0], esik) else None
 
 
 def alarmlari_kontrol_et(supabase) -> None:
@@ -75,17 +97,20 @@ def alarmlari_kontrol_et(supabase) -> None:
 
     gonderilen = 0
     for a in alarmlar:
-        fiyat = fiyatlar.get(a["urun_norm"])
-        if fiyat is None or not a.get("fcm_token"):
+        norm_fiyatlar = fiyatlar.get(a["urun_norm"])
+        if not norm_fiyatlar or not a.get("fcm_token"):
             continue
         esik = float(a["esik_fiyat"])
-        if not _tetik(a["yon"], fiyat, esik):
+        tetik = _tetikleyen(a["yon"], norm_fiyatlar, esik)
+        if not tetik:
             continue
+        fiyat, kaynak = tetik
 
         ad = a["urun_norm"]
         yon_txt = "ustune cikti" if a["yon"] == "yukari" else "altina indi"
         baslik = f"{ad} fiyat alarmi"
-        govde = f"{ad} fiyati {fiyat:g} oldu — esigin {esik:g} {yon_txt}."
+        # Hangi borsanin tetikledigini yaz — seffaflik (arpa borsadan borsaya degisir)
+        govde = f"{ad} {kaynak} borsasinda {fiyat:g} TL — esigin {esik:g} {yon_txt}."
         try:
             r = requests.post(
                 f"https://fcm.googleapis.com/v1/projects/{proje_id}/messages:send",
