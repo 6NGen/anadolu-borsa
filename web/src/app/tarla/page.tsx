@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Güzlük buğday/arpa tarlanı sanal aç, açılış maliyetini sabitle, bugünkü değerini canlı borsa fiyatıyla izle, hasatta paylaş.",
 };
 
-const URUNLER = ["BUGDAY", "ARPA"];
+const URUNLER = ["BUGDAY", "ARPA", "YULAF", "MISIR"];
 
 export default async function TarlaPage() {
   const [{ data: mazotRows }, { data: sonFiyatlar }] = await Promise.all([
