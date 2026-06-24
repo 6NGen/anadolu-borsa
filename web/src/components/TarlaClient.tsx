@@ -45,7 +45,15 @@ export default function TarlaClient({ mazot, borsa }: Props) {
   const [ilDokunuldu, setIlDokunuldu] = useState(false);
 
   useEffect(() => {
-    try { const ham = localStorage.getItem(ANAHTAR); if (ham) setTarla(JSON.parse(ham)); } catch { /* yok */ }
+    try {
+      const ham = localStorage.getItem(ANAHTAR);
+      if (ham) {
+        const t = JSON.parse(ham);
+        // Geçerli yeni şema mı? (eski broken sürümün kaydı urunKey içermez → ele)
+        if (t && typeof t.urunKey === "string" && tarlaUrunBul(t.urunKey)) setTarla(t);
+        else localStorage.removeItem(ANAHTAR);
+      }
+    } catch { localStorage.removeItem(ANAHTAR); }
     setYuklendi(true);
   }, []);
   useEffect(() => {
@@ -125,7 +133,15 @@ export default function TarlaClient({ mazot, borsa }: Props) {
   }
 
   // ── İZLE / HASAT ──
-  const u = tarlaUrunBul(tarla.urunKey)!;
+  const u = tarlaUrunBul(tarla.urunKey);
+  if (!u) {
+    return (
+      <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)", textAlign: "center" }}>
+        <p style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "14px" }}>Tarla kaydı okunamadı (eski sürüm olabilir).</p>
+        <button onClick={tarlayiKapat} style={{ padding: "10px 20px", background: RENKLER.green, color: "#06140C", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Sıfırla</button>
+      </main>
+    );
+  }
   const renk = YEM_RENK[tarla.urunNorm] ?? RENKLER.green;
   const bf = borsa[tarla.urunNorm];
   const guncelFiyat = bf?.fiyat ?? tarla.acilisFiyat;
