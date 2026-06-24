@@ -6,6 +6,7 @@ import VeriTazelik from "@/components/VeriTazelik";
 import { RENKLER, HAYVAN_RENK } from "@/lib/theme";
 import { formatFiyat } from "@/lib/format";
 import { tekHayvanKaynak } from "@/lib/guncel";
+import { hasatSezonuMu } from "@/lib/hasat-takvimi";
 
 // Kartlarda temiz, büyük harf Türkçe ad (ham "Cig Sut (USK tavsiye)" / "I. KALİTE (Tosun)" yerine)
 const HAYVAN_GORUNEN: Record<string, string> = {
@@ -60,6 +61,20 @@ export default async function Dashboard() {
 
       {/* Kurban sayacı */}
       <KurbanSayaci />
+
+      {/* Hasat dönemi giriş kartı — yalnız Mayıs–Ağustos */}
+      {hasatSezonuMu() && (
+        <Link href="/hasat" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "12px 16px", marginBottom: "16px", background: "linear-gradient(135deg,#0C1A0E,#10210F)", border: `1px solid ${RENKLER.green}40`, borderRadius: "8px", textDecoration: "none" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "20px" }}>🌾</span>
+            <span>
+              <span style={{ display: "block", fontSize: "13px", color: RENKLER.text, fontWeight: 600 }}>Hasat Paneli</span>
+              <span style={{ display: "block", fontSize: "10px", color: RENKLER.muted }}>Bölge havası · fiyat trendi · hasat takvimi</span>
+            </span>
+          </span>
+          <span style={{ fontSize: "11px", color: RENKLER.green }}>Aç →</span>
+        </Link>
+      )}
 
       {/* Sekmeler */}
       <div style={{ display: "flex", gap: "6px", marginBottom: "20px", flexWrap: "wrap" }}>
