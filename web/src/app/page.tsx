@@ -7,12 +7,7 @@ import { RENKLER, HAYVAN_RENK } from "@/lib/theme";
 import { formatFiyat } from "@/lib/format";
 import { tekHayvanKaynak } from "@/lib/guncel";
 import { hasatSezonuMu } from "@/lib/hasat-takvimi";
-
-// Kartlarda temiz, büyük harf Türkçe ad (ham "Cig Sut (USK tavsiye)" / "I. KALİTE (Tosun)" yerine)
-const HAYVAN_GORUNEN: Record<string, string> = {
-  TOSUN: "TOSUN", DANA: "DANA", INEK: "İNEK", MANDA: "MANDA",
-  KUZU: "KUZU", TOKLU: "TOKLU", KOYUN: "KOYUN", OGLAK: "OĞLAK", SUT: "ÇİĞ SÜT",
-};
+import { hayvanGorunen } from "@/lib/karkas";
 import KurbanSayaci from "@/components/KurbanSayaci";
 import SinyalMotoru from "@/components/SinyalMotoru";
 import Link from "next/link";
@@ -32,7 +27,7 @@ export default async function Dashboard() {
   // 3.3: her ticker öğesi TEK string — parça kopması/yetim birim olmaz
   const tickerItems = [
     ...(sonFiyatlar ?? []).map((f) => `${f.urun_norm} ${formatFiyat(f.ortalama)} TL/KG`),
-    ...sonHayvan.map((h) => `${HAYVAN_GORUNEN[h.hayvan_norm] ?? h.hayvan_norm} ${formatFiyat(h.fiyat)} ${h.birim ?? "TL/kg"}`),
+    ...sonHayvan.map((h) => `${hayvanGorunen(h.hayvan_norm)} ${formatFiyat(h.fiyat)} ${h.birim ?? "TL/kg"}`),
   ];
 
   return (
@@ -124,7 +119,7 @@ export default async function Dashboard() {
                     <div key={`${h.kaynak}-${h.hayvan_norm}`} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px", display: "flex", gap: "10px" }}>
                       <div style={{ width: "3px", background: renk, borderRadius: "2px", flexShrink: 0 }} />
                       <div>
-                        <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "0 0 2px" }}>{HAYVAN_GORUNEN[h.hayvan_norm] ?? h.hayvan}</div>
+                        <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "0 0 2px" }}>{hayvanGorunen(h.hayvan_norm)}</div>
                         <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(h.fiyat)}</div>
                         <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "2px" }}>{h.birim}</div>
                         <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>

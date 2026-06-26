@@ -4,6 +4,7 @@ import HayvanClient from "@/components/HayvanClient";
 import SuruDegeri from "@/components/SuruDegeri";
 import PiyasaKarti from "@/components/PiyasaKarti";
 import { tekHayvanKaynak } from "@/lib/guncel";
+import { hayvanGorunen } from "@/lib/karkas";
 import { RENKLER } from "@/lib/theme";
 
 export const revalidate = 3600;
@@ -48,7 +49,7 @@ export default async function HayvanPage() {
                 return (
                   <PiyasaKarti
                     key={h.hayvan_norm}
-                    urun_ad={h.hayvan}
+                    urun_ad={hayvanGorunen(h.hayvan_norm)}
                     borsa={{ kaynak: h.kaynak.replace("_SUT", ""), fiyat: h.fiyat, birim: h.birim ?? "TL/kg", tarih: h.cekilme_tarihi }}
                     piyasa={pv ? { agirlikli_ortalama: pv.agirlikli_ortalama, en_az: pv.en_az, en_cok: pv.en_cok, bildirim_sayisi: pv.bildirim_sayisi, il: pv.il } : null}
                   />

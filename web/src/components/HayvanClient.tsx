@@ -7,6 +7,7 @@ import { HAYVAN_RENK, RENKLER } from "@/lib/theme";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { distinctGun } from "@/lib/guncel";
 import { kartUretilebilir } from "@/lib/tazelik";
+import { hayvanGorunen } from "@/lib/karkas";
 
 interface HayvanFiyat {
   kaynak: string;
@@ -55,7 +56,7 @@ export default function HayvanClient({ fiyatlar, grafik }: Props) {
               onClick={() => setSecilen(f.hayvan_norm)}
               style={{ padding: "5px 12px", fontSize: "11px", background: aktif ? r : RENKLER.surface, color: aktif ? "#fff" : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}
             >
-              {f.hayvan_norm}
+              {hayvanGorunen(f.hayvan_norm)}
             </button>
           );
         })}
@@ -72,7 +73,7 @@ export default function HayvanClient({ fiyatlar, grafik }: Props) {
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
           <div style={{ marginBottom: "16px" }}>
             <PaylasButonlar
-              metin={`🐄 ${sf.hayvan} ${formatFiyat(sf.fiyat)} ${sf.birim}\n${sf.kaynak.replace("_SUT", "")} · ${kisaTarih(sf.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/hayvan`}
+              metin={`🐄 ${hayvanGorunen(secilen)} ${formatFiyat(sf.fiyat)} ${sf.birim}\n${sf.kaynak.replace("_SUT", "")} · ${kisaTarih(sf.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/hayvan`}
               pngUrl={kartUretilebilir(sf.cekilme_tarihi) ? `/api/kart/fiyat?urun=${secilen}` : null}
             />
           </div>

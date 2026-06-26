@@ -19,6 +19,14 @@ export const HAYVAN_AD: Record<string, string> = {
   KUZU: "Kuzu", TOKLU: "Toklu", KOYUN: "Koyun", OGLAK: "Oğlak",
 };
 
+// Kartlarda/başlıklarda temiz BÜYÜK harf ad (ham "Cig Sut (USK tavsiye)" /
+// "I. KALİTE (Tosun)" yerine). SUT → ÇİĞ SÜT. Tek kaynak (ev + hayvan sayfası).
+export const HAYVAN_GORUNEN: Record<string, string> = {
+  TOSUN: "TOSUN", DANA: "DANA", INEK: "İNEK", MANDA: "MANDA",
+  KUZU: "KUZU", TOKLU: "TOKLU", KOYUN: "KOYUN", OGLAK: "OĞLAK", SUT: "ÇİĞ SÜT",
+};
+export const hayvanGorunen = (norm: string) => HAYVAN_GORUNEN[norm] ?? norm;
+
 // "baş (ort. 450kg, %50 karkas)" — canlı ağırlık = karkas × 2 varsayımı
 export function karkasLabel(norm: string): string {
   const kg = KARKAS_KG[norm];
