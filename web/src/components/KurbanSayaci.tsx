@@ -49,7 +49,7 @@ export default function KurbanSayaci() {
       <div style={{ fontSize: "26px", fontWeight: 700, color: RENKLER.text, fontFamily: "var(--font-mono)", lineHeight: 1 }}>
         {String(deger).padStart(2, "0")}
       </div>
-      <div style={{ fontSize: "9px", color: RENKLER.muted, letterSpacing: "0.1em", marginTop: "4px" }}>{etiket}</div>
+      <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginTop: "4px" }}>{etiket}</div>
     </div>
   );
 
@@ -60,7 +60,7 @@ export default function KurbanSayaci() {
           <span style={{ fontSize: "30px" }}>🐑</span>
           <div>
             <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>KURBAN BAYRAMI&apos;NA</div>
-            <div style={{ fontSize: "10px", color: RENKLER.muted }}>
+            <div style={{ fontSize: "12px", color: RENKLER.muted }}>
               {hedef.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })} · canlı hayvan fiyatları →
             </div>
           </div>

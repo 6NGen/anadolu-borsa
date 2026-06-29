@@ -22,7 +22,7 @@ export default async function TarimPage() {
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>TARIM BORSASI</h1>
-        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "4px" }}>TOBB ve Konya Ticaret Borsası (KTB) verileri · Günlük güncellenir</p>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>TOBB ve Konya Ticaret Borsası (KTB) verileri · Günlük güncellenir</p>
       </div>
 
       {(sonFiyatlar ?? []).length === 0 ? (
@@ -33,7 +33,7 @@ export default async function TarimPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4">
           <TarimClient sonFiyatlar={sonFiyatlar ?? []} grafik={grafik ?? []} />
           <div>
-            <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>BORSA vs PİYASA</div>
+            <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>BORSA vs PİYASA</div>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {(sonFiyatlar ?? []).map((f) => {
                 const piyasaVeri = (piyasa ?? []).find((p) => p.urun_norm === f.urun_norm) ?? null;

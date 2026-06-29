@@ -11,5 +11,5 @@ export default function SaatGosterg() {
     const t = setInterval(update, 1000);
     return () => clearInterval(t);
   }, []);
-  return <span style={{ fontSize: "11px", color: RENKLER.muted, fontVariantNumeric: "tabular-nums" }}>{saat}</span>;
+  return <span style={{ fontSize: "13px", color: RENKLER.muted, fontVariantNumeric: "tabular-nums" }}>{saat}</span>;
 }

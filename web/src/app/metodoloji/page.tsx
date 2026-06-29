@@ -53,7 +53,7 @@ const ROZETLER = [
 const S = {
   h2: { fontSize: "12px", color: RENKLER.green, letterSpacing: "0.15em", margin: "28px 0 10px", fontWeight: 700 } as const,
   p: { fontSize: "12px", color: RENKLER.text, lineHeight: 1.7, margin: "6px 0" } as const,
-  mut: { fontSize: "11px", color: RENKLER.muted, lineHeight: 1.7 } as const,
+  mut: { fontSize: "13px", color: RENKLER.muted, lineHeight: 1.7 } as const,
   kutu: { background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px 16px" } as const,
   td: { padding: "8px 10px", borderBottom: `1px solid ${RENKLER.border}`, verticalAlign: "top" as const },
 };
@@ -68,7 +68,7 @@ export default function MetodolojiPage() {
 
       <h2 style={S.h2}>VERİ KAYNAKLARI</h2>
       <div style={{ ...S.kutu, padding: 0, overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
           <thead>
             <tr style={{ color: RENKLER.muted, textAlign: "left", letterSpacing: "0.08em" }}>
               <th style={S.td}>KAYNAK</th>

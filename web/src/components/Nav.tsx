@@ -38,7 +38,7 @@ export default function Nav() {
             const active = isActive(l.href);
             return (
               <Link key={l.href} href={l.href} style={{
-                color: active ? RENKLER.text : RENKLER.muted, fontSize: "11px", textDecoration: "none",
+                color: active ? RENKLER.text : RENKLER.muted, fontSize: "13px", textDecoration: "none",
                 padding: "4px 8px", borderBottom: active ? `2px solid ${RENKLER.green}` : "2px solid transparent",
                 transition: "color 0.15s", whiteSpace: "nowrap",
               }}>
@@ -53,7 +53,7 @@ export default function Nav() {
           <BolgemSecici />
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: RENKLER.pos, display: "inline-block", animation: "pulse 2s infinite" }} />
-            <span className="hidden sm:inline" style={{ fontSize: "10px", color: RENKLER.muted }}>CANLI</span>
+            <span className="hidden sm:inline" style={{ fontSize: "12px", color: RENKLER.muted }}>CANLI</span>
           </div>
           {/* M2: giriş durumu — giriş yapılmışsa 👤, değilse Giriş linki */}
           <Link href="/giris" title={user ? "Hesabım" : "Giriş yap"} style={{ fontSize: user ? "15px" : "11px", color: user ? RENKLER.text : RENKLER.green, textDecoration: "none", whiteSpace: "nowrap" }}>

@@ -36,7 +36,7 @@ export default async function Dashboard() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", padding: "12px 16px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
         <div>
           <span style={{ fontFamily: "var(--font-syne)", fontSize: "18px", fontWeight: 700, color: RENKLER.green, letterSpacing: "0.08em" }}>ANADOLU BORSA</span>
-          <span className="hidden sm:inline" style={{ marginLeft: "10px", fontSize: "10px", color: RENKLER.muted }}>Türkiye Tarım & Hayvancılık Fiyat Platformu</span>
+          <span className="hidden sm:inline" style={{ marginLeft: "10px", fontSize: "12px", color: RENKLER.muted }}>Türkiye Tarım & Hayvancılık Fiyat Platformu</span>
         </div>
         <SaatGosterg />
       </div>
@@ -46,7 +46,7 @@ export default async function Dashboard() {
         <div style={{ overflow: "hidden", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "7px 0", marginBottom: "16px" }}>
           <div style={{ display: "flex", animation: "ticker 40s linear infinite", width: "max-content" }}>
             {[...tickerItems, ...tickerItems].map((item, i) => (
-              <span key={i} style={{ fontSize: "11px", color: RENKLER.muted, padding: "0 24px", whiteSpace: "nowrap", borderRight: `1px solid ${RENKLER.border}` }}>
+              <span key={i} style={{ fontSize: "13px", color: RENKLER.muted, padding: "0 24px", whiteSpace: "nowrap", borderRight: `1px solid ${RENKLER.border}` }}>
                 {item}
               </span>
             ))}
@@ -64,10 +64,10 @@ export default async function Dashboard() {
             <span style={{ fontSize: "20px" }}>🌾</span>
             <span>
               <span style={{ display: "block", fontSize: "13px", color: RENKLER.text, fontWeight: 600 }}>Hasat Paneli</span>
-              <span style={{ display: "block", fontSize: "10px", color: RENKLER.muted }}>Bölge havası · fiyat trendi · hasat takvimi</span>
+              <span style={{ display: "block", fontSize: "12px", color: RENKLER.muted }}>Bölge havası · fiyat trendi · hasat takvimi</span>
             </span>
           </span>
-          <span style={{ fontSize: "11px", color: RENKLER.green }}>Aç →</span>
+          <span style={{ fontSize: "13px", color: RENKLER.green }}>Aç →</span>
         </Link>
       )}
 
@@ -79,7 +79,7 @@ export default async function Dashboard() {
           { href: "/parite", label: "PARİTE ENDEKSİ" },
           { href: "/hedef",  label: "HEDEF PANEL" },
         ].map(({ href, label }) => (
-          <Link key={href} href={href} style={{ padding: "7px 14px", fontSize: "11px", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", textDecoration: "none", letterSpacing: "0.05em" }}>
+          <Link key={href} href={href} style={{ padding: "7px 14px", fontSize: "13px", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", textDecoration: "none", letterSpacing: "0.05em" }}>
             {label}
           </Link>
         ))}
@@ -94,8 +94,8 @@ export default async function Dashboard() {
           {(sonFiyatlar ?? []).length > 0 && (
             <section style={{ marginBottom: "24px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.12em" }}>YEM FİYATLARI</span>
-                <Link href="/tarim" style={{ fontSize: "10px", color: RENKLER.green, textDecoration: "none" }}>Grafik & Detay →</Link>
+                <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em" }}>YEM FİYATLARI</span>
+                <Link href="/tarim" style={{ fontSize: "12px", color: RENKLER.green, textDecoration: "none" }}>Grafik & Detay →</Link>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: "8px" }}>
                 {(sonFiyatlar ?? []).map((f) => (
@@ -109,8 +109,8 @@ export default async function Dashboard() {
           {sonHayvan.length > 0 && (
             <section>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.12em" }}>HAYVAN FİYATLARI</span>
-                <Link href="/hayvan" style={{ fontSize: "10px", color: RENKLER.green, textDecoration: "none" }}>Grafik & Detay →</Link>
+                <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em" }}>HAYVAN FİYATLARI</span>
+                <Link href="/hayvan" style={{ fontSize: "12px", color: RENKLER.green, textDecoration: "none" }}>Grafik & Detay →</Link>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: "8px" }}>
                 {sonHayvan.map((h) => {
@@ -121,8 +121,8 @@ export default async function Dashboard() {
                       <div>
                         <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "0 0 2px" }}>{hayvanGorunen(h.hayvan_norm)}</div>
                         <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(h.fiyat)}</div>
-                        <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "2px" }}>{h.birim}</div>
-                        <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
+                        <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "2px" }}>{h.birim}</div>
+                        <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
                           <span>{h.kaynak} · {h.cekilme_tarihi}</span>
                           <VeriTazelik tarih={h.cekilme_tarihi} />
                         </div>
@@ -146,7 +146,7 @@ export default async function Dashboard() {
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           <HavaDurumu />
           <div style={{ padding: "14px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
-            <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>ARAÇLAR</div>
+            <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>ARAÇLAR</div>
             {[
               { href: "/fiyat-bildir", label: "Fiyat Bildir", desc: "Gerçek piyasa fiyatını gir" },
               { href: "/parite",       label: "Parite",       desc: "Mazot/Süt, Mazot/Arpa oranı" },
@@ -154,7 +154,7 @@ export default async function Dashboard() {
             ].map(({ href, label, desc }) => (
               <Link key={href} href={href} style={{ display: "block", padding: "9px 10px", marginBottom: "4px", background: "#080E09", borderRadius: "3px", textDecoration: "none", border: `1px solid ${RENKLER.border}` }}>
                 <div style={{ fontSize: "12px", color: RENKLER.text }}>{label}</div>
-                <div style={{ fontSize: "10px", color: RENKLER.muted }}>{desc}</div>
+                <div style={{ fontSize: "12px", color: RENKLER.muted }}>{desc}</div>
               </Link>
             ))}
           </div>

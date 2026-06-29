@@ -10,14 +10,14 @@ export default function BolgemSecici() {
   return (
     <label
       title="Bölgeni seç — hava durumu ve borsa fiyatı kişiselleşir"
-      style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "10px", color: RENKLER.muted, cursor: "pointer" }}
+      style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "12px", color: RENKLER.muted, cursor: "pointer" }}
     >
       <span aria-hidden>📍</span>
       <select
         value={il ?? ""}
         onChange={(e) => setIl(e.target.value)}
         aria-label="Bölge seç"
-        style={{ background: "transparent", border: "none", color: il ? RENKLER.text : RENKLER.muted, fontSize: "10px", fontFamily: "var(--font-mono)", cursor: "pointer", outline: "none", maxWidth: "104px" }}
+        style={{ background: "transparent", border: "none", color: il ? RENKLER.text : RENKLER.muted, fontSize: "12px", fontFamily: "var(--font-mono)", cursor: "pointer", outline: "none", maxWidth: "104px" }}
       >
         <option value="" disabled>Bölge seç</option>
         {ILLER.map((i) => (

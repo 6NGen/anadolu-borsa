@@ -16,8 +16,8 @@ interface Props {
 function Etiket({ children, not }: { children: React.ReactNode; not?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "6px" }}>
-      <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", fontWeight: 600 }}>{children}</span>
-      {not && <span style={{ fontSize: "9px", color: "#3A5A40" }}>{not}</span>}
+      <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", fontWeight: 600 }}>{children}</span>
+      {not && <span style={{ fontSize: "12px", color: "#3A5A40" }}>{not}</span>}
     </div>
   );
 }
@@ -66,7 +66,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
     <main style={{ maxWidth: "680px", margin: "0 auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>EKİM MALİYETİ</h1>
-        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Dekar başı maliyet ve bugünkü borsa fiyatıyla beklenen gelir. Gelecek fiyat tahmin edilmez.</p>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Dekar başı maliyet ve bugünkü borsa fiyatıyla beklenen gelir. Gelecek fiyat tahmin edilmez.</p>
       </div>
 
       {/* Ürün */}
@@ -75,7 +75,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
           const r = YEM_RENK[u] ?? RENKLER.green;
           const aktif = u === urun;
           return (
-            <button key={u} onClick={() => urunSec(u)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", fontSize: "11.5px", background: aktif ? `${r}22` : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+            <button key={u} onClick={() => urunSec(u)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", fontSize: "13px", background: aktif ? `${r}22` : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
               <span style={{ fontSize: "13px" }}>{emoji(u)}</span>{AD[u]}
             </button>
           );
@@ -97,7 +97,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
       <div style={{ ...kart, marginBottom: "12px" }}>
         <Etiket>MALİYET KALEMLERİ (TL/dekar)</Etiket>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: `1px solid ${RENKLER.border}` }}>
-          <span style={{ fontSize: "12px", color: RENKLER.text }}>⛽ Mazot <span style={{ fontSize: "9px", color: RENKLER.muted }}>({mazotLt} lt × {formatFiyat(mazot)} ₺ · canlı)</span></span>
+          <span style={{ fontSize: "12px", color: RENKLER.text }}>⛽ Mazot <span style={{ fontSize: "12px", color: RENKLER.muted }}>({mazotLt} lt × {formatFiyat(mazot)} ₺ · canlı)</span></span>
           <span style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600 }}>{formatFiyat(s.mazotTlDekar, 0)} ₺</span>
         </div>
         {([["Tohum", tohum, setTohum], ["Gübre", gubre, setGubre], ["İşçilik", iscilik, setIscilik], ["Diğer", diger, setDiger]] as const).map(([ad, val, set]) => (
@@ -105,7 +105,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
             <span style={{ fontSize: "12px", color: RENKLER.text }}>{ad}</span>
             <div style={{ position: "relative", width: "120px" }}>
               <input type="text" inputMode="decimal" value={val} onChange={(e) => set(e.target.value)} style={{ ...inputStil, padding: "7px 24px 7px 10px", fontSize: "13px", textAlign: "right" }} />
-              <span style={{ position: "absolute", right: "9px", top: "50%", transform: "translateY(-50%)", fontSize: "10px", color: RENKLER.muted }}>₺</span>
+              <span style={{ position: "absolute", right: "9px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: RENKLER.muted }}>₺</span>
             </div>
           </div>
         ))}
@@ -122,18 +122,18 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
         ) : (
           <>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-              <span style={{ fontSize: "11px", color: RENKLER.muted }}>Beklenen gelir / dekar <span style={{ fontSize: "9px" }}>(bugünkü fiyatla)</span></span>
+              <span style={{ fontSize: "13px", color: RENKLER.muted }}>Beklenen gelir / dekar <span style={{ fontSize: "12px" }}>(bugünkü fiyatla)</span></span>
               <span style={{ fontSize: "13px", color: RENKLER.text }}>{formatFiyat(s.gelirDekar, 0)} ₺</span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "10px" }}>
-              <span style={{ fontSize: "11px", color: RENKLER.muted }}>Net / dekar</span>
+              <span style={{ fontSize: "13px", color: RENKLER.muted }}>Net / dekar</span>
               <span style={{ fontSize: "30px", color: netPozitif ? RENKLER.pos : RENKLER.red, fontWeight: 800 }}>{netPozitif ? "+" : ""}{formatFiyat(s.netDekar, 0)} ₺</span>
             </div>
             <div style={{ borderTop: `1px solid ${RENKLER.border}`, paddingTop: "10px", display: "flex", justifyContent: "space-between", fontSize: "12px" }}>
               <span style={{ color: RENKLER.muted }}>{formatFiyat(parseFiyatGirdi(dekar) || 0, 0)} dekar toplam net</span>
               <span style={{ color: netPozitif ? RENKLER.pos : RENKLER.red, fontWeight: 700 }}>{netPozitif ? "+" : ""}{formatFiyat(s.netToplam, 0)} ₺</span>
             </div>
-            <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "10px", lineHeight: 1.5 }}>
+            <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "10px", lineHeight: 1.5 }}>
               Gelir = verim × {AD[urun].toLowerCase()} {formatFiyat(bf.fiyat)} ₺/kg ({bf.borsa} · {kisaTarih(bf.tarih)}). Verim TÜİK ortalamasıdır, düzenleyebilirsin. Maliyet kalemleri tahminidir — kendi değerlerini gir.
             </div>
             <button

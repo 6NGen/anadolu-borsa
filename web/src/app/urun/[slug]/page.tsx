@@ -76,7 +76,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
         />
       )}
       {/* Breadcrumb */}
-      <div style={{ fontSize: "10px", color: RENKLER.muted, marginBottom: "16px" }}>
+      <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "16px" }}>
         Anadolu Borsa / {meta?.kategori ?? "ürün"} / {norm}
       </div>
 
@@ -95,7 +95,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
           />
         )}
         <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "16px" }}>
-          <div style={{ fontSize: "10px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>SON 30 GÜN</div>
+          <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>SON 30 GÜN</div>
           <FiyatGrafik data={grafikVeri} renk={renk} birim={guncel?.birim ?? "TL/KG"} urun_ad={guncel?.urun_ad ?? norm} />
         </div>
       </div>

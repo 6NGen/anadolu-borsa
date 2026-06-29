@@ -54,7 +54,7 @@ export default function HayvanClient({ fiyatlar, grafik }: Props) {
             <button
               key={`${f.kaynak}-${f.hayvan_norm}`}
               onClick={() => setSecilen(f.hayvan_norm)}
-              style={{ padding: "5px 12px", fontSize: "11px", background: aktif ? r : RENKLER.surface, color: aktif ? "#fff" : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}
+              style={{ padding: "5px 12px", fontSize: "13px", background: aktif ? r : RENKLER.surface, color: aktif ? "#fff" : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}
             >
               {hayvanGorunen(f.hayvan_norm)}
             </button>
@@ -67,7 +67,7 @@ export default function HayvanClient({ fiyatlar, grafik }: Props) {
           <div style={{ display: "flex", gap: "16px", alignItems: "baseline", marginBottom: "10px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "36px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(sf.fiyat)}</span>
             <span style={{ fontSize: "13px", color: RENKLER.muted }}>{sf.birim}</span>
-            <span style={{ fontSize: "11px", color: RENKLER.muted }}>{sf.kaynak} · {sf.cekilme_tarihi}</span>
+            <span style={{ fontSize: "13px", color: RENKLER.muted }}>{sf.kaynak} · {sf.cekilme_tarihi}</span>
             <VeriTazelik tarih={sf.cekilme_tarihi} />
           </div>
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
@@ -81,7 +81,7 @@ export default function HayvanClient({ fiyatlar, grafik }: Props) {
       )}
 
       <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "12px" }}>
-        <div style={{ fontSize: "10px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>
+        <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>
           30 GÜN TARİHÇE · {gunSayisi}/30 gün{sf ? ` · ${sf.kaynak}` : ""}
         </div>
         <FiyatGrafik data={grafikVeri} renk={renk} birim={sf?.birim ?? "TL/kg"} urun_ad={sf?.hayvan ?? secilen} kaynakEtiket={sf?.kaynak} />

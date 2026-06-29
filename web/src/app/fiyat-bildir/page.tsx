@@ -75,7 +75,7 @@ function Etiket({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
       <span style={{ width: "3px", height: "11px", background: RENKLER.green, borderRadius: "2px" }} />
-      <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.12em", fontWeight: 600 }}>{children}</span>
+      <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em", fontWeight: 600 }}>{children}</span>
     </div>
   );
 }
@@ -185,7 +185,7 @@ export default function FiyatBildirPage() {
         <div style={{ marginTop: "20px", padding: "28px 24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
           <div style={{ fontSize: "30px", marginBottom: "12px" }}>📍</div>
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Bulunduğun yerin gerçek piyasa fiyatını bildir.</p>
-          <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Özellikle kaba yem ve gübrenin resmi kaynağı yok — senin bildirimin en değerlisi. En az 3 bildirim sonrası görünür.</p>
+          <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Özellikle kaba yem ve gübrenin resmi kaynağı yok — senin bildirimin en değerlisi. En az 3 bildirim sonrası görünür.</p>
           <Link href="/giris" style={{ display: "inline-block", marginTop: "18px", padding: "11px 26px", background: RENKLER.green, color: "#06140C", borderRadius: "8px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
             Google ile Giriş Yap
           </Link>
@@ -205,7 +205,7 @@ export default function FiyatBildirPage() {
             <div style={{ marginTop: "16px", padding: "12px", background: RENKLER.bg, border: `1px solid ${RENKLER.border}`, borderRadius: "8px" }}>
               <div style={{ fontSize: "12px", color: RENKLER.muted }}>{adGoster(urun)} · {il}</div>
               <div style={{ fontSize: "22px", color: urunRenk(urun), fontWeight: 800, margin: "2px 0" }}>{sayac}<span style={{ fontSize: "13px", color: RENKLER.muted }}> / 3 bildirim</span></div>
-              <div style={{ fontSize: "10px", color: RENKLER.muted }}>{sayac >= 3 ? "Piyasa ortalaması artık görünür." : "3 bildirime ulaşınca piyasa ortalaması görünür."}</div>
+              <div style={{ fontSize: "12px", color: RENKLER.muted }}>{sayac >= 3 ? "Piyasa ortalaması artık görünür." : "3 bildirime ulaşınca piyasa ortalaması görünür."}</div>
             </div>
           )}
           <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
@@ -224,7 +224,7 @@ export default function FiyatBildirPage() {
       <button key={u} type="button" onClick={() => urunSec(u)}
         style={{
           display: "inline-flex", alignItems: "center", gap: "6px",
-          padding: "7px 13px", fontSize: "11.5px", fontFamily: "var(--font-mono)",
+          padding: "7px 13px", fontSize: "13px", fontFamily: "var(--font-mono)",
           background: aktif ? `${renk}22` : "transparent",
           color: aktif ? renk : RENKLER.muted,
           border: `1px solid ${aktif ? renk : RENKLER.border}`,
@@ -243,12 +243,12 @@ export default function FiyatBildirPage() {
     <main style={{ maxWidth: "560px", margin: "32px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
       <div style={{ marginBottom: "18px" }}>
         <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>FİYAT BİLDİR</h1>
-        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Piyasa fiyatını bildirerek gerçek veri oluştur. En az 3 bildirim sonrası görünür.</p>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Piyasa fiyatını bildirerek gerçek veri oluştur. En az 3 bildirim sonrası görünür.</p>
       </div>
 
       <form onSubmit={(e) => { e.preventDefault(); gonder(); }} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "22px", display: "flex", flexDirection: "column", gap: "18px" }}>
         {mevcut && (
-          <div style={{ fontSize: "11px", color: "#E8C040", background: "#19150622", border: "1px solid #3A301055", borderRadius: "8px", padding: "9px 11px", display: "flex", gap: "6px", alignItems: "center" }}>
+          <div style={{ fontSize: "13px", color: "#E8C040", background: "#19150622", border: "1px solid #3A301055", borderRadius: "8px", padding: "9px 11px", display: "flex", gap: "6px", alignItems: "center" }}>
             <span>✎</span> Bugün <b style={{ color: "#E8C040" }}>{adGoster(urun)}</b> için bildirimin var — düzenliyorsun.
           </div>
         )}
@@ -274,7 +274,7 @@ export default function FiyatBildirPage() {
                 const aktif = birim === k;
                 return (
                   <button key={k} type="button" onClick={() => setBirim(k)}
-                    style={{ padding: "7px 14px", fontSize: "11.5px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+                    style={{ padding: "7px 14px", fontSize: "13px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
                     {ad}
                   </button>
                 );
@@ -289,17 +289,17 @@ export default function FiyatBildirPage() {
           <div style={{ display: "flex", gap: "10px" }}>
             <div style={{ position: "relative", flex: 1 }}>
               <input type="text" inputMode="decimal" value={fiyat} onChange={(e) => setFiyat(e.target.value)} placeholder="Örn: 250" style={{ ...inputStil, fontSize: "17px", fontWeight: 700, color: urunRenk(urun), paddingRight: "30px" }} />
-              <span style={{ position: "absolute", right: "13px", top: "50%", transform: "translateY(-50%)", fontSize: "11px", color: RENKLER.muted }}>₺</span>
+              <span style={{ position: "absolute", right: "13px", top: "50%", transform: "translateY(-50%)", fontSize: "13px", color: RENKLER.muted }}>₺</span>
             </div>
             {birim === "balya" && (
               <div style={{ position: "relative", width: "140px" }}>
                 <input type="text" inputMode="decimal" value={balyaKg} onChange={(e) => setBalyaKg(e.target.value)} placeholder="balya kg" style={{ ...inputStil, fontSize: "13px" }} />
-                <span style={{ position: "absolute", right: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "10px", color: RENKLER.muted }}>kg</span>
+                <span style={{ position: "absolute", right: "11px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", color: RENKLER.muted }}>kg</span>
               </div>
             )}
           </div>
           {birimliKategori && Number.isFinite(normalKg) && normalKg > 0 && (
-            <div style={{ fontSize: "11px", color: RENKLER.green, marginTop: "7px" }}>
+            <div style={{ fontSize: "13px", color: RENKLER.green, marginTop: "7px" }}>
               ≈ {normalKg.toLocaleString("tr-TR", { maximumFractionDigits: 2 })} TL/kg <span style={{ color: RENKLER.muted }}>· topluluk ortalaması kg üzerinden hesaplanır</span>
             </div>
           )}
@@ -327,7 +327,7 @@ export default function FiyatBildirPage() {
               const aktif = kaynak === k;
               return (
                 <button key={k} type="button" onClick={() => setKaynak(k)}
-                  style={{ padding: "7px 14px", fontSize: "11.5px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+                  style={{ padding: "7px 14px", fontSize: "13px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
                   {k}
                 </button>
               );
@@ -335,7 +335,7 @@ export default function FiyatBildirPage() {
           </div>
         </div>
 
-        {hata && <div style={{ fontSize: "11px", color: RENKLER.red, background: `${RENKLER.red}14`, border: `1px solid ${RENKLER.red}33`, borderRadius: "8px", padding: "9px 11px" }}>{hata}</div>}
+        {hata && <div style={{ fontSize: "13px", color: RENKLER.red, background: `${RENKLER.red}14`, border: `1px solid ${RENKLER.red}33`, borderRadius: "8px", padding: "9px 11px" }}>{hata}</div>}
 
         <div style={{ display: "flex", gap: "8px" }}>
           <button type="submit" disabled={mesgul} style={{ flex: 1, padding: "13px", fontSize: "13px", background: RENKLER.green, color: "#06140C", border: "none", borderRadius: "8px", cursor: mesgul ? "wait" : "pointer", fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "0.03em" }}>

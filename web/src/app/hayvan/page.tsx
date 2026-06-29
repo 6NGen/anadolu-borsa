@@ -29,7 +29,7 @@ export default async function HayvanPage() {
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>HAYVAN BORSASI</h1>
-        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "4px" }}>ESK karkas alım fiyatları + Çiğ süt · Günlük güncellenir</p>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>ESK karkas alım fiyatları + Çiğ süt · Günlük güncellenir</p>
       </div>
 
       {fiyatlar.length === 0 ? (
@@ -42,7 +42,7 @@ export default async function HayvanPage() {
 
           {/* Resmi (ESK/USK) vs Gerçek (kullanıcı bildirimi, min 3) */}
           <section style={{ marginTop: "20px" }}>
-            <div style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>BORSA vs PİYASA</div>
+            <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>BORSA vs PİYASA</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "8px" }}>
               {fiyatlar.map((h) => {
                 const pv = (piyasa ?? []).find((p) => p.urun_norm === h.hayvan_norm) ?? null;

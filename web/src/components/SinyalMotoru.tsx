@@ -44,9 +44,9 @@ export default async function SinyalMotoru() {
   return (
     <section style={{ marginBottom: "24px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
-        <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.12em" }}>📡 SİNYAL MOTORU</span>
+        <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em" }}>📡 SİNYAL MOTORU</span>
         {/* 2.5: tek eşik dili — sinyal için en az MIN_VERI_GUN farklı gün gerekir */}
-        <span style={{ fontSize: "9px", color: RENKLER.muted }}>· bugün vs 30 güne kadar ortalama · en az {MIN_VERI_GUN} gün veri gerekir</span>
+        <span style={{ fontSize: "12px", color: RENKLER.muted }}>· bugün vs 30 güne kadar ortalama · en az {MIN_VERI_GUN} gün veri gerekir</span>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "8px" }}>
         {satirlar.map((r) => {
@@ -60,23 +60,23 @@ export default async function SinyalMotoru() {
                 <span style={{ fontSize: "12px", color: RENKLER.text, fontWeight: 600 }}>
                   <span style={{ marginRight: "5px" }}>{emoji(r.urun_norm)}</span>{r.urun_norm}
                 </span>
-                <span style={{ fontSize: "10px", color: rz.renk, fontWeight: 700 }}>{rz.ikon} {rz.etiket}</span>
+                <span style={{ fontSize: "12px", color: rz.renk, fontWeight: 700 }}>{rz.ikon} {rz.etiket}</span>
               </div>
               {tip !== "veri" ? (
                 <>
                   <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
                     <span style={{ fontSize: "20px", color: renk, fontWeight: 700, fontFamily: "var(--font-mono)" }}>{formatFiyat(r.bugun)}</span>
-                    <span style={{ fontSize: "11px", color: rz.renk, fontWeight: 600 }}>
+                    <span style={{ fontSize: "13px", color: rz.renk, fontWeight: 600 }}>
                       {sapma != null ? `${sapma > 0 ? "+" : "−"}%${formatFiyat(Math.abs(sapma), 1)}` : ""}
                     </span>
                   </div>
-                  <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "4px" }}>
+                  <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "4px" }}>
                     30g ort: {formatFiyat(r.ort_30gun)} · {r.veri_gun_sayisi} gün veri
                     {dusukGuven && <span style={{ color: "#E8A838" }}> · düşük güven</span>}
                   </div>
                 </>
               ) : (
-                <div style={{ fontSize: "10px", color: RENKLER.muted }}>
+                <div style={{ fontSize: "12px", color: RENKLER.muted }}>
                   {r.veri_gun_sayisi}/{MIN_VERI_GUN} gün birikti — sinyal için en az {MIN_VERI_GUN} gün gerekir
                 </div>
               )}

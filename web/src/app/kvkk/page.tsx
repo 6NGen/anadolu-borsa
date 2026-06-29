@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const S = {
   h2: { fontSize: "12px", color: RENKLER.green, letterSpacing: "0.12em", margin: "24px 0 8px", fontWeight: 700 } as const,
   p: { fontSize: "12px", color: RENKLER.text, lineHeight: 1.7, margin: "6px 0" } as const,
-  mut: { fontSize: "11px", color: RENKLER.muted, lineHeight: 1.7 } as const,
+  mut: { fontSize: "13px", color: RENKLER.muted, lineHeight: 1.7 } as const,
 };
 
 export default function KvkkPage() {

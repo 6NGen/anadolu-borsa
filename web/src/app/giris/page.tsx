@@ -40,12 +40,12 @@ export default function GirisPage() {
   return (
     <main style={{ maxWidth: "420px", margin: "48px auto", padding: "0 16px", fontFamily: "var(--font-mono)" }}>
       <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>GİRİŞ</h1>
-      <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "4px", marginBottom: "20px" }}>
+      <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px", marginBottom: "20px" }}>
         Google hesabınla tek tıkla giriş — şifre yok.
       </p>
 
       <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
-        <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "11px", color: RENKLER.muted, lineHeight: 1.5, cursor: "pointer" }}>
+        <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px", color: RENKLER.muted, lineHeight: 1.5, cursor: "pointer" }}>
           <input type="checkbox" checked={kvkk} onChange={(e) => setKvkk(e.target.checked)} style={{ marginTop: "2px", accentColor: RENKLER.green }} />
           <span>
             <Link href="/kvkk" target="_blank" style={{ color: RENKLER.green }}>KVKK aydınlatma metnini</Link> okudum;
@@ -53,7 +53,7 @@ export default function GirisPage() {
           </span>
         </label>
 
-        {hata && <div style={{ fontSize: "11px", color: RENKLER.red }}>{hata}</div>}
+        {hata && <div style={{ fontSize: "13px", color: RENKLER.red }}>{hata}</div>}
 
         <button
           onClick={girisYap}

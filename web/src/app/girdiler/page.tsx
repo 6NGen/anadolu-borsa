@@ -41,13 +41,13 @@ export default async function GirdilerPage() {
   }
 
   const kart: React.CSSProperties = { background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "18px" };
-  const etiket: React.CSSProperties = { fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.12em", marginBottom: "10px", fontWeight: 600 };
+  const etiket: React.CSSProperties = { fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em", marginBottom: "10px", fontWeight: 600 };
 
   return (
     <main style={{ maxWidth: "900px", margin: "0 auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
       <div style={{ marginBottom: "18px" }}>
         <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>GİRDİ FİYATLARI</h1>
-        <p style={{ fontSize: "11px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Üretim maliyetinin temel kalemleri. Mazot resmi; gübre topluluk bildirimiyle (resmi liste fiyatı yakında).</p>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Üretim maliyetinin temel kalemleri. Mazot resmi; gübre topluluk bildirimiyle (resmi liste fiyatı yakında).</p>
       </div>
 
       {/* Mazot + Elektrik */}
@@ -61,7 +61,7 @@ export default async function GirdilerPage() {
                 <span style={{ fontSize: "34px", color: C.mazot, fontWeight: 800, lineHeight: 1 }}>{formatFiyat(mazot.fiyat)}</span>
                 <span style={{ fontSize: "12px", color: RENKLER.muted }}>{mazot.birim ?? "TL/litre"}</span>
               </div>
-              <div style={{ fontSize: "10px", color: RENKLER.muted, marginTop: "8px", display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
+              <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "8px", display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
                 <span>{mazot.kaynak ?? "EPDK"} · {kisaTarih(mazot.gecerlilik_tarihi)}.{String(mazot.gecerlilik_tarihi).slice(0, 4)}</span>
                 <VeriTazelik tarih={mazot.gecerlilik_tarihi} />
               </div>
@@ -75,7 +75,7 @@ export default async function GirdilerPage() {
         <div style={{ ...kart, opacity: 0.6 }}>
           <div style={etiket}>⚡ ELEKTRİK</div>
           <div style={{ fontSize: "20px", color: RENKLER.muted, fontWeight: 700 }}>Yakında</div>
-          <div style={{ fontSize: "10px", color: RENKLER.muted, marginTop: "8px" }}>Tarımsal sulama tarifesi eklenecek</div>
+          <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "8px" }}>Tarımsal sulama tarifesi eklenecek</div>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export default async function GirdilerPage() {
       <div style={{ ...kart, padding: "18px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
           <div style={etiket}>🧪 GÜBRE · TOPLULUK FİYATI</div>
-          <Link href="/fiyat-bildir" style={{ fontSize: "10px", color: RENKLER.green, textDecoration: "none" }}>Fiyat bildir →</Link>
+          <Link href="/fiyat-bildir" style={{ fontSize: "12px", color: RENKLER.green, textDecoration: "none" }}>Fiyat bildir →</Link>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px" }}>
           {GUBRE.map((g) => {
@@ -93,22 +93,22 @@ export default async function GirdilerPage() {
                 <div style={{ fontSize: "12px", color: RENKLER.text, fontWeight: 600, marginBottom: "6px" }}>{g.ad}</div>
                 {v ? (
                   <>
-                    <div style={{ fontSize: "22px", color: C.gubre, fontWeight: 800 }}>{formatFiyat(v.ort)}<span style={{ fontSize: "11px", color: RENKLER.muted, fontWeight: 400 }}> ₺/kg</span></div>
-                    <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "4px" }}>{v.il} · {v.bildirim} bildirim</div>
+                    <div style={{ fontSize: "22px", color: C.gubre, fontWeight: 800 }}>{formatFiyat(v.ort)}<span style={{ fontSize: "13px", color: RENKLER.muted, fontWeight: 400 }}> ₺/kg</span></div>
+                    <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "4px" }}>{v.il} · {v.bildirim} bildirim</div>
                   </>
                 ) : (
-                  <div style={{ fontSize: "10px", color: RENKLER.muted, lineHeight: 1.5 }}>Topluluk verisi bekleniyor<br />(min 3 bildirim)</div>
+                  <div style={{ fontSize: "12px", color: RENKLER.muted, lineHeight: 1.5 }}>Topluluk verisi bekleniyor<br />(min 3 bildirim)</div>
                 )}
               </div>
             );
           })}
         </div>
-        <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "12px", lineHeight: 1.5 }}>
+        <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "12px", lineHeight: 1.5 }}>
           Gübre fiyatı bayide değişir. Topluluk ortalaması TL/kg üzerindendir (çuval/ton girişleri normalize edilir). Resmi liste fiyatı (Gübretaş) yakında.
         </div>
       </div>
 
-      <div style={{ fontSize: "9px", color: "#2A4030", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
+      <div style={{ fontSize: "12px", color: "#2A4030", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
         Mazot fiyatı EPDK/pompa kaynaklıdır, elle güncellenir · Gübre/kaba yem fiyatları kullanıcı bildirimidir (min 3)
       </div>
     </main>

@@ -23,7 +23,7 @@ function CustomTooltip({ active, payload, label, kaynakEtiket }: { active?: bool
   const degerler = payload.map((p) => p.value);
   const hepsiAyni = degerler.every((v) => v === degerler[0]); // 2.7: min=ort=max tek satır
   return (
-    <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, padding: "8px 12px", fontSize: "11px" }}>
+    <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, padding: "8px 12px", fontSize: "13px" }}>
       <div style={{ color: RENKLER.muted, marginBottom: "4px" }}>
         {label}{kaynakEtiket ? ` · ${kaynakEtiket}` : ""}
       </div>
@@ -62,10 +62,10 @@ export default function FiyatGrafik({ data, renk, birim, urun_ad, kaynakEtiket }
           </linearGradient>
         </defs>
         <CartesianGrid stroke={RENKLER.border} strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="tarih" tick={{ fontSize: 10, fill: RENKLER.muted }} tickLine={false} axisLine={false} tickFormatter={(v: string) => v.slice(5)} />
+        <XAxis dataKey="tarih" tick={{ fontSize: 12, fill: RENKLER.muted }} tickLine={false} axisLine={false} tickFormatter={(v: string) => v.slice(5)} />
         {/* 2.6: y ekseni 0'dan değil, veri bandından başlar — düz çizgi tavana yapışmaz */}
         <YAxis
-          tick={{ fontSize: 10, fill: RENKLER.muted }}
+          tick={{ fontSize: 12, fill: RENKLER.muted }}
           tickLine={false}
           axisLine={false}
           width={48}

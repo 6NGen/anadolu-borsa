@@ -22,7 +22,7 @@ export default function VeriTazelik({ tarih }: Props) {
   }
 
   return (
-    <span style={{ fontSize: "9px", color: renk, whiteSpace: "nowrap" }} title={`Veri tarihi: ${tarih!.slice(0, 10)}`}>
+    <span style={{ fontSize: "12px", color: renk, whiteSpace: "nowrap" }} title={`Veri tarihi: ${tarih!.slice(0, 10)}`}>
       {metin}
     </span>
   );

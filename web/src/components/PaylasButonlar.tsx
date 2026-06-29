@@ -24,7 +24,7 @@ export default function PaylasButonlar({ metin, pngUrl, pasifNot = "veri güncel
     border: `1px solid ${aktif ? renk : "#2A4030"}`,
     color: aktif ? renk : "#3A5040",
     padding: "8px 18px", borderRadius: 20, cursor: aktif ? "pointer" : "not-allowed",
-    fontSize: 11, fontFamily: "var(--font-mono), monospace",
+    fontSize: 13, fontFamily: "var(--font-mono), monospace",
   });
 
   return (
@@ -35,7 +35,7 @@ export default function PaylasButonlar({ metin, pngUrl, pasifNot = "veri güncel
         📷 PNG İndir
       </button>
       {!pngUrl && (
-        <span style={{ fontSize: 9, color: "#E8C040" }}>🔒 {pasifNot}</span>
+        <span style={{ fontSize: 12, color: "#E8C040" }}>🔒 {pasifNot}</span>
       )}
     </div>
   );

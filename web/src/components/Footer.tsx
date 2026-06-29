@@ -5,7 +5,7 @@ import { RENKLER } from "@/lib/theme";
 export default function Footer() {
   return (
     <footer style={{ borderTop: `1px solid ${RENKLER.border}`, marginTop: "40px", padding: "20px 16px 28px", fontFamily: "var(--font-mono)" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px 20px", fontSize: "10px", color: RENKLER.muted }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px 20px", fontSize: "12px", color: RENKLER.muted }}>
         <span style={{ color: RENKLER.green, fontWeight: 700, letterSpacing: "0.1em" }}>ANADOLU BORSA</span>
         <Link href="/metodoloji" style={{ color: RENKLER.muted, textDecoration: "underline" }}>Metodoloji</Link>
         <Link href="/kvkk" style={{ color: RENKLER.muted, textDecoration: "underline" }}>KVKK</Link>

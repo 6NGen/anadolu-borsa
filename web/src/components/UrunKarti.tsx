@@ -28,18 +28,18 @@ export default function UrunKarti({ urun_norm, urun_ad, renk, ortalama, en_az, e
       >
         <div style={{ width: "3px", background: renk, borderRadius: "2px", flexShrink: 0 }} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: "9px", color: RENKLER.muted, letterSpacing: "0.12em" }}>{urun_norm}</div>
+          <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em" }}>{urun_norm}</div>
           <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "2px 0" }}>{urun_ad}</div>
           <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>
             {formatFiyat(ortalama)}
           </div>
-          <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "2px" }}>{birim}</div>
+          <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "2px" }}>{birim}</div>
           {aralikGoster && (
-            <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "4px" }}>
+            <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "4px" }}>
               ↓{formatFiyat(en_az)} ↑{formatFiyat(en_cok)}
             </div>
           )}
-          <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
+          <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
             <span>{borsa} · {tarih}</span>
             <VeriTazelik tarih={tarih} />
           </div>

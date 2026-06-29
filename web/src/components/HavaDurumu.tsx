@@ -45,37 +45,37 @@ export default function HavaDurumu() {
   return (
     <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-        <span style={{ fontSize: "10px", color: RENKLER.muted, letterSpacing: "0.1em" }}>HAVA DURUMU</span>
+        <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em" }}>HAVA DURUMU</span>
         <select
           value={il}
           onChange={(e) => setBolgem(e.target.value)}
-          style={{ background: "#080E09", border: `1px solid ${RENKLER.border}`, color: RENKLER.text, fontSize: "10px", padding: "2px 6px", borderRadius: "3px", cursor: "pointer" }}
+          style={{ background: "#080E09", border: `1px solid ${RENKLER.border}`, color: RENKLER.text, fontSize: "12px", padding: "2px 6px", borderRadius: "3px", cursor: "pointer" }}
         >
           {ILLER.map((k) => <option key={k} value={k}>{k}</option>)}
         </select>
       </div>
 
       {yukleniyor ? (
-        <div style={{ color: RENKLER.muted, fontSize: "11px", padding: "16px 0", textAlign: "center" }}>Yükleniyor…</div>
+        <div style={{ color: RENKLER.muted, fontSize: "13px", padding: "16px 0", textAlign: "center" }}>Yükleniyor…</div>
       ) : hava ? (
         <div style={{ display: "flex", gap: "6px", overflowX: "auto" }}>
           {hava.time.slice(0, 7).map((tarih, i) => (
             <div key={tarih} style={{ flexShrink: 0, textAlign: "center", padding: "8px 6px", background: "#080E09", borderRadius: "3px", minWidth: "52px" }}>
-              <div style={{ fontSize: "9px", color: RENKLER.muted }}>{tarih.slice(5)}</div>
+              <div style={{ fontSize: "12px", color: RENKLER.muted }}>{tarih.slice(5)}</div>
               <div style={{ fontSize: "16px", margin: "3px 0" }}>{weatherIcon(hava.weathercode[i])}</div>
               <div style={{ fontSize: "12px", color: RENKLER.text, fontWeight: 600 }}>{Math.round(hava.temperature_2m_max[i])}°</div>
-              <div style={{ fontSize: "10px", color: RENKLER.muted }}>{Math.round(hava.temperature_2m_min[i])}°</div>
+              <div style={{ fontSize: "12px", color: RENKLER.muted }}>{Math.round(hava.temperature_2m_min[i])}°</div>
               {hava.precipitation_sum[i] > 0 && (
-                <div style={{ fontSize: "9px", color: "#70A8E8", marginTop: "2px" }}>{hava.precipitation_sum[i]}mm</div>
+                <div style={{ fontSize: "12px", color: "#70A8E8", marginTop: "2px" }}>{hava.precipitation_sum[i]}mm</div>
               )}
             </div>
           ))}
         </div>
       ) : (
-        <div style={{ color: RENKLER.muted, fontSize: "11px", textAlign: "center", padding: "16px 0" }}>Hava verisi alınamadı</div>
+        <div style={{ color: RENKLER.muted, fontSize: "13px", textAlign: "center", padding: "16px 0" }}>Hava verisi alınamadı</div>
       )}
 
-      <div style={{ fontSize: "9px", color: RENKLER.muted, marginTop: "8px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}` }}>
+      <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "8px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}` }}>
         Kaynak: Open-Meteo · Bilgilendirme amaçlıdır
       </div>
     </div>

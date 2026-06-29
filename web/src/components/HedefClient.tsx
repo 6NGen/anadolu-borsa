@@ -99,10 +99,10 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
 
       {/* Panel */}
       <div style={{ background: "#0A1810", border: "1px solid #1A4028", borderRadius: 16, padding: 20, marginBottom: 20 }}>
-        <div style={{ fontSize: 9, color: "#4A9060", letterSpacing: 2, marginBottom: 16 }}>🎯 ÜRETİCİ HEDEF PANELİ — KONYA</div>
+        <div style={{ fontSize: 12, color: "#4A9060", letterSpacing: 2, marginBottom: 16 }}>🎯 ÜRETİCİ HEDEF PANELİ — KONYA</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ marginBottom: 16 }}>
           <div>
-            <div style={{ fontSize: 9, color: C.mut, marginBottom: 4 }}>ÜRÜN</div>
+            <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>ÜRÜN</div>
             <select value={urun} onChange={(e) => setUrun(e.target.value)} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 12, fontFamily: "monospace", outline: "none" }}>
               {yemler.length > 0 && (
                 <optgroup label="Tahıllar & Yem">
@@ -117,22 +117,22 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             </select>
           </div>
           <div>
-            <div style={{ fontSize: 9, color: C.mut, marginBottom: 4 }}>HEDEF VARLIK</div>
+            <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>HEDEF VARLIK</div>
             <select value={varlik} onChange={(e) => setVarlik(e.target.value)} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 12, fontFamily: "monospace", outline: "none" }}>
               {Object.entries(varliklar).map(([k, val]) => <option key={k} value={k}>{val.ikon} {val.ad}</option>)}
             </select>
           </div>
           <div>
-            <div style={{ fontSize: 9, color: C.mut, marginBottom: 4 }}>MİKTAR ({miktarBirimi.toUpperCase()})</div>
+            <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>MİKTAR ({miktarBirimi.toUpperCase()})</div>
             <input type="number" value={miktar} min={1} onChange={(e) => setMiktar(Math.max(1, +e.target.value || 1))} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 16, fontFamily: "monospace", outline: "none" }} />
-            {hayvanMi && <div style={{ fontSize: 8, color: "#3A6040", marginTop: 4 }}>{u.karkasLabel}</div>}
+            {hayvanMi && <div style={{ fontSize: 12, color: "#3A6040", marginTop: 4 }}>{u.karkasLabel}</div>}
           </div>
         </div>
 
         <div style={{ borderTop: `1px solid ${C.brd}`, paddingTop: 16 }}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <div style={{ fontSize: 9, color: C.mut, marginBottom: 3 }}>{miktar} {miktarBirimi} {u.ad.toUpperCase()} =</div>
+              <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>{miktar} {miktarBirimi} {u.ad.toUpperCase()} =</div>
               <div style={{ fontSize: 32, fontWeight: 800, color: v.renk, letterSpacing: -1 }}>
                 {formatFiyat(Number(karsilik), varlik === "traktor" ? 2 : 1)}
                 <span style={{ fontSize: 14, color: C.mut, marginLeft: 5, fontWeight: 400 }}>{karsilikBirim} {v.ad.toLowerCase()}</span>
@@ -140,7 +140,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             </div>
             {kacBirim && (
               <div>
-                <div style={{ fontSize: 9, color: C.mut, marginBottom: 3 }}>1 {v.ad.toUpperCase()} İÇİN</div>
+                <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>1 {v.ad.toUpperCase()} İÇİN</div>
                 <div style={{ fontSize: 32, fontWeight: 800, color: "#E86040", letterSpacing: -1 }}>
                   {formatFiyat(Number(kacBirim), hayvanMi ? 0 : 1)}
                   <span style={{ fontSize: 14, color: C.mut, marginLeft: 5, fontWeight: 400 }}>{miktarBirimi} {u.ad.toLowerCase()}</span>
@@ -148,7 +148,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
               </div>
             )}
           </div>
-          <div style={{ fontSize: 9, color: "#3A7040", marginTop: 8 }}>{aciklamaMetni} · {v.aciklama}</div>
+          <div style={{ fontSize: 12, color: "#3A7040", marginTop: 8 }}>{aciklamaMetni} · {v.aciklama}</div>
 
           {/* Paylaşım: "1 varlık = X ton/baş ürün" kartı — bayat veride PNG pasif (KARAR) */}
           <div style={{ marginTop: 14 }}>
@@ -170,9 +170,9 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
           return (
             <Kart key={k} renk={val.renk} onClick={() => setVarlik(k)}>
               <div style={{ fontSize: 16, marginBottom: 4 }}>{val.ikon}</div>
-              <div style={{ fontSize: 9, color: C.mut, marginBottom: 3 }}>{val.ad.toUpperCase()}</div>
+              <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>{val.ad.toUpperCase()}</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: varlik === k ? val.renk : C.txt }}>{etiket}</div>
-              <div style={{ fontSize: 8, color: "#3A6040", marginTop: 3 }}>{val.aciklama}</div>
+              <div style={{ fontSize: 12, color: "#3A6040", marginTop: 3 }}>{val.aciklama}</div>
             </Kart>
           );
         })}
@@ -180,20 +180,20 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
 
       {/* Tarihsel grafik */}
       <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 14, padding: 20 }}>
-        <div style={{ fontSize: 9, color: C.mut, letterSpacing: 1, marginBottom: 12 }}>
+        <div style={{ fontSize: 12, color: C.mut, letterSpacing: 1, marginBottom: 12 }}>
           TARİHSEL — 1 {v.ikon} {v.ad.toUpperCase()} İÇİN KAÇ {miktarBirimi.toUpperCase()} {u.ad.toUpperCase()}?
         </div>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={tarihsel} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
             <CartesianGrid stroke="#142018" strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="y" tick={{ fill: C.mut, fontSize: 9 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill: C.mut, fontSize: 9 }} axisLine={false} tickLine={false} />
+            <XAxis dataKey="y" tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
             {/* 3.6: hover'daki gri bant (varsayılan cursor) kaldırıldı — ikinci bar gibi okunuyordu */}
           <Tooltip content={<TT sfx={` ${miktarBirimi}`} />} cursor={{ fill: "transparent" }} />
             <Bar dataKey="deger" fill={v.renk} radius={[4, 4, 0, 0]} name={miktarBirimi} />
           </BarChart>
         </ResponsiveContainer>
-        <div style={{ fontSize: 8, color: C.mut, marginTop: 8 }}>
+        <div style={{ fontSize: 12, color: C.mut, marginTop: 8 }}>
           Güncel ürün fiyatı canlı borsa verisidir (TOBB/ESK) · Varlık fiyatları Konya referans serisi (TÜİK/manuel)
         </div>
       </div>
