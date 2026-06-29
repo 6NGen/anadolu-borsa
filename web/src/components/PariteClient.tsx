@@ -97,11 +97,6 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
     <div style={{ background: C.bg, color: C.txt, fontFamily: "'Courier New',monospace", padding: 20, maxWidth: 1200, margin: "0 auto" }}>
       <style>{`select option{background:#0A140C;}`}</style>
 
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 9, color: C.mut, letterSpacing: 3, marginBottom: 4 }}>ÇİFTÇİ SATIN ALMA GÜCÜ ENDEKSİ</div>
-        <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>PARİTE ANALİZİ</div>
-      </div>
-
       {/* ÜST: MATRİS (satır=ürün, sütun=girdi, çift yön) */}
       <PariteMatris girdiler={girdiler} urunler={urunler} seciliGirdi={girdi} seciliUrun={urun} onSec={(g, u) => { setGirdi(g); setUrun(u); }} />
 
