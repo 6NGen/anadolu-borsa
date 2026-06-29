@@ -3,28 +3,24 @@ import { useState } from "react";
 import { AreaChart, BarChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { kartUretilebilir } from "@/lib/tazelik";
-import VeriTazelik from "./VeriTazelik";
 import PaylasButonlar from "./PaylasButonlar";
+import PariteMatris from "./PariteMatris";
 
 export interface Seri { y: string; f: number }
 export interface Girdi { ad: string; ikon: string; renk: string; birim: string; hist: Seri[]; guncel: number; aktif: boolean; tarih: string | null }
 export interface Urun {
   ad: string; ikon: string; renk: string; birim: string;
-  hist: Seri[];                 // TÜİK tahmini tarihsel seri (2026 ucu canlı)
-  guncel: number;               // canlı DB fiyatı (canli=false ise anlamsız)
-  canli: boolean;               // canlı veri var mı — yoksa çip pasif
-  kaynak: string | null;        // hangi borsa/kaynak (ör. ESKISEHIR, ESK_SUT)
-  tarih: string | null;         // canlı fiyatın tarihi
-  gercekGun: number;            // son 30 günde kaç FARKLI gün gerçek veri var
-  gercekSeri: { tarih: string; fiyat: number }[]; // gün başına gerçek seri
+  hist: Seri[];
+  guncel: number;
+  canli: boolean;
+  kaynak: string | null;
+  tarih: string | null;
+  gercekGun: number;
+  gercekSeri: { tarih: string; fiyat: number }[];
 }
 
-const OLAYLAR: Record<string, string> = {
-  "2008": "🌍 Kriz", "2018": "💸 Döviz", "2022": "📈 Kur+Enerji",
-};
-
-const KIYAS_ESIK_GUN = 30; // gerçek veri bu kadar gün birikmeden kıyas kartı gösterilmez
-
+const OLAYLAR: Record<string, string> = { "2008": "🌍 Kriz", "2018": "💸 Döviz", "2022": "📈 Kur+Enerji" };
+const KIYAS_ESIK_GUN = 30;
 const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#4A7050", txt: "#DDF0DE", pos: "#4AE870", neg: "#E84A4A" };
 
 function pariteHesapla(g: Girdi, u: Urun) {
@@ -46,9 +42,7 @@ function TT2({ active, payload, label }: TTProps) {
     <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "10px 14px", fontSize: 12 }}>
       <div style={{ color: C.mut, fontWeight: 700, marginBottom: 4 }}>{label} {olay || ""}</div>
       {payload.map((p, i) => (
-        <div key={i} style={{ color: p.color || C.txt }}>
-          {p.name}: <b>{typeof p.value === "number" ? formatFiyat(p.value, 3) : p.value}</b>
-        </div>
+        <div key={i} style={{ color: p.color || C.txt }}>{p.name}: <b>{typeof p.value === "number" ? formatFiyat(p.value, 3) : p.value}</b></div>
       ))}
     </div>
   );
@@ -60,23 +54,8 @@ function DegTT({ active, payload, label }: TTProps) {
   return (
     <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 12px", fontSize: 12 }}>
       <div style={{ color: C.mut, marginBottom: 4 }}>{label}</div>
-      <div style={{ color: v > 0 ? C.neg : C.pos, fontWeight: 700 }}>
-        {v > 0 ? "▲" : "▼"} %{formatFiyat(Math.abs(v), 1)} {v > 0 ? "kötüleşti" : "iyileşti"}
-      </div>
+      <div style={{ color: v > 0 ? C.neg : C.pos, fontWeight: 700 }}>{v > 0 ? "▲" : "▼"} %{formatFiyat(Math.abs(v), 1)} {v > 0 ? "kötüleşti" : "iyileşti"}</div>
     </div>
-  );
-}
-
-function SelBtn({ aktif, renk, onClick, disabled, title, children }: { aktif: boolean; renk: string; onClick: () => void; disabled?: boolean; title?: string; children: React.ReactNode }) {
-  return (
-    <button onClick={disabled ? undefined : onClick} disabled={disabled} title={title} style={{
-      background: aktif ? renk : "transparent",
-      border: `1px solid ${aktif ? renk : C.brd}`,
-      color: disabled ? "#2A4030" : aktif ? "#060E08" : C.mut,
-      padding: "5px 14px", borderRadius: 20, cursor: disabled ? "not-allowed" : "pointer",
-      fontWeight: aktif ? 700 : 400, fontSize: 11, transition: "all 0.15s", fontFamily: "monospace",
-      opacity: disabled ? 0.5 : 1,
-    }}>{children}</button>
   );
 }
 
@@ -88,34 +67,6 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
   const G = girdiler[girdi];
   const U = urunler[urun];
 
-  const { hist, guncel } = pariteHesapla(G, U);
-  const tamSayi = Math.floor(guncel);
-  const goster = Math.min(tamSayi, 12);
-
-  // ── 30 gün kuralı: GERÇEK veri birikmeden kıyas yapılmaz ──
-  const kiyasHazir = U.gercekGun >= KIYAS_ESIK_GUN && U.gercekSeri.length >= 2 && G.guncel > 0;
-  // Hazır olduğunda kıyas GERÇEK seriden hesaplanır (TÜİK tahmininden değil)
-  const seri = U.gercekSeri;
-  const ilkNokta = seri[0];
-  const sonNokta = seri.at(-1);
-  const ilkParite = kiyasHazir && ilkNokta ? +(G.guncel / ilkNokta.fiyat).toFixed(3) : null;
-  const sonParite = kiyasHazir && sonNokta ? +(G.guncel / sonNokta.fiyat).toFixed(3) : null;
-  const degisim30 = ilkParite && sonParite ? +(((sonParite - ilkParite) / ilkParite) * 100).toFixed(1) : null;
-
-  const degVerisi = hist.slice(1).map((d, i) => ({
-    y: d.y,
-    deg: +((d.p - hist[i].p) / hist[i].p * 100).toFixed(1),
-  }));
-
-  // M4: girdi (mazot) fiyatının yaşı — elle güncellendiği için 14+ günde uyarı gösterilir
-  const girdiGun = G.tarih ? Math.floor((Date.now() - new Date(G.tarih).getTime()) / 86400000) : null;
-
-  const paylasMetni = `${G.ikon} ${G.ad} / ${U.ikon} ${U.ad} paritesi\nBugün: 1 ${G.birim.replace("TL/", "")} ${G.ad.toLowerCase()} = ${formatFiyat(guncel, 2)} ${U.birim.replace("TL/", "")} ${U.ad.toLowerCase()}\n${U.kaynak ?? ""} · ${kisaTarih(U.tarih)}\nhttps://borsanadolu.6ngen.com/parite`;
-
-  // KARAR 2026-06-12: veri >ESIK gün bayatsa PNG kart üretilmez — buton pasifleşir
-  const kartAktif = kartUretilebilir(U.tarih);
-
-  const aktifGirdiler = Object.entries(girdiler).filter(([, v]) => v.aktif);
   const canliUrunler = Object.entries(urunler).filter(([, v]) => v.canli);
 
   if (!G?.aktif || canliUrunler.length === 0) {
@@ -126,127 +77,44 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
     );
   }
 
+  const { hist, guncel } = pariteHesapla(G, U);
+
+  // 30 gün GERÇEK veri kıyası (slim gösterim, grafiklerin üstünde)
+  const kiyasHazir = U.gercekGun >= KIYAS_ESIK_GUN && U.gercekSeri.length >= 2 && G.guncel > 0;
+  const seri = U.gercekSeri;
+  const ilkParite = kiyasHazir && seri[0] ? +(G.guncel / seri[0].fiyat).toFixed(3) : null;
+  const sonParite = kiyasHazir && seri.at(-1) ? +(G.guncel / seri.at(-1)!.fiyat).toFixed(3) : null;
+  const degisim30 = ilkParite && sonParite ? +(((sonParite - ilkParite) / ilkParite) * 100).toFixed(1) : null;
+
+  const degVerisi = hist.slice(1).map((d, i) => ({ y: d.y, deg: +((d.p - hist[i].p) / hist[i].p * 100).toFixed(1) }));
+
+  const paylasMetni = `${G.ikon} ${G.ad} / ${U.ikon} ${U.ad} paritesi\nBugün: 1 ${G.birim.replace("TL/", "")} ${G.ad.toLowerCase()} = ${formatFiyat(guncel, 2)} ${U.birim.replace("TL/", "")} ${U.ad.toLowerCase()}\n${U.kaynak ?? ""} · ${kisaTarih(U.tarih)}\nhttps://borsanadolu.6ngen.com/parite`;
+  const kartAktif = kartUretilebilir(U.tarih);
+  // Matris kartı: en az bir ürün taze ise üretilebilir
+  const matrisAktif = canliUrunler.some(([, u]) => kartUretilebilir(u.tarih));
+
   return (
     <div style={{ background: C.bg, color: C.txt, fontFamily: "'Courier New',monospace", padding: 20, maxWidth: 1200, margin: "0 auto" }}>
       <style>{`select option{background:#0A140C;}`}</style>
 
-      {/* BAŞLIK */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 9, color: C.mut, letterSpacing: 3, marginBottom: 4 }}>ÇİFTÇİ SATIN ALMA GÜCÜ ENDEKSİ</div>
         <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>PARİTE ANALİZİ</div>
       </div>
 
-      {/* SEÇİCİ */}
-      <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 16, padding: 20, marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
-          <div>
-            <div style={{ fontSize: 9, color: C.mut, letterSpacing: 1, marginBottom: 8 }}>GİRDİ (MALİYET)</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {Object.entries(girdiler).map(([k, v]) => (
-                <SelBtn key={k} aktif={girdi === k} renk={v.renk} disabled={!v.aktif} title={!v.aktif ? "Yakında" : undefined} onClick={() => setGirdi(k)}>
-                  {v.ikon} {v.ad}{!v.aktif && " · yakında"}
-                </SelBtn>
-              ))}
-            </div>
-          </div>
-          <div style={{ fontSize: 22, color: C.mut, paddingTop: 22 }}>÷</div>
-          <div>
-            <div style={{ fontSize: 9, color: C.mut, letterSpacing: 1, marginBottom: 8 }}>ÜRÜN (GELİR)</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {Object.entries(urunler).map(([k, v]) => (
-                <SelBtn key={k} aktif={urun === k} renk={v.renk} disabled={!v.canli} title={!v.canli ? "Veri yok" : undefined} onClick={() => setUrun(k)}>
-                  {v.ikon} {v.ad}{!v.canli && " · veri yok"}
-                </SelBtn>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* ÜST: MATRİS (satır=ürün, sütun=girdi, çift yön) */}
+      <PariteMatris girdiler={girdiler} urunler={urunler} seciliGirdi={girdi} seciliUrun={urun} onSec={(g, u) => { setGirdi(g); setUrun(u); }} />
 
-        {/* HERO */}
-        <div style={{ background: "linear-gradient(135deg,#0A1A0C,#0F2015)", border: "1px solid #1A4025", borderRadius: 14, padding: 24, position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: -60, right: -60, width: 240, height: 240, borderRadius: "50%", background: `${G.renk}10`, filter: "blur(80px)" }} />
-          <div style={{ fontSize: 9, color: "#4A9055", letterSpacing: 3, marginBottom: 12 }}>
-            1 {G.birim.replace("TL/", "")} {G.ad.toUpperCase()} = KAÇ {U.birim.replace("TL/", "")} {U.ad.toUpperCase()}?
-          </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 16, flexWrap: "wrap" }}>
-            <div>
-              <div style={{ fontSize: 9, color: C.mut, marginBottom: 4 }}>BUGÜN</div>
-              <div style={{ fontSize: 54, fontWeight: 800, color: G.renk, lineHeight: 1, letterSpacing: -3 }}>
-                {formatFiyat(guncel, 2)}
-                <span style={{ fontSize: 16, color: C.mut, marginLeft: 8, fontWeight: 400 }}>{U.birim.replace("TL/", "")}</span>
-              </div>
-              {/* 1.1: hangi borsanın fiyatı kullanılıyorsa kaynak + tarih burada yazar */}
-              <div style={{ fontSize: 10, color: "#3A7040", marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span>{G.ad}: {formatFiyat(G.guncel, 2)} {G.birim}{G.tarih ? ` · geçerlilik ${kisaTarih(G.tarih)}` : ""}</span>
-                {/* M4: mazot elle güncellenir — 14+ gün geçtiyse açıkça uyar */}
-                {girdiGun != null && girdiGun >= 14 && (
-                  <span style={{ color: "#E8C040" }}>⚠ {G.ad.toLowerCase()} fiyatı {girdiGun} gündür güncellenmedi — eski olabilir</span>
-                )}
-                <span>·</span>
-                <span>{U.ad}: {formatFiyat(U.guncel, 2)} {U.birim} · {U.kaynak} · {kisaTarih(U.tarih)}</span>
-                <VeriTazelik tarih={U.tarih} />
-              </div>
-            </div>
-
-            {/* 1.2: kıyas kartları yalnız 30+ gün GERÇEK veri varsa */}
-            {kiyasHazir && degisim30 != null ? (
-              <div style={{ background: degisim30 > 0 ? "#2A0A08" : "#0A2A10", border: `1px solid ${degisim30 > 0 ? "#5A2018" : "#1A5A28"}`, borderRadius: 10, padding: "12px 16px" }}>
-                <div style={{ fontSize: 10, color: degisim30 > 0 ? "#E86040" : C.pos }}>30 günlük değişim</div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: degisim30 > 0 ? "#E86040" : C.pos }}>
-                  {degisim30 > 0 ? "▲" : "▼"} %{formatFiyat(Math.abs(degisim30), 1)}
-                </div>
-                <div style={{ fontSize: 9, color: C.mut }}>gerçek borsa verisi</div>
-              </div>
-            ) : (
-              <div style={{ background: "#0A1A28", border: "1px solid #1A3A5A", borderRadius: 10, padding: "12px 16px", maxWidth: 280 }}>
-                <div style={{ fontSize: 11, color: "#6090E8", lineHeight: 1.6 }}>
-                  📈 Tarihsel seri birikiyor — karşılaştırma {Math.max(0, KIYAS_ESIK_GUN - U.gercekGun)} gün sonra aktif ({U.gercekGun}/{KIYAS_ESIK_GUN} gün)
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* EMOJİ + ALINTI: yalnız kıyas hazırsa (tek veriyle "bugün vs bugün" saçmalığı yok) */}
-          {kiyasHazir && ilkParite != null && sonParite != null && ilkNokta && (
-            <>
-              <div style={{ background: "#06080660", borderRadius: 12, padding: 16, marginBottom: 16 }}>
-                <div style={{ fontSize: 9, color: C.mut, letterSpacing: 2, marginBottom: 10 }}>
-                  {G.ikon} 1 {G.ad.toUpperCase()} = {U.ikon} KAÇ {U.ad.toUpperCase()}? (30 gün önce → bugün)
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-                  <div>
-                    <div style={{ fontSize: 9, color: C.mut, marginBottom: 4 }}>{kisaTarih(ilkNokta.tarih)}</div>
-                    <div style={{ display: "flex", gap: 2, flexWrap: "wrap", maxWidth: 200 }}>
-                      {Array.from({ length: Math.max(1, Math.min(Math.round(ilkParite), 8)) }).map((_, i) => (
-                        <span key={i} style={{ fontSize: 20 }}>{U.ikon}</span>
-                      ))}
-                    </div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: C.mut, marginTop: 4 }}>{formatFiyat(ilkParite, 2)}</div>
-                  </div>
-                  <div style={{ fontSize: 24, color: C.mut }}>→</div>
-                  <div>
-                    <div style={{ fontSize: 9, color: C.mut, marginBottom: 4 }}>bugün</div>
-                    <div style={{ display: "flex", gap: 2, flexWrap: "wrap", maxWidth: 300 }}>
-                      {Array.from({ length: goster }).map((_, i) => (
-                        <span key={i} style={{ fontSize: 20 }}>{U.ikon}</span>
-                      ))}
-                      {tamSayi > 12 && <span style={{ fontSize: 14, color: G.renk, alignSelf: "center", marginLeft: 4 }}>+{tamSayi - 12}</span>}
-                    </div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: G.renk, marginTop: 4 }}>{formatFiyat(sonParite, 2)}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3.8: boşluklar şablonda açıkça korunur */}
-              <div style={{ fontSize: 12, color: "#5A8060", lineHeight: 1.7, fontStyle: "italic", borderLeft: "3px solid #2A5030", paddingLeft: 14 }}>
-                {`"${kisaTarih(ilkNokta.tarih)}'de ${formatFiyat(ilkParite, 2)} ${U.birim.replace("TL/", "")} yeterliydi. Bugün ${formatFiyat(sonParite, 2)} ${U.birim.replace("TL/", "")} gerekiyor."`}
-              </div>
-            </>
-          )}
-        </div>
+      {/* Seçili çift + 30 gün değişim (grafikleri sürer) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 12, padding: "0 4px" }}>
+        <span style={{ fontSize: 11, color: C.txt }}>Grafik: <b style={{ color: G.renk }}>{G.ikon} {G.ad}</b> / <b style={{ color: U.renk }}>{U.ikon} {U.ad}</b></span>
+        <span style={{ fontSize: 11, color: C.mut }}>bugün 1 {G.birim.replace("TL/", "")} = <b style={{ color: C.txt }}>{formatFiyat(guncel, 2)}</b> {U.birim.replace("TL/", "")} {U.ad.toLowerCase()}</span>
+        {kiyasHazir && degisim30 != null && (
+          <span style={{ fontSize: 11, color: degisim30 > 0 ? "#E86040" : C.pos }}>· 30g {degisim30 > 0 ? "▲" : "▼"} %{formatFiyat(Math.abs(degisim30), 1)}</span>
+        )}
       </div>
 
-      {/* TARİHSEL GRAFİK (TÜİK tahmini seri — dipnotta etiketli) */}
+      {/* TARİHSEL GRAFİK (mum grafiği — korunur) */}
       {hist.length > 1 && (
         <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 14, padding: 20, marginBottom: 20 }}>
           <div style={{ marginBottom: 14 }}>
@@ -255,8 +123,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
             <div style={{ display: "flex", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
               {Object.entries(OLAYLAR).map(([y, metin]) => (
                 <div key={y} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, color: C.mut }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#E84040", opacity: 0.7 }} />
-                  {y}: {metin}
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#E84040", opacity: 0.7 }} />{y}: {metin}
                 </div>
               ))}
             </div>
@@ -274,22 +141,20 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
               <YAxis tick={{ fill: C.mut, fontSize: 9 }} axisLine={false} tickLine={false} domain={[0, "auto"]} />
               <Tooltip content={<TT2 />} />
               <ReferenceLine y={1} stroke="#3A6A3A" strokeDasharray="6 3" label={{ value: "Eşit (1.0)", position: "right", fill: C.mut, fontSize: 8 }} />
-              {Object.keys(OLAYLAR).map((y) => (
-                <ReferenceLine key={y} x={y} stroke="#E8404050" strokeWidth={1} strokeDasharray="4 2" />
-              ))}
+              {Object.keys(OLAYLAR).map((y) => (<ReferenceLine key={y} x={y} stroke="#E8404050" strokeWidth={1} strokeDasharray="4 2" />))}
               <Area type="monotone" dataKey="p" stroke={G.renk} strokeWidth={2.5} fill="url(#pg)" dot={{ fill: G.renk, r: 3, strokeWidth: 0 }} activeDot={{ r: 5, fill: G.renk }} name="Parite" />
             </AreaChart>
           </ResponsiveContainer>
           <div style={{ fontSize: 8, color: C.mut, marginTop: 6 }}>
-            Kesikli çizgi: Eşit parite (1.0) — altı çiftçi lehine, üstü aleyhine · Tarihsel ürün serisi TÜİK tahminidir, 2026 ucu canlı borsa verisidir
+            Kesikli çizgi: Eşit parite (1.0) · Tarihsel ürün serisi TÜİK tahminidir, 2026 ucu canlı borsa verisidir
           </div>
         </div>
       )}
 
-      {/* YILLIK DEĞİŞİM (TÜİK tahmini) */}
+      {/* YILLIK DEĞİŞİM (korunur) */}
       {degVerisi.length > 1 && (
         <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 14, padding: 20, marginBottom: 20 }}>
-          <div style={{ fontSize: 9, color: C.mut, letterSpacing: 1, marginBottom: 12 }}>YIL BAZLI DEĞİŞİM (tahmini seri) — Her dönem ne kadar kötüleşti?</div>
+          <div style={{ fontSize: 9, color: C.mut, letterSpacing: 1, marginBottom: 12 }}>YIL BAZLI DEĞİŞİM (tahmini seri)</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={degVerisi} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
               <CartesianGrid stroke="#142018" strokeDasharray="4 4" vertical={false} />
@@ -298,74 +163,37 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
               <Tooltip content={<DegTT />} cursor={{ fill: "transparent" }} />
               <ReferenceLine y={0} stroke={C.brd} />
               <Bar dataKey="deg" radius={[3, 3, 0, 0]} name="Değişim">
-                {degVerisi.map((d, i) => (
-                  <Cell key={i} fill={d.deg > 0 ? C.neg : C.pos} />
-                ))}
+                {degVerisi.map((d, i) => (<Cell key={i} fill={d.deg > 0 ? C.neg : C.pos} />))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
       )}
 
-      {/* MATRİS — yalnız canlı veri olan ürünler */}
-      {canliUrunler.length > 0 && (
-        <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 14, padding: 20, marginBottom: 20, overflowX: "auto" }}>
-          <div style={{ fontSize: 9, color: C.mut, letterSpacing: 1, marginBottom: 14 }}>TÜM PARİTE KOMBİNASYONLARI — GÜNCEL (canlı borsa verisi)</div>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
-            <thead>
-              <tr>
-                <th style={{ padding: "8px 10px", textAlign: "left", fontSize: 9, color: C.mut, borderBottom: `1px solid ${C.brd}` }}>GİRDİ → ÜRÜN</th>
-                {canliUrunler.map(([k, v]) => (
-                  <th key={k} style={{ padding: "8px 10px", textAlign: "center", fontSize: 10, color: v.renk, borderBottom: `1px solid ${C.brd}` }}>
-                    {v.ikon} {v.ad}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {aktifGirdiler.map(([gk, gv]) => (
-                <tr key={gk} style={{ borderBottom: "1px solid #0E1C10" }}>
-                  <td style={{ padding: "10px", fontSize: 11, color: gv.renk, fontWeight: 700 }}>{gv.ikon} {gv.ad}</td>
-                  {canliUrunler.map(([uk, uv]) => {
-                    const p = +(gv.guncel / uv.guncel).toFixed(2);
-                    const secili = gk === girdi && uk === urun;
-                    return (
-                      <td key={uk} onClick={() => { setGirdi(gk); setUrun(uk); }} style={{
-                        padding: "10px", textAlign: "center", cursor: "pointer",
-                        background: secili ? `${gv.renk}22` : "transparent",
-                        outline: secili ? `1px solid ${gv.renk}` : "none",
-                        borderRadius: 6, transition: "all 0.15s",
-                      }}>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: p > 2 ? C.neg : p > 1 ? "#E8A040" : C.pos }}>{formatFiyat(p, 2)}×</div>
-                        <div style={{ fontSize: 8, color: C.mut, marginTop: 2 }}>{uv.birim.replace("TL/", "")}</div>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div style={{ fontSize: 8, color: C.mut, marginTop: 10 }}>
-            🟢 &lt;1,0 çiftçi lehine · 🟡 1,0–2,0 dengede · 🔴 &gt;2,0 çiftçi aleyhine · Hücreye tıkla → grafik değişir · ⚡ Elektrik yakında
-          </div>
-        </div>
-      )}
-
       {/* PAYLAŞIM */}
       <div style={{ background: "#0A1810", border: "1px solid #1A4028", borderRadius: 14, padding: 20, marginBottom: 10 }}>
-        <div style={{ fontSize: 9, color: "#4A9060", letterSpacing: 2, marginBottom: 12 }}>📤 PAYLAŞIM KARTI</div>
-        <div style={{ background: C.bg, borderRadius: 12, padding: 16, marginBottom: 14, border: `1px solid ${G.renk}30`, lineHeight: 1.8 }}>
-          <div style={{ fontSize: 9, color: C.mut, marginBottom: 6, letterSpacing: 2 }}>ÖNİZLEME</div>
-          <span style={{ color: G.renk, fontWeight: 700 }}>{G.ikon} {G.ad} / {U.ikon} {U.ad}</span><br />
-          <span style={{ color: C.txt }}>1 {G.birim.replace("TL/", "")} {G.ad.toLowerCase()} = <b style={{ color: G.renk }}>{formatFiyat(guncel, 2)}</b> {U.birim.replace("TL/", "")} {U.ad.toLowerCase()}</span><br />
-          <span style={{ color: C.mut, fontSize: 10 }}>{U.kaynak} · {kisaTarih(U.tarih)} · borsanadolu.6ngen.com/parite</span>
+        <div style={{ fontSize: 9, color: "#4A9060", letterSpacing: 2, marginBottom: 12 }}>📤 PAYLAŞIM</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 9, color: C.mut, marginBottom: 6 }}>Seçili parite kartı ({G.ad}/{U.ad})</div>
+            <PaylasButonlar metin={paylasMetni} pngUrl={kartAktif ? `/api/kart/parite?urun=${urun}` : null} />
+          </div>
+          <div style={{ borderTop: `1px solid ${C.brd}`, paddingTop: 12 }}>
+            <div style={{ fontSize: 9, color: C.mut, marginBottom: 6 }}>Tüm matris tek görselde</div>
+            <button
+              onClick={() => matrisAktif && window.open(`/api/kart/matris`, "_blank")}
+              disabled={!matrisAktif}
+              style={{ background: "transparent", border: `1px solid ${matrisAktif ? "#6090E8" : "#2A4030"}`, color: matrisAktif ? "#6090E8" : "#3A5040", padding: "8px 18px", borderRadius: 20, cursor: matrisAktif ? "pointer" : "not-allowed", fontSize: 11, fontFamily: "monospace", fontWeight: 700 }}
+            >
+              📊 Parite Matrisi Kartı
+            </button>
+          </div>
         </div>
-        <PaylasButonlar metin={paylasMetni} pngUrl={kartAktif ? `/api/kart/parite?urun=${urun}` : null} />
       </div>
 
       <div style={{ fontSize: 8, color: "#2A4030", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>
-        Güncel fiyatlar canlı borsa verisidir (TOBB/KTB hububat · ESK karkas · USK çiğ süt) — kaynak ve tarih her kartta yazar.<br />
-        Tarihsel ürün serileri TÜİK tahminidir · Elektrik tahmini (yakında canlı).
+        Güncel fiyatlar canlı borsa verisidir (TOBB/KTB hububat · ESK karkas · USK çiğ süt) · Matris yalnızca oranı gösterir, tavsiye vermez.<br />
+        Tarihsel ürün serileri TÜİK tahminidir.
       </div>
     </div>
   );
