@@ -16,7 +16,7 @@ export default function PariteMatris({
   seciliUrun: string;
   onSec: (girdi: string, urun: string) => void;
 }) {
-  const [yon, setYon] = useState<Yon>("ug");
+  const [yon, setYon] = useState<Yon>("gu"); // varsayılan girdi→ürün (temiz/≥1 sayı)
   const [hg, setHg] = useState<string | undefined>();
   const [hu, setHu] = useState<string | undefined>();
 

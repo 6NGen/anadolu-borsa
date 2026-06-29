@@ -22,7 +22,9 @@ const URUNLER = [
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const yon = searchParams.get("yon") === "gu" ? "gu" : "ug";
+  // Varsayılan: girdi→ürün ("1 litre mazot = X kg ürün") — çoğu ürün mazottan
+  // ucuz olduğu için bu yön ≥1 temiz sayı verir (küsürat olmaz).
+  const yon = searchParams.get("yon") === "ug" ? "ug" : "gu";
 
   const [{ data: mazotRows }, { data: yem }, { data: hayHam }] = await Promise.all([
     supabaseServer.from("girdi_fiyat").select("fiyat, gecerlilik_tarihi").eq("girdi_turu", "mazot").order("gecerlilik_tarihi", { ascending: false }).limit(1),
