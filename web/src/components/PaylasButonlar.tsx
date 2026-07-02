@@ -21,8 +21,8 @@ export default function PaylasButonlar({ metin, pngUrl, pasifNot = "veri güncel
 
   const stil = (renk: string, aktif = true): React.CSSProperties => ({
     background: "transparent",
-    border: `1px solid ${aktif ? renk : "#2A4030"}`,
-    color: aktif ? renk : "#3A5040",
+    border: `1px solid ${aktif ? renk : "#2E4A38"}`,
+    color: aktif ? renk : "#587D62",
     padding: "8px 18px", borderRadius: 20, cursor: aktif ? "pointer" : "not-allowed",
     fontSize: 13, fontFamily: "var(--font-mono), monospace",
   });

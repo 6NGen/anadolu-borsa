@@ -12,7 +12,7 @@ import { maliyetHesapla, VERIM_TUIK, MAZOT_LITRE_DEKAR, TOHUM_VARSAYILAN, GUBRE_
 export const revalidate = 3600;
 
 const AD: Record<string, string> = { BUGDAY: "BUĞDAY", ARPA: "ARPA", MISIR: "MISIR", YULAF: "YULAF", CAVDAR: "ÇAVDAR" };
-const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#4A7050", txt: "#DDF0DE", yesil: "#68B890", kirmizi: "#E87060" };
+const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#7BA98C", txt: "#DDF0DE", yesil: "#68B890", kirmizi: "#E87060" };
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

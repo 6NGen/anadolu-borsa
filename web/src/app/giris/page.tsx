@@ -61,11 +61,11 @@ export default function GirisPage() {
           style={{
             display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
             width: "100%", padding: "11px", fontSize: "13px", borderRadius: "3px", fontWeight: 700, fontFamily: "var(--font-mono)",
-            background: kvkk ? "#fff" : "#1A2018", color: kvkk ? "#1A1A1A" : "#3A5040",
+            background: kvkk ? "#fff" : "#1A2018", color: kvkk ? "#1A1A1A" : "#587D62",
             border: "none", cursor: kvkk && !gidiliyor ? "pointer" : "not-allowed",
           }}
         >
-          <span style={{ fontSize: "15px", fontWeight: 700, color: kvkk ? "#4285F4" : "#3A5040" }}>G</span>
+          <span style={{ fontSize: "15px", fontWeight: 700, color: kvkk ? "#4285F4" : "#587D62" }}>G</span>
           {gidiliyor ? "Yönlendiriliyor…" : "Google ile Giriş"}
         </button>
       </div>

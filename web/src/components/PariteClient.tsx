@@ -21,7 +21,7 @@ export interface Urun {
 
 const OLAYLAR: Record<string, string> = { "2008": "🌍 Kriz", "2018": "💸 Döviz", "2022": "📈 Kur+Enerji" };
 const KIYAS_ESIK_GUN = 30;
-const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#4A7050", txt: "#DDF0DE", pos: "#4AE870", neg: "#E84A4A" };
+const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#7BA98C", txt: "#DDF0DE", pos: "#4AE870", neg: "#E84A4A" };
 
 function pariteHesapla(g: Girdi, u: Urun) {
   const yillar = [...new Set([...g.hist, ...u.hist].map((d) => d.y))].sort();
@@ -177,12 +177,12 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
 
       {/* PAYLAŞIM — tüm matris (WhatsApp/X metni + PNG kartı) */}
       <div style={{ background: "#0A1810", border: "1px solid #1A4028", borderRadius: 14, padding: 20, marginBottom: 10 }}>
-        <div style={{ fontSize: 12, color: "#4A9060", letterSpacing: 2, marginBottom: 6 }}>📤 PARİTE MATRİSİNİ PAYLAŞ</div>
+        <div style={{ fontSize: 12, color: "#5FBF80", letterSpacing: 2, marginBottom: 6 }}>📤 PARİTE MATRİSİNİ PAYLAŞ</div>
         <div style={{ fontSize: 13, color: C.mut, marginBottom: 12 }}>WhatsApp/X metninde ve PNG kartında matrisin tamamı görünür.</div>
         <PaylasButonlar metin={matrisMetni} pngUrl={matrisAktif ? `/api/kart/matris` : null} />
       </div>
 
-      <div style={{ fontSize: 12, color: "#2A4030", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 12, color: "#6B9478", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>
         Güncel fiyatlar canlı borsa verisidir (TOBB/KTB hububat · ESK karkas · USK çiğ süt) · Matris yalnızca oranı gösterir, tavsiye vermez.<br />
         Tarihsel ürün serileri TÜİK tahminidir.
       </div>

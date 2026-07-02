@@ -7,7 +7,7 @@ export const alt = "Anadolu Borsa — Türkiye Tarım ve Hayvancılık Fiyatlar�
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const C = { bg: "#060E08", brd: "#1A3020", mut: "#4A7050", txt: "#DDF0DE", yesil: "#68B890" };
+const C = { bg: "#060E08", brd: "#1A3020", mut: "#7BA98C", txt: "#DDF0DE", yesil: "#68B890" };
 
 export default async function Image() {
   return new ImageResponse(

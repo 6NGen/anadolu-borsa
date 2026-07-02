@@ -25,7 +25,7 @@ export interface VarlikItem {
   hist: { y: string; f: number }[];
 }
 
-const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#4A7050", txt: "#DDF0DE", pos: "#4AE870", neg: "#E84A4A" };
+const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#7BA98C", txt: "#DDF0DE", pos: "#4AE870", neg: "#E84A4A" };
 
 function TT({ active, payload, label, sfx = "" }: { active?: boolean; payload?: { name?: string; value?: number; color?: string }[]; label?: string; sfx?: string }) {
   if (!active || !payload?.length) return null;
@@ -99,7 +99,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
 
       {/* Panel */}
       <div style={{ background: "#0A1810", border: "1px solid #1A4028", borderRadius: 16, padding: 20, marginBottom: 20 }}>
-        <div style={{ fontSize: 12, color: "#4A9060", letterSpacing: 2, marginBottom: 16 }}>🎯 ÜRETİCİ HEDEF PANELİ — KONYA</div>
+        <div style={{ fontSize: 12, color: "#5FBF80", letterSpacing: 2, marginBottom: 16 }}>🎯 ÜRETİCİ HEDEF PANELİ — KONYA</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>ÜRÜN</div>
@@ -125,7 +125,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
           <div>
             <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>MİKTAR ({miktarBirimi.toUpperCase()})</div>
             <input type="number" value={miktar} min={1} onChange={(e) => setMiktar(Math.max(1, +e.target.value || 1))} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 16, fontFamily: "monospace", outline: "none" }} />
-            {hayvanMi && <div style={{ fontSize: 12, color: "#3A6040", marginTop: 4 }}>{u.karkasLabel}</div>}
+            {hayvanMi && <div style={{ fontSize: 12, color: "#6B9478", marginTop: 4 }}>{u.karkasLabel}</div>}
           </div>
         </div>
 
@@ -172,7 +172,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
               <div style={{ fontSize: 16, marginBottom: 4 }}>{val.ikon}</div>
               <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>{val.ad.toUpperCase()}</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: varlik === k ? val.renk : C.txt }}>{etiket}</div>
-              <div style={{ fontSize: 12, color: "#3A6040", marginTop: 3 }}>{val.aciklama}</div>
+              <div style={{ fontSize: 12, color: "#6B9478", marginTop: 3 }}>{val.aciklama}</div>
             </Kart>
           );
         })}

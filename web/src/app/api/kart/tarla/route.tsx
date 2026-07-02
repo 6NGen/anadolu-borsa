@@ -10,7 +10,7 @@ import { tarlaUrunBul } from "@/lib/tarla";
 
 export const revalidate = 1800;
 
-const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#4A7050", txt: "#DDF0DE", yesil: "#68B890", kirmizi: "#E87060" };
+const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#7BA98C", txt: "#DDF0DE", yesil: "#68B890", kirmizi: "#E87060" };
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

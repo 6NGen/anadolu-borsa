@@ -9,7 +9,7 @@ import { kartUretilebilir, gunFarki, BAYAT_ESIK_GUN } from "@/lib/tazelik";
 
 export const revalidate = 3600;
 
-const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#4A7050", txt: "#DDF0DE", yesil: "#68B890", sari: "#E8C040" };
+const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#7BA98C", txt: "#DDF0DE", yesil: "#68B890", sari: "#E8C040" };
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

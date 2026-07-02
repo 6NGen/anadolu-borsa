@@ -108,7 +108,7 @@ export default async function GirdilerPage() {
         </div>
       </div>
 
-      <div style={{ fontSize: "12px", color: "#2A4030", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
+      <div style={{ fontSize: "12px", color: "#6B9478", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
         Mazot fiyatı EPDK/pompa kaynaklıdır, elle güncellenir · Gübre/kaba yem fiyatları kullanıcı bildirimidir (min 3)
       </div>
     </main>

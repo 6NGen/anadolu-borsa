@@ -2,7 +2,7 @@ export const RENKLER = {
   bg:      "#080E09",
   surface: "#0F1A12",
   border:  "#1E3A22",
-  muted:   "#506A52",
+  muted:   "#7BA98C",
   text:    "#E8F5EA",
   green:   "#68B890",
   red:     "#E87060",
