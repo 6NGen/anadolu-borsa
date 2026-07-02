@@ -3,6 +3,12 @@ import '../tema.dart';
 import '../veri.dart';
 import '../parcalar.dart';
 
+class _AnaVeri {
+  final List<Fiyat> yem, hayvan;
+  final List<Sinyal> sinyal;
+  _AnaVeri(this.yem, this.hayvan, this.sinyal);
+}
+
 class AnaEkran extends StatefulWidget {
   const AnaEkran({super.key});
   @override
@@ -10,7 +16,7 @@ class AnaEkran extends StatefulWidget {
 }
 
 class _AnaEkranState extends State<AnaEkran> {
-  late Future<List<List<Fiyat>>> _veri;
+  late Future<_AnaVeri> _veri;
 
   @override
   void initState() {
@@ -18,39 +24,47 @@ class _AnaEkranState extends State<AnaEkran> {
     _veri = _getir();
   }
 
-  Future<List<List<Fiyat>>> _getir() => Future.wait([yemFiyatlari(), hayvanFiyatlari()]);
+  Future<_AnaVeri> _getir() async {
+    // Sinyal ayrı yakalanır: view hata verirse ana liste yine gelsin.
+    final yemF = yemFiyatlari();
+    final hayvanF = hayvanFiyatlari();
+    List<Sinyal> sinyal = [];
+    try {
+      sinyal = await sinyaller();
+    } catch (_) {/* sinyal opsiyonel */}
+    return _AnaVeri(await yemF, await hayvanF, sinyal);
+  }
 
   Future<void> _yenile() async {
-    setState(() => _veri = _getir());
-    await _veri;
+    final f = _getir();
+    setState(() => _veri = f);
+    await f;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<List<Fiyat>>>(
+    return FutureBuilder<_AnaVeri>(
       future: _veri,
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) return yukleniyor();
-        if (snap.hasError) {
-          return RefreshIndicator(
-            color: C.green, backgroundColor: C.surface, onRefresh: _yenile,
-            child: ListView(children: [SizedBox(height: 200, child: hataKutusu(snap.error))]),
-          );
-        }
-        final yem = snap.data![0], hayvan = snap.data![1];
+        if (snap.hasError) return hataListe(_yenile, snap.error);
+        final v = snap.data!;
         return RefreshIndicator(
           color: C.green, backgroundColor: C.surface, onRefresh: _yenile,
           child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(14),
             children: [
               markaBaslik('Türkiye tarım & hayvancılık fiyatları · günlük'),
+              if (v.sinyal.isNotEmpty) SinyalSeridi(v.sinyal),
               bolumBaslik('YEM FİYATLARI'),
-              ...yem.map((f) => FiyatKarti(f)),
+              ...v.yem.map((f) => FiyatKarti(f)),
               const SizedBox(height: 12),
               bolumBaslik('HAYVAN FİYATLARI'),
-              ...hayvan.map((f) => FiyatKarti(f)),
+              ...v.hayvan.map((f) => FiyatKarti(f)),
               const SizedBox(height: 20),
-              Center(child: Text('Aşağı çekerek yenile · Günlük güncellenir', style: TextStyle(color: C.muted, fontSize: 10))),
+              Center(child: Text('Karta uzun bas → paylaş · Aşağı çekerek yenile', style: TextStyle(color: C.muted, fontSize: 10))),
+              const SizedBox(height: 60), // FAB altta kart örtmesin
             ],
           ),
         );

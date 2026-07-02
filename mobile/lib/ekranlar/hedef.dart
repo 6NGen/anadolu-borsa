@@ -35,15 +35,21 @@ class _HedefEkranState extends State<HedefEkran> {
     return [...yem, ...hayvan];
   }
 
+  Future<void> _yenile() async {
+    final f = _yukle();
+    setState(() => _veri = f);
+    await f;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Fiyat>>(
       future: _veri,
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) return yukleniyor();
-        if (snap.hasError) return hataKutusu(snap.error);
+        if (snap.hasError) return hataListe(_yenile, snap.error);
         final liste = (snap.data ?? []).where((f) => f.fiyat != null && f.fiyat! > 0).toList();
-        if (liste.isEmpty) return Center(child: Text('Veri yok', style: TextStyle(color: C.muted)));
+        if (liste.isEmpty) return hataListe(_yenile);
         final urun = _urun ?? liste.first.norm;
         final f = liste.firstWhere((x) => x.norm == urun, orElse: () => liste.first);
         final hayvanMi = _karkas.containsKey(f.norm);
@@ -52,7 +58,10 @@ class _HedefEkranState extends State<HedefEkran> {
         final varlikFiyat = _varliklar[_varlik]!;
         final kacBirim = varlikFiyat / (f.fiyat! * olcek);
 
-        return ListView(
+        return RefreshIndicator(
+          color: C.green, backgroundColor: C.surface, onRefresh: _yenile,
+          child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(14),
           children: [
             bolumBaslik('ÜRÜN'),
@@ -76,8 +85,9 @@ class _HedefEkranState extends State<HedefEkran> {
               '${f.ad} ${formatFiyat(f.fiyat)} ${f.birim} (canlı)${hayvanMi ? ' · karkas ~${_karkas[f.norm]} kg (tahmin)' : ''}\n$_varlik ${formatFiyat(varlikFiyat, 0)} ₺ (referans/tahmin)',
               style: TextStyle(color: C.muted, fontSize: 10, height: 1.5),
             ),
+            const SizedBox(height: 70),
           ],
-        );
+        ));
       },
     );
   }

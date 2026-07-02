@@ -12,7 +12,16 @@ SupabaseClient get sb => Supabase.instance.client;
 class Fiyat {
   final String norm, ad, kaynak, tarih, birim;
   final double? fiyat;
-  Fiyat({required this.norm, required this.ad, required this.kaynak, required this.tarih, required this.birim, this.fiyat});
+  final double? miktar; // işlem miktarı (kg) — yem borsalarında var
+  Fiyat({
+    required this.norm,
+    required this.ad,
+    required this.kaynak,
+    required this.tarih,
+    required this.birim,
+    this.fiyat,
+    this.miktar,
+  });
 }
 
 class GrafikNoktasi {
@@ -23,12 +32,15 @@ class GrafikNoktasi {
 
 // --- Güncel fiyatlar ---
 Future<List<Fiyat>> yemFiyatlari() async {
-  final rows = await sb.from('son_fiyatlar').select('urun_norm, urun_ad, ortalama, borsa, cekilme_tarihi, birim');
+  final rows = await sb
+      .from('son_fiyatlar')
+      .select('urun_norm, urun_ad, ortalama, borsa, cekilme_tarihi, birim, islem_miktari');
   return [
     for (final r in rows)
       Fiyat(
         norm: r['urun_norm'], ad: r['urun_ad'] ?? r['urun_norm'],
         fiyat: (r['ortalama'] as num?)?.toDouble(),
+        miktar: (r['islem_miktari'] as num?)?.toDouble(),
         kaynak: r['borsa'] ?? '', tarih: r['cekilme_tarihi'] ?? '', birim: r['birim'] ?? 'TL/KG',
       ),
   ]..sort((a, b) => a.norm.compareTo(b.norm));
@@ -52,28 +64,73 @@ Future<List<Fiyat>> hayvanFiyatlari() async {
 }
 
 // --- 30 günlük seri (grafik) ---
-Future<List<GrafikNoktasi>> yemSeri(String norm) async {
+// [kaynak] verilirse o borsa/kaynak çizilir (başlıkla seri aynı borsadan olsun);
+// verilmez ya da o kaynakta veri yoksa en güncel kaydın kaynağına düşülür.
+Future<List<GrafikNoktasi>> yemSeri(String norm, {String? kaynak}) async {
   final rows = await sb.from('son_30_gun').select('borsa, cekilme_tarihi, ortalama')
       .eq('urun_norm', norm).order('cekilme_tarihi');
+  return _tekKaynakSeri(rows, 'borsa', 'ortalama', kaynak);
+}
+
+Future<List<GrafikNoktasi>> hayvanSeri(String norm, {String? kaynak}) async {
+  final rows = await sb.from('son_30_gun_hayvan').select('kaynak, cekilme_tarihi, fiyat')
+      .eq('hayvan_norm', norm).order('cekilme_tarihi');
+  return _tekKaynakSeri(rows, 'kaynak', 'fiyat', kaynak);
+}
+
+List<GrafikNoktasi> _tekKaynakSeri(List<Map<String, dynamic>> rows, String kaynakKolon, String degerKolon, String? istenen) {
   if (rows.isEmpty) return [];
-  // Tek borsa: en güncel kaydın borsası (karışma olmasın)
-  final borsa = rows.last['borsa'];
+  final varMi = istenen != null && rows.any((r) => r[kaynakKolon] == istenen);
+  final secilen = varMi ? istenen : rows.last[kaynakKolon];
   return [
     for (final r in rows)
-      if (r['borsa'] == borsa && r['ortalama'] != null)
-        GrafikNoktasi(r['cekilme_tarihi'], (r['ortalama'] as num).toDouble()),
+      if (r[kaynakKolon] == secilen && r[degerKolon] != null)
+        GrafikNoktasi(r['cekilme_tarihi'], (r[degerKolon] as num).toDouble()),
   ];
 }
 
-Future<List<GrafikNoktasi>> hayvanSeri(String norm) async {
-  final rows = await sb.from('son_30_gun_hayvan').select('kaynak, cekilme_tarihi, fiyat')
-      .eq('hayvan_norm', norm).order('cekilme_tarihi');
-  if (rows.isEmpty) return [];
-  final kaynak = rows.last['kaynak'];
+// --- Borsa karşılaştırma: seçili ürünün her borsadaki SON fiyatı ---
+class BorsaSatir {
+  final String borsa, tarih;
+  final double fiyat;
+  final double? miktar; // kg
+  BorsaSatir(this.borsa, this.tarih, this.fiyat, this.miktar);
+}
+
+Future<List<BorsaSatir>> borsaSonlari(String norm) async {
+  final rows = await sb.from('son_30_gun').select('borsa, cekilme_tarihi, ortalama, islem_miktari')
+      .eq('urun_norm', norm).order('cekilme_tarihi');
+  final sonlar = <String, BorsaSatir>{}; // sıralı geldiği için sonuncusu en güncel
+  for (final r in rows) {
+    if (r['ortalama'] == null) continue;
+    sonlar[r['borsa']] = BorsaSatir(
+      r['borsa'], r['cekilme_tarihi'],
+      (r['ortalama'] as num).toDouble(),
+      (r['islem_miktari'] as num?)?.toDouble(),
+    );
+  }
+  return sonlar.values.toList()..sort((a, b) => a.fiyat.compareTo(b.fiyat));
+}
+
+// --- Sinyal motoru (web fiyat_sinyal view'ı — hesap DB'de, kural web ile aynı) ---
+class Sinyal {
+  final String norm;
+  final double? ort30, bugun;
+  final int gunSayisi;
+  Sinyal(this.norm, this.ort30, this.bugun, this.gunSayisi);
+}
+
+Future<List<Sinyal>> sinyaller() async {
+  final rows = await sb.from('fiyat_sinyal')
+      .select('urun_norm, ort_30gun, bugun, veri_gun_sayisi').order('urun_norm');
   return [
     for (final r in rows)
-      if (r['kaynak'] == kaynak && r['fiyat'] != null)
-        GrafikNoktasi(r['cekilme_tarihi'], (r['fiyat'] as num).toDouble()),
+      Sinyal(
+        r['urun_norm'],
+        (r['ort_30gun'] as num?)?.toDouble(),
+        (r['bugun'] as num?)?.toDouble(),
+        (r['veri_gun_sayisi'] as num?)?.toInt() ?? 0,
+      ),
   ];
 }
 
