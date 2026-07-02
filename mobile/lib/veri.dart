@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Supabase herkese açık bağlantı bilgileri (web ile aynı; anon key client'a gider).
@@ -8,6 +11,10 @@ const supabaseAnonKey =
 const siteUrl = 'https://borsanadolu.6ngen.com';
 
 SupabaseClient get sb => Supabase.instance.client;
+
+// Çevrimdışı durumu — veri katmanı ayarlar, kabuk şerit gösterir.
+// Tarih eski kalacağı için tazelik rozeti (⚠) dürüstlüğü ayrıca korur.
+final cevrimdisi = ValueNotifier<bool>(false);
 
 class Fiyat {
   final String norm, ad, kaynak, tarih, birim;
@@ -22,6 +29,14 @@ class Fiyat {
     this.fiyat,
     this.miktar,
   });
+
+  Map<String, dynamic> toJson() =>
+      {'norm': norm, 'ad': ad, 'kaynak': kaynak, 'tarih': tarih, 'birim': birim, 'fiyat': fiyat, 'miktar': miktar};
+
+  factory Fiyat.fromJson(Map<String, dynamic> m) => Fiyat(
+        norm: m['norm'], ad: m['ad'], kaynak: m['kaynak'], tarih: m['tarih'], birim: m['birim'],
+        fiyat: (m['fiyat'] as num?)?.toDouble(), miktar: (m['miktar'] as num?)?.toDouble(),
+      );
 }
 
 class GrafikNoktasi {
@@ -30,38 +45,55 @@ class GrafikNoktasi {
   GrafikNoktasi(this.tarih, this.deger);
 }
 
-// --- Güncel fiyatlar ---
-Future<List<Fiyat>> yemFiyatlari() async {
-  final rows = await sb
-      .from('son_fiyatlar')
-      .select('urun_norm, urun_ad, ortalama, borsa, cekilme_tarihi, birim, islem_miktari');
-  return [
-    for (final r in rows)
-      Fiyat(
-        norm: r['urun_norm'], ad: r['urun_ad'] ?? r['urun_norm'],
-        fiyat: (r['ortalama'] as num?)?.toDouble(),
-        miktar: (r['islem_miktari'] as num?)?.toDouble(),
-        kaynak: r['borsa'] ?? '', tarih: r['cekilme_tarihi'] ?? '', birim: r['birim'] ?? 'TL/KG',
-      ),
-  ]..sort((a, b) => a.norm.compareTo(b.norm));
+// Başarılı çekimde önbelleğe yaz; ağ yoksa önbellekten dön (yoksa hata fırlar).
+Future<List<Fiyat>> _onbellekli(String anahtar, Future<List<Fiyat>> Function() cek) async {
+  try {
+    final liste = await cek();
+    cevrimdisi.value = false;
+    final p = await SharedPreferences.getInstance();
+    await p.setString(anahtar, jsonEncode([for (final f in liste) f.toJson()]));
+    return liste;
+  } catch (_) {
+    final p = await SharedPreferences.getInstance();
+    final s = p.getString(anahtar);
+    if (s == null) rethrow;
+    cevrimdisi.value = true;
+    return [for (final m in jsonDecode(s)) Fiyat.fromJson(m)];
+  }
 }
 
-Future<List<Fiyat>> hayvanFiyatlari() async {
-  final rows = await sb.from('son_hayvan_fiyatlari').select('hayvan_norm, hayvan, fiyat, kaynak, cekilme_tarihi, birim');
-  // hayvan_norm başına en güncel (kaynak değişimi → çift kayıt olmasın; web tekHayvanKaynak ile aynı)
-  final enYeni = <String, Fiyat>{};
-  for (final r in rows) {
-    final f = Fiyat(
-      norm: r['hayvan_norm'], ad: r['hayvan'] ?? r['hayvan_norm'],
-      fiyat: (r['fiyat'] as num?)?.toDouble(),
-      kaynak: (r['kaynak'] ?? '').toString().replaceAll('_SUT', ''),
-      tarih: r['cekilme_tarihi'] ?? '', birim: r['birim'] ?? 'TL/kg',
-    );
-    final v = enYeni[f.norm];
-    if (v == null || f.tarih.compareTo(v.tarih) > 0) enYeni[f.norm] = f;
-  }
-  return enYeni.values.toList()..sort((a, b) => a.norm.compareTo(b.norm));
-}
+// --- Güncel fiyatlar ---
+Future<List<Fiyat>> yemFiyatlari() => _onbellekli('cache_yem', () async {
+      final rows = await sb
+          .from('son_fiyatlar')
+          .select('urun_norm, urun_ad, ortalama, borsa, cekilme_tarihi, birim, islem_miktari');
+      return [
+        for (final r in rows)
+          Fiyat(
+            norm: r['urun_norm'], ad: r['urun_ad'] ?? r['urun_norm'],
+            fiyat: (r['ortalama'] as num?)?.toDouble(),
+            miktar: (r['islem_miktari'] as num?)?.toDouble(),
+            kaynak: r['borsa'] ?? '', tarih: r['cekilme_tarihi'] ?? '', birim: r['birim'] ?? 'TL/KG',
+          ),
+      ]..sort((a, b) => a.norm.compareTo(b.norm));
+    });
+
+Future<List<Fiyat>> hayvanFiyatlari() => _onbellekli('cache_hayvan', () async {
+      final rows = await sb.from('son_hayvan_fiyatlari').select('hayvan_norm, hayvan, fiyat, kaynak, cekilme_tarihi, birim');
+      // hayvan_norm başına en güncel (kaynak değişimi → çift kayıt olmasın; web tekHayvanKaynak ile aynı)
+      final enYeni = <String, Fiyat>{};
+      for (final r in rows) {
+        final f = Fiyat(
+          norm: r['hayvan_norm'], ad: r['hayvan'] ?? r['hayvan_norm'],
+          fiyat: (r['fiyat'] as num?)?.toDouble(),
+          kaynak: (r['kaynak'] ?? '').toString().replaceAll('_SUT', ''),
+          tarih: r['cekilme_tarihi'] ?? '', birim: r['birim'] ?? 'TL/kg',
+        );
+        final v = enYeni[f.norm];
+        if (v == null || f.tarih.compareTo(v.tarih) > 0) enYeni[f.norm] = f;
+      }
+      return enYeni.values.toList()..sort((a, b) => a.norm.compareTo(b.norm));
+    });
 
 // --- 30 günlük seri (grafik) ---
 // [kaynak] verilirse o borsa/kaynak çizilir (başlıkla seri aynı borsadan olsun);
@@ -113,6 +145,8 @@ Future<List<BorsaSatir>> borsaSonlari(String norm) async {
 }
 
 // --- Sinyal motoru (web fiyat_sinyal view'ı — hesap DB'de, kural web ile aynı) ---
+// BİLİNÇLİ: önbelleklenmez. "Bugün vs ortalama" eski veriyle yanıltıcı olur;
+// çevrimdışıyken sinyal şeridi gizlenir.
 class Sinyal {
   final String norm;
   final double? ort30, bugun;
@@ -136,8 +170,18 @@ Future<List<Sinyal>> sinyaller() async {
 
 // --- Mazot (parite için) ---
 Future<double?> guncelMazot() async {
-  final rows = await sb.from('girdi_fiyat').select('fiyat, gecerlilik_tarihi')
-      .eq('girdi_turu', 'mazot').order('gecerlilik_tarihi', ascending: false).limit(1);
-  if (rows.isEmpty) return null;
-  return (rows.first['fiyat'] as num?)?.toDouble();
+  final p = await SharedPreferences.getInstance();
+  try {
+    final rows = await sb.from('girdi_fiyat').select('fiyat, gecerlilik_tarihi')
+        .eq('girdi_turu', 'mazot').order('gecerlilik_tarihi', ascending: false).limit(1);
+    if (rows.isEmpty) return null;
+    final f = (rows.first['fiyat'] as num?)?.toDouble();
+    if (f != null) await p.setDouble('cache_mazot', f);
+    return f;
+  } catch (_) {
+    final f = p.getDouble('cache_mazot');
+    if (f == null) rethrow;
+    cevrimdisi.value = true;
+    return f;
+  }
 }

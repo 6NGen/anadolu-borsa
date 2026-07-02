@@ -3,6 +3,7 @@ import 'package:share_plus/share_plus.dart';
 import '../tema.dart';
 import '../bicim.dart';
 import '../veri.dart';
+import '../tercih.dart';
 import '../parcalar.dart';
 
 // Web parite matrisi ile aynı satırlar ve kurallar:
@@ -33,7 +34,8 @@ class _PariteEkranState extends State<PariteEkran> {
     final hayvan = sonuc[2] as List<Fiyat>;
     final hepsi = [...yem, ...hayvan].where((f) => _urunSirasi.contains(f.norm)).toList()
       ..sort((a, b) => _urunSirasi.indexOf(a.norm).compareTo(_urunSirasi.indexOf(b.norm)));
-    return _PariteVeri(mazot, hepsi);
+    // Kişiselleştirme: kullanıcının ürünleri en üstte
+    return _PariteVeri(mazot, Tercih.onceUrunlerim(hepsi, (f) => f.norm));
   }
 
   Future<void> _yenile() async {

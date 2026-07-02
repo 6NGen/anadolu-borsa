@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import '../tema.dart';
 import '../bicim.dart';
 import '../veri.dart';
+import '../sabitler.dart';
 import '../parcalar.dart';
 
-// Karkas kg (web lib/karkas ile aynı) — baş hesabı için
-const _karkas = {'TOSUN': 250, 'INEK': 250, 'KUZU': 17, 'TOKLU': 22, 'KOYUN': 25};
-// Varlık referansları (web lib/varliklar ile aynı, tahmin)
-const _varliklar = {
-  'Traktör': 2500000.0, 'Daire (m²)': 38000.0, 'Arsa (m²)': 4500.0, 'Tarla (m²)': 1180.0,
-};
+// Karkas + varlık referansları lib/sabitler.dart'ta (Kaç Para Eder ile ortak)
+const _karkas = karkasKg;
+const _varliklar = varlikFiyatlari;
 
 class HedefEkran extends StatefulWidget {
   const HedefEkran({super.key});

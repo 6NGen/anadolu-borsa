@@ -5,16 +5,19 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tema.dart';
 import 'veri.dart';
+import 'tercih.dart';
 import 'ekranlar/ana.dart';
 import 'ekranlar/tarim.dart';
 import 'ekranlar/hayvan.dart';
 import 'ekranlar/parite.dart';
-import 'ekranlar/hedef.dart';
+import 'ekranlar/araclar.dart';
 import 'ekranlar/ayarlar.dart';
+import 'ekranlar/urun_sec.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseAnonKey);
+  await Tercih.yukle();
   final prefs = await SharedPreferences.getInstance();
   final acik = prefs.getBool('acikTema') ?? false;
   paletUygula(acik);
@@ -48,11 +51,22 @@ class _AnadoluBorsaAppState extends State<AnadoluBorsaApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Anadolu Borsa',
-      debugShowCheckedModeBanner: false,
-      theme: anadoluTema(_acik),
-      home: AnaKabuk(acik: _acik, onTema: _temaDegistir),
+    // Tercih.surum artınca (ürünlerim/büyük yazı) tüm ağaç yeniden çizilir
+    return ValueListenableBuilder<int>(
+      valueListenable: Tercih.surum,
+      builder: (context, surum, child) => MaterialApp(
+        title: 'Anadolu Borsa',
+        debugShowCheckedModeBanner: false,
+        theme: anadoluTema(_acik),
+        builder: (context, child) {
+          final mq = MediaQuery.of(context);
+          return MediaQuery(
+            data: mq.copyWith(textScaler: TextScaler.linear(Tercih.buyukYazi ? 1.2 : 1.0)),
+            child: child!,
+          );
+        },
+        home: AnaKabuk(acik: _acik, onTema: _temaDegistir),
+      ),
     );
   }
 }
@@ -67,12 +81,23 @@ class AnaKabuk extends StatefulWidget {
 
 class _AnaKabukState extends State<AnaKabuk> {
   int _sekme = 0;
-  static const _basliklar = ['ANA SAYFA', 'TARIM BORSASI', 'HAYVAN BORSASI', 'PARİTE', 'HEDEF'];
+  static const _basliklar = ['ANA SAYFA', 'TARIM BORSASI', 'HAYVAN BORSASI', 'PARİTE', 'ARAÇLAR'];
+
+  @override
+  void initState() {
+    super.initState();
+    // İlk açılış: "Ne üretiyorsun?" seçicisi (atlanabilir, bir kez sorulur)
+    if (!Tercih.kurulumTamam) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const UrunSecEkran(ilkKurulum: true)));
+      });
+    }
+  }
 
   // Her build'de TAZE örnek (const DEĞİL) → tema değişince ekranlar yeniden
   // çizilir; State korunur (aynı tip+konum), veri yeniden çekilmez.
   // ignore: prefer_const_constructors
-  List<Widget> _ekranlarYap() => [AnaEkran(), TarimEkran(), HayvanEkran(), PariteEkran(), HedefEkran()];
+  List<Widget> _ekranlarYap() => [AnaEkran(), TarimEkran(), HayvanEkran(), PariteEkran(), AraclarEkran()];
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +124,22 @@ class _AnaKabukState extends State<AnaKabuk> {
           const SizedBox(width: 4),
         ],
       ),
-      body: IndexedStack(index: _sekme, children: ekranlar),
+      body: Column(children: [
+        // Çevrimdışı şeridi — önbellekten veri gösterilirken dürüst uyarı
+        ValueListenableBuilder<bool>(
+          valueListenable: cevrimdisi,
+          builder: (context, kapali, _) => kapali
+              ? Container(
+                  width: double.infinity,
+                  color: C.orange.withValues(alpha: 0.16),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  child: Text('📡 Çevrimdışı — son kaydedilen fiyatlar gösteriliyor',
+                      style: TextStyle(color: C.orange, fontSize: 11, fontWeight: FontWeight.w600)),
+                )
+              : const SizedBox.shrink(),
+        ),
+        Expanded(child: IndexedStack(index: _sekme, children: ekranlar)),
+      ]),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => linkAc('$siteUrl/fiyat-bildir'),
         backgroundColor: C.green,
@@ -125,7 +165,7 @@ class _AnaKabukState extends State<AnaKabuk> {
             BottomNavigationBarItem(icon: Icon(Icons.grass_rounded), label: 'Tarım'),
             BottomNavigationBarItem(icon: Icon(Icons.pets_rounded), label: 'Hayvan'),
             BottomNavigationBarItem(icon: Icon(Icons.sync_alt_rounded), label: 'Parite'),
-            BottomNavigationBarItem(icon: Icon(Icons.flag_rounded), label: 'Hedef'),
+            BottomNavigationBarItem(icon: Icon(Icons.calculate_rounded), label: 'Araçlar'),
           ],
         ),
       ),

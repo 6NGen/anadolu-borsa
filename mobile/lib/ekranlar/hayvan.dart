@@ -83,6 +83,9 @@ class _HayvanEkranState extends State<HayvanEkran> {
                   FutureBuilder<List<GrafikNoktasi>>(
                     future: _seri,
                     builder: (context, s) {
+                      if (s.hasError) {
+                        return SizedBox(height: 100, child: Center(child: Text('Grafik için bağlantı gerekli', style: TextStyle(color: C.muted, fontSize: 11))));
+                      }
                       if (!s.hasData) return SizedBox(height: 180, child: yukleniyor());
                       return MiniGrafik(s.data!, renk);
                     },

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../tema.dart';
+import '../tercih.dart';
 import '../veri.dart';
+import 'urun_sec.dart';
 
 class AyarlarEkran extends StatefulWidget {
   final bool acik;
@@ -13,6 +15,7 @@ class AyarlarEkran extends StatefulWidget {
 
 class _AyarlarEkranState extends State<AyarlarEkran> {
   late bool _acik = widget.acik;
+  late bool _buyuk = Tercih.buyukYazi;
 
   Widget _bolum(String s) => Padding(
         padding: const EdgeInsets.only(top: 16, bottom: 8),
@@ -41,6 +44,20 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
       body: ListView(
         padding: const EdgeInsets.all(14),
         children: [
+          _bolum('KİŞİSELLEŞTİRME'),
+          _kart(ListTile(
+            leading: Icon(Icons.agriculture_rounded, color: C.green),
+            title: Text('Ürünlerim', style: TextStyle(color: C.text, fontSize: 13)),
+            subtitle: Text(
+              Tercih.urunlerim.isEmpty ? 'Seçilmedi — tüm fiyatlar aynı sırada' : '${Tercih.urunlerim.length} ürün seçili · her ekranda üstte',
+              style: TextStyle(color: C.muted, fontSize: 11),
+            ),
+            trailing: Icon(Icons.chevron_right_rounded, color: C.muted),
+            onTap: () async {
+              await Navigator.push(context, MaterialPageRoute(builder: (_) => const UrunSecEkran()));
+              if (mounted) setState(() {});
+            },
+          )),
           _bolum('GÖRÜNÜM'),
           _kart(Column(children: [
             SwitchListTile(
@@ -53,6 +70,19 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
               title: Text(_acik ? 'Açık tema' : 'Koyu tema', style: TextStyle(color: C.text, fontSize: 13)),
               subtitle: Text(_acik ? 'Beyaz zemin' : 'Koyu zemin (varsayılan)', style: TextStyle(color: C.muted, fontSize: 11)),
               secondary: Icon(_acik ? Icons.light_mode : Icons.dark_mode, color: C.green),
+            ),
+            Divider(height: 1, color: C.border),
+            SwitchListTile(
+              value: _buyuk,
+              activeThumbColor: C.green,
+              onChanged: (v) async {
+                setState(() => _buyuk = v);
+                Tercih.buyukYazi = v;
+                await Tercih.kaydet();
+              },
+              title: Text('Büyük yazı', style: TextStyle(color: C.text, fontSize: 13)),
+              subtitle: Text('Tüm yazıları %20 büyütür', style: TextStyle(color: C.muted, fontSize: 11)),
+              secondary: Icon(Icons.text_increase_rounded, color: C.green),
             ),
           ])),
           _bolum('HAKKINDA'),
@@ -68,7 +98,7 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
             ListTile(
               leading: Icon(Icons.info_outline, color: C.muted),
               title: Text('Anadolu Borsa', style: TextStyle(color: C.text, fontSize: 13)),
-              subtitle: Text('Türkiye tarım ve hayvancılık fiyatları · sürüm 1.1', style: TextStyle(color: C.muted, fontSize: 11)),
+              subtitle: Text('Türkiye tarım ve hayvancılık fiyatları · sürüm 1.2', style: TextStyle(color: C.muted, fontSize: 11)),
             ),
           ])),
           const SizedBox(height: 16),
