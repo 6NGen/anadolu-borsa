@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'sabitler.dart';
 
 // Supabase herkese açık bağlantı bilgileri (web ile aynı; anon key client'a gider).
 const supabaseUrl = 'https://semuedzrtqihnsexyemt.supabase.co';
@@ -84,7 +85,11 @@ Future<List<Fiyat>> hayvanFiyatlari() => _onbellekli('cache_hayvan', () async {
       final enYeni = <String, Fiyat>{};
       for (final r in rows) {
         final f = Fiyat(
-          norm: r['hayvan_norm'], ad: r['hayvan'] ?? r['hayvan_norm'],
+          norm: r['hayvan_norm'],
+          // DB adları ham/ASCII gelebiliyor ("Cig Sut (USK tavsiye)", "I. KALİTE
+          // (Tosun)") — görünen ad her zaman düzgün Türkçe katalogdan (web
+          // hayvanGorunen ile aynı ilke).
+          ad: tumUrunler[r['hayvan_norm']] ?? r['hayvan'] ?? r['hayvan_norm'],
           fiyat: (r['fiyat'] as num?)?.toDouble(),
           kaynak: (r['kaynak'] ?? '').toString().replaceAll('_SUT', ''),
           tarih: r['cekilme_tarihi'] ?? '', birim: r['birim'] ?? 'TL/kg',
@@ -168,20 +173,44 @@ Future<List<Sinyal>> sinyaller() async {
   ];
 }
 
-// --- Mazot (parite için) ---
-Future<double?> guncelMazot() async {
+// --- Girdiler (parite için): mazot + elektrik + üre + DAP ---
+// Web parite matrisi ile aynı: verisi olan tür listede yer alır (sahte veri yok).
+class Girdi {
+  final String tur, ad, birim, tarih; // birim: "litre"/"kWh"/"kg" (TL/ soyulmuş)
+  final double fiyat;
+  Girdi(this.tur, this.ad, this.birim, this.fiyat, this.tarih);
+
+  Map<String, dynamic> toJson() => {'tur': tur, 'ad': ad, 'birim': birim, 'fiyat': fiyat, 'tarih': tarih};
+  factory Girdi.fromJson(Map<String, dynamic> m) =>
+      Girdi(m['tur'], m['ad'], m['birim'], (m['fiyat'] as num).toDouble(), m['tarih']);
+}
+
+const _girdiSira = ['mazot', 'elektrik', 'ure', 'dap'];
+const _girdiAd = {'mazot': 'Motorin', 'elektrik': 'Elektrik', 'ure': 'Üre', 'dap': 'DAP'};
+
+Future<List<Girdi>> girdiFiyatlari() async {
   final p = await SharedPreferences.getInstance();
   try {
-    final rows = await sb.from('girdi_fiyat').select('fiyat, gecerlilik_tarihi')
-        .eq('girdi_turu', 'mazot').order('gecerlilik_tarihi', ascending: false).limit(1);
-    if (rows.isEmpty) return null;
-    final f = (rows.first['fiyat'] as num?)?.toDouble();
-    if (f != null) await p.setDouble('cache_mazot', f);
-    return f;
+    final rows = await sb.from('girdi_fiyat').select('girdi_turu, fiyat, birim, gecerlilik_tarihi')
+        .inFilter('girdi_turu', _girdiSira).order('gecerlilik_tarihi');
+    final son = <String, Girdi>{}; // sıralı geldiği için sonuncusu en güncel
+    for (final r in rows) {
+      final f = (r['fiyat'] as num?)?.toDouble();
+      if (f == null || f <= 0) continue;
+      final tur = r['girdi_turu'] as String;
+      son[tur] = Girdi(
+        tur, _girdiAd[tur] ?? tur,
+        (r['birim'] ?? '').toString().replaceAll('TL/', ''),
+        f, r['gecerlilik_tarihi'] ?? '',
+      );
+    }
+    final liste = [for (final t in _girdiSira) if (son.containsKey(t)) son[t]!];
+    await p.setString('cache_girdi', jsonEncode([for (final g in liste) g.toJson()]));
+    return liste;
   } catch (_) {
-    final f = p.getDouble('cache_mazot');
-    if (f == null) rethrow;
+    final s = p.getString('cache_girdi');
+    if (s == null) rethrow;
     cevrimdisi.value = true;
-    return f;
+    return [for (final m in jsonDecode(s)) Girdi.fromJson(m)];
   }
 }

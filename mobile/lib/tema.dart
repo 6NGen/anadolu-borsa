@@ -57,6 +57,8 @@ Color urunRenk(String norm) => yemRenk[norm] ?? hayvanRenk[norm] ?? C.green;
 const _emoji = {
   'ARPA': '🌾', 'BUGDAY': '🌾', 'MISIR': '🌽', 'SAMAN': '🌿', 'YONCA': '🍀', 'YULAF': '🌾', 'CAVDAR': '🌾',
   'TOSUN': '🐂', 'DANA': '🐄', 'INEK': '🐄', 'MANDA': '🐃', 'KUZU': '🐑', 'TOKLU': '🐑', 'KOYUN': '🐑', 'OGLAK': '🐐', 'SUT': '🥛',
+  // girdiler (parite)
+  'mazot': '⛽', 'elektrik': '⚡', 'ure': '⚪', 'dap': '🟤',
 };
 String emoji(String norm) => _emoji[norm] ?? '📦';
 

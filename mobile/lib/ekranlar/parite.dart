@@ -6,9 +6,10 @@ import '../veri.dart';
 import '../tercih.dart';
 import '../parcalar.dart';
 
-// Web parite matrisi ile aynı satırlar ve kurallar:
-// varsayılan yön girdi→ürün (1 litre mazot = X kg ürün — temiz/≥1 sayı),
-// kademeli ondalık (oranBicim), yorum/tavsiye YOK.
+// Web parite matrisi (mobil kart görünümü) ile birebir aynı kurallar:
+// - satır = ürün kartı, içinde her girdi bir TAM CÜMLE:
+//   "1 litre motorin = 2,76 litre çiğ süt" (her birim kendi cinsinden)
+// - çift yön, varsayılan girdi→ürün; kademeli ondalık; tavsiye YOK.
 const _urunSirasi = ['BUGDAY', 'ARPA', 'MISIR', 'SUT', 'KUZU'];
 
 class PariteEkran extends StatefulWidget {
@@ -19,7 +20,7 @@ class PariteEkran extends StatefulWidget {
 
 class _PariteEkranState extends State<PariteEkran> {
   late Future<_PariteVeri> _veri;
-  bool _girdidenUrune = true; // true: 1 lt mazot = X ürün · false: 1 birim ürün = X lt mazot
+  bool _girdidenUrune = true; // true: 1 birim girdi = X ürün · false: tersi
 
   @override
   void initState() {
@@ -28,14 +29,14 @@ class _PariteEkranState extends State<PariteEkran> {
   }
 
   Future<_PariteVeri> _yukle() async {
-    final sonuc = await Future.wait([guncelMazot(), yemFiyatlari(), hayvanFiyatlari()]);
-    final mazot = sonuc[0] as double?;
+    final sonuc = await Future.wait([girdiFiyatlari(), yemFiyatlari(), hayvanFiyatlari()]);
+    final girdiler = sonuc[0] as List<Girdi>;
     final yem = sonuc[1] as List<Fiyat>;
     final hayvan = sonuc[2] as List<Fiyat>;
-    final hepsi = [...yem, ...hayvan].where((f) => _urunSirasi.contains(f.norm)).toList()
+    final urunler = [...yem, ...hayvan].where((f) => _urunSirasi.contains(f.norm)).toList()
       ..sort((a, b) => _urunSirasi.indexOf(a.norm).compareTo(_urunSirasi.indexOf(b.norm)));
     // Kişiselleştirme: kullanıcının ürünleri en üstte
-    return _PariteVeri(mazot, Tercih.onceUrunlerim(hepsi, (f) => f.norm));
+    return _PariteVeri(girdiler, Tercih.onceUrunlerim(urunler, (f) => f.norm));
   }
 
   Future<void> _yenile() async {
@@ -44,15 +45,19 @@ class _PariteEkranState extends State<PariteEkran> {
     await f;
   }
 
+  // Cümle içinde girdi adı: küçük harf, DAP kısaltma olduğu için aynen kalır
+  String _gAd(Girdi g) => g.tur == 'dap' ? 'DAP' : g.ad.toLowerCase();
+
   void _paylas(_PariteVeri v) {
-    // Web matris paylaşım metniyle aynı format
+    final mazot = v.girdiler.where((g) => g.tur == 'mazot').firstOrNull;
+    if (mazot == null) return;
     final satirlar = [
       '📊 Anadolu Borsa — Parite',
-      '1 litre motorin (${formatFiyat(v.mazot)} ₺) parasıyla:',
+      '1 ${mazot.birim} motorin (${formatFiyat(mazot.fiyat)} ₺) parasıyla:',
       '',
       for (final f in v.urunler)
         if (f.fiyat != null && f.fiyat! > 0)
-          '${emoji(f.norm)} ${oranBicim(v.mazot! / f.fiyat!)} ${f.birim.replaceAll('TL/', '').toLowerCase()} ${f.ad.toLowerCase()}',
+          '${emoji(f.norm)} ${oranBicim(mazot.fiyat / f.fiyat!)} ${f.birim.replaceAll('TL/', '').toLowerCase()} ${f.ad.toLowerCase()}',
       '',
       '$siteUrl/parite',
     ];
@@ -67,7 +72,7 @@ class _PariteEkranState extends State<PariteEkran> {
         if (snap.connectionState == ConnectionState.waiting) return yukleniyor();
         if (snap.hasError) return hataListe(_yenile, snap.error);
         final v = snap.data!;
-        if (v.mazot == null || v.mazot! <= 0) return hataListe(_yenile);
+        if (v.girdiler.isEmpty || v.urunler.isEmpty) return hataListe(_yenile);
 
         return RefreshIndicator(
           color: C.green, backgroundColor: C.surface, onRefresh: _yenile,
@@ -77,14 +82,18 @@ class _PariteEkranState extends State<PariteEkran> {
             children: [
               bolumBaslik('ÇİFTÇİ SATIN ALMA GÜCÜ'),
 
-              // Mazot referansı
+              // Girdi referans şeridi (fiyat + kaynak tarihi)
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                 decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: C.border)),
                 child: Row(children: [
-                  const Text('⛽', style: TextStyle(fontSize: 22)),
-                  const SizedBox(width: 10),
-                  Expanded(child: Text('Motorin ${formatFiyat(v.mazot)} ₺/litre', style: TextStyle(color: C.text, fontSize: 13.5, fontWeight: FontWeight.w700))),
+                  Expanded(
+                    child: Wrap(spacing: 12, runSpacing: 4, children: [
+                      for (final g in v.girdiler)
+                        Text('${emoji(g.tur)} ${g.ad} ${formatFiyat(g.fiyat)} ₺/${g.birim}',
+                            style: TextStyle(color: C.text, fontSize: 11.5, fontWeight: FontWeight.w600)),
+                    ]),
+                  ),
                   IconButton(
                     icon: Icon(Icons.ios_share_rounded, color: C.green, size: 20),
                     tooltip: 'Pariteyi paylaş',
@@ -103,46 +112,64 @@ class _PariteEkranState extends State<PariteEkran> {
                 padding: const EdgeInsets.only(bottom: 12, left: 2),
                 child: Text(
                   _girdidenUrune
-                      ? '1 litre motorin parasıyla kaç birim ürün alınır'
-                      : '1 birim ürün kaç litre motorin eder',
+                      ? '1 birim girdi parasıyla kaç birim ürün alınır'
+                      : '1 birim ürün kaç birim girdi eder',
                   style: TextStyle(color: C.muted, fontSize: 11),
                 ),
               ),
 
+              // ÜRÜN KARTLARI — her satır kendi birimiyle tam cümle
               ...v.urunler.map((f) {
-                final birimKisa = f.birim.replaceAll('TL/', '').toLowerCase();
+                final uBirim = f.birim.replaceAll('TL/', '').toLowerCase();
+                final uAd = f.ad.toLowerCase();
                 final gecerli = f.fiyat != null && f.fiyat! > 0;
-                final oran = !gecerli ? null : (_girdidenUrune ? v.mazot! / f.fiyat! : f.fiyat! / v.mazot!);
-                final sonucBirim = _girdidenUrune ? birimKisa : 'litre';
                 final renk = urunRenk(f.norm);
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(10), border: Border.all(color: C.border)),
-                  child: Row(children: [
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(color: C.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: C.border)),
+                  child: Column(children: [
+                    // Kart başlığı: ürün + fiyat + tazelik
                     Container(
-                      width: 40, height: 40, alignment: Alignment.center,
-                      decoration: BoxDecoration(color: renk.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(10)),
-                      child: Text(emoji(f.norm), style: const TextStyle(fontSize: 18)),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(
-                        _girdidenUrune ? '1 lt motorin = ${f.ad.toLowerCase()}' : '1 $birimKisa ${f.ad.toLowerCase()} = motorin',
-                        style: TextStyle(color: C.text, fontSize: 12, fontWeight: FontWeight.w600),
+                      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: C.surface2,
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                        border: Border(bottom: BorderSide(color: C.border)),
                       ),
-                      const SizedBox(height: 3),
-                      Row(children: [
-                        Text('${formatFiyat(f.fiyat)} ${f.birim} · ${f.kaynak}', style: TextStyle(color: C.muted, fontSize: 10)),
-                        const SizedBox(width: 6),
+                      child: Row(children: [
+                        Text(emoji(f.norm), style: const TextStyle(fontSize: 16)),
+                        const SizedBox(width: 7),
+                        Text(f.ad, style: TextStyle(color: renk, fontSize: 14.5, fontWeight: FontWeight.w800)),
+                        const SizedBox(width: 8),
                         TazelikRozet(f.tarih),
+                        const Spacer(),
+                        Text('${formatFiyat(f.fiyat)} ${f.birim} · ${f.kaynak}',
+                            style: TextStyle(color: C.muted, fontSize: 10)),
                       ]),
-                    ])),
-                    Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text(oranBicim(oran), style: TextStyle(color: renk, fontSize: 24, fontWeight: FontWeight.bold, height: 1)),
-                      const SizedBox(height: 2),
-                      Text(sonucBirim, style: TextStyle(color: C.muted, fontSize: 10)),
-                    ]),
+                    ),
+                    // Girdi satırları: "1 litre motorin = 2,76 litre çiğ süt"
+                    ...v.girdiler.map((g) {
+                      final oran = !gecerli ? null : (_girdidenUrune ? g.fiyat / f.fiyat! : f.fiyat! / g.fiyat);
+                      final sol = _girdidenUrune ? '1 ${g.birim} ${_gAd(g)}' : '1 $uBirim $uAd';
+                      final sagBirim = _girdidenUrune ? '$uBirim $uAd' : '${g.birim} ${_gAd(g)}';
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+                        decoration: BoxDecoration(
+                          border: g == v.girdiler.last ? null : Border(bottom: BorderSide(color: C.border.withValues(alpha: 0.5))),
+                        ),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+                          Text(emoji(g.tur), style: const TextStyle(fontSize: 13)),
+                          const SizedBox(width: 6),
+                          Text(sol, style: TextStyle(color: C.green, fontSize: 13, fontWeight: FontWeight.w600)),
+                          const SizedBox(width: 6),
+                          Text('=', style: TextStyle(color: C.muted, fontSize: 13)),
+                          const Spacer(),
+                          Text(oranBicim(oran), style: TextStyle(color: C.text, fontSize: 18, fontWeight: FontWeight.w800)),
+                          const SizedBox(width: 5),
+                          Text(sagBirim, style: TextStyle(color: renk, fontSize: 12, fontWeight: FontWeight.w600)),
+                        ]),
+                      );
+                    }),
                   ]),
                 );
               }),
@@ -162,7 +189,7 @@ class _PariteEkranState extends State<PariteEkran> {
 }
 
 class _PariteVeri {
-  final double? mazot;
+  final List<Girdi> girdiler;
   final List<Fiyat> urunler;
-  _PariteVeri(this.mazot, this.urunler);
+  _PariteVeri(this.girdiler, this.urunler);
 }
