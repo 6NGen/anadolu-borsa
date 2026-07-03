@@ -17,6 +17,10 @@ SupabaseClient get sb => Supabase.instance.client;
 // Tarih eski kalacağı için tazelik rozeti (⚠) dürüstlüğü ayrıca korur.
 final cevrimdisi = ValueNotifier<bool>(false);
 
+// Kayan fiyat şeridi verisi (Bloomberg tarzı) — Ana ekranın çektiği listeden
+// beslenir (ek istek YOK); kabuk tüm sekmelerde üstte akıtır.
+final seritFiyatlari = ValueNotifier<List<Fiyat>>([]);
+
 class Fiyat {
   final String norm, ad, kaynak, tarih, birim;
   final double? fiyat;

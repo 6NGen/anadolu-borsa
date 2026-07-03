@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:share_plus/share_plus.dart';
@@ -65,6 +66,107 @@ Widget markaBaslik(String altyazi) => Container(
         ),
       ]),
     );
+
+// Kayan fiyat şeridi (Bloomberg tarzı) — içerik iki kez dizilir; ilk kopyanın
+// genişliği kadar kayınca başa sarılır (dikişsiz sonsuz döngü, sabit hız).
+class FiyatSeridi extends StatefulWidget {
+  final List<Fiyat> liste;
+  const FiyatSeridi(this.liste, {super.key});
+  @override
+  State<FiyatSeridi> createState() => _FiyatSeridiState();
+}
+
+class _FiyatSeridiState extends State<FiyatSeridi> {
+  final _sc = ScrollController();
+  final _kopyaKey = GlobalKey();
+  bool _duruyor = false; // kullanıcı dokununca akış durur
+
+  static const _hiz = 0.045; // px/ms (~45 px/sn)
+
+  @override
+  void initState() {
+    super.initState();
+    _dongu();
+  }
+
+  Future<void> _dongu() async {
+    // İlk yerleşimi bekle
+    await Future.delayed(const Duration(milliseconds: 600));
+    while (mounted) {
+      if (_duruyor || !_sc.hasClients || _sc.position.maxScrollExtent <= 0) {
+        await Future.delayed(const Duration(milliseconds: 400));
+        continue;
+      }
+      final kopya = _kopyaKey.currentContext?.size?.width;
+      if (kopya == null || kopya <= 0) {
+        await Future.delayed(const Duration(milliseconds: 400));
+        continue;
+      }
+      if (_sc.offset >= kopya) {
+        _sc.jumpTo(_sc.offset - kopya); // dikişsiz sarma
+        continue;
+      }
+      final kalan = kopya - _sc.offset;
+      try {
+        await _sc.animateTo(kopya,
+            duration: Duration(milliseconds: (kalan / _hiz).round()), curve: Curves.linear);
+      } catch (_) {/* widget söküldü */}
+    }
+  }
+
+  @override
+  void dispose() {
+    _sc.dispose();
+    super.dispose();
+  }
+
+  Widget _ogeDizisi({Key? key}) => Row(
+        key: key,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final f in widget.liste) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(emoji(f.norm), style: const TextStyle(fontSize: 11)),
+                const SizedBox(width: 4),
+                Text(f.ad.toUpperCase(), style: TextStyle(color: C.muted, fontSize: 10.5, fontWeight: FontWeight.w600, letterSpacing: 0.4)),
+                const SizedBox(width: 5),
+                Text(formatFiyat(f.fiyat), style: TextStyle(color: urunRenk(f.norm), fontSize: 11.5, fontWeight: FontWeight.w800)),
+              ]),
+            ),
+            Container(width: 1, height: 10, color: C.border),
+          ],
+        ],
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.liste.isEmpty) return const SizedBox.shrink();
+    return GestureDetector(
+      // Dokun-basılı tut: akış durur (okumak için); bırakınca devam eder
+      onTapDown: (_) => setState(() => _duruyor = true),
+      onTapUp: (_) => setState(() => _duruyor = false),
+      onTapCancel: () => setState(() => _duruyor = false),
+      child: Container(
+        height: 30,
+        decoration: BoxDecoration(
+          color: C.surface,
+          border: Border(bottom: BorderSide(color: C.border)),
+        ),
+        child: SingleChildScrollView(
+          controller: _sc,
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          child: Row(children: [
+            Center(child: _ogeDizisi(key: _kopyaKey)),
+            Center(child: _ogeDizisi()),
+          ]),
+        ),
+      ),
+    );
+  }
+}
 
 // Veri tazeliği rozeti — web VeriTazelik ile aynı dil (tek eşik: bayatEsikGun)
 class TazelikRozet extends StatelessWidget {

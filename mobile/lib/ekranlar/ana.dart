@@ -36,6 +36,10 @@ class _AnaEkranState extends State<AnaEkran> {
     } catch (_) {/* sinyal opsiyonel — çevrimdışıyken gizlenir */}
     final yem = await yemF, hayvan = await hayvanF;
     widgetGuncelle(yem, hayvan); // ana ekran widget'ı (beklenmez)
+    seritFiyatlari.value = [
+      for (final f in [...yem, ...hayvan])
+        if (f.fiyat != null && f.fiyat! > 0) f,
+    ]; // kayan şerit (kabukta)
     return _AnaVeri(yem, hayvan, sinyal);
   }
 

@@ -7,6 +7,7 @@ import 'tema.dart';
 import 'veri.dart';
 import 'tercih.dart';
 import 'bildirim.dart';
+import 'parcalar.dart';
 import 'ekranlar/ana.dart';
 import 'ekranlar/tarim.dart';
 import 'ekranlar/hayvan.dart';
@@ -140,6 +141,11 @@ class _AnaKabukState extends State<AnaKabuk> {
                       style: TextStyle(color: C.orange, fontSize: 11, fontWeight: FontWeight.w600)),
                 )
               : const SizedBox.shrink(),
+        ),
+        // Kayan fiyat şeridi (Bloomberg tarzı) — tüm sekmelerde, dokununca durur
+        ValueListenableBuilder<List<Fiyat>>(
+          valueListenable: seritFiyatlari,
+          builder: (context, liste, _) => FiyatSeridi(liste),
         ),
         Expanded(child: IndexedStack(index: _sekme, children: ekranlar)),
       ]),
