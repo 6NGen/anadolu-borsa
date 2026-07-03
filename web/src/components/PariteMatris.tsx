@@ -55,32 +55,40 @@ export default function PariteMatris({
         <button className={yon === "gu" ? "aktif" : ""} onClick={() => setYon("gu")}>Girdi → Ürün</button>
       </div>
 
-      {/* MOBİL (md altı): tablo yerine ürün kartları — yatay kaydırma yok (GÜNCELLEME 1) */}
+      {/* MOBİL (md altı): tablo yerine ürün kartları — yatay kaydırma yok (GÜNCELLEME 1).
+          Her satır KENDİ BİRİMLERİYLE tam cümledir: "1 litre motorin = 2,76 litre çiğ süt"
+          (saha geri bildirimi: kısaltılmış satır ters okunuyordu). */}
       <div className="pmx-kartlar">
         {urunKeys.map((uk) => {
           const u = urunler[uk];
           const bayat = (gunFarki(u.tarih) ?? 0) >= BAYAT_ESIK_GUN;
+          const uAd = u.ad.toLowerCase();
           return (
             <div key={uk} className="pmx-ukart">
               <div className="pmx-ukart-bas">
                 <span className="ua">{u.ikon} {u.ad}</span>
                 {bayat && <span className="bayat" title="Veri 3+ gün eski">⚠</span>}
-                <span className="ub">1 {birimAd(u.birim)}</span>
               </div>
               {girdiKeys.map((gk) => {
                 const g = girdiler[gk];
                 const h = hucre(gk, uk);
                 const secili = gk === seciliGirdi && uk === seciliUrun;
+                const gAd = g.ad.toLowerCase();
+                // Sol: baz birim (yöne göre girdi ya da ürün) · Sağ: sonuç kendi cinsiyle
+                const sol = yon === "gu" ? `1 ${birimAd(g.birim)} ${gAd}` : `1 ${birimAd(u.birim)} ${uAd}`;
+                const sagAd = yon === "gu" ? `${birimAd(u.birim)} ${uAd}` : `${birimAd(g.birim)} ${gAd}`;
                 return (
                   <div
                     key={gk}
                     className={`pmx-usat${secili ? " secili" : ""}${h.bos ? " bos" : ""}`}
                     onClick={() => !h.bos && onSec(gk, uk)}
                   >
-                    <span className="ga">{g.ikon} {g.ad}</span>
-                    <span className="ok">→</span>
-                    <span className="deg mono">{h.deger}</span>
-                    <span className="br">{h.birim}</span>
+                    <span className="ga">{g.ikon} {sol}</span>
+                    <span className="ok">=</span>
+                    <span className="sonuc">
+                      <span className="deg mono">{h.deger}</span>
+                      <span className="br">{h.bos ? "" : sagAd}</span>
+                    </span>
                   </div>
                 );
               })}
@@ -273,14 +281,14 @@ const CSS = `
   border-bottom:1px solid var(--cizgi);cursor:pointer;transition:background .12s;
 }
 .pmx-usat:last-child{border-bottom:none}
-.pmx-usat .ga{color:var(--yesil);font-size:14px;font-weight:600}
+.pmx-usat .ga{color:var(--yesil);font-size:13.5px;font-weight:600;white-space:nowrap}
 .pmx-usat .ok{color:var(--soluk);font-size:13px}
-.pmx-usat .deg{margin-left:auto;color:var(--murekkep);font-size:18px;font-weight:700}
-.pmx-usat .br{color:var(--soluk);font-size:12px;font-family:ui-monospace,monospace;min-width:44px;text-align:left}
+.pmx-usat .sonuc{margin-left:auto;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.pmx-usat .deg{color:var(--murekkep);font-size:18px;font-weight:700}
+.pmx-usat .br{color:var(--basak);font-size:12.5px;font-weight:600}
 .pmx-usat.secili{background:rgba(224,169,59,.13);box-shadow:inset 3px 0 0 var(--basak)}
 .pmx-usat.bos{cursor:default}
 .pmx-usat.bos .deg{color:var(--cizgi2);font-weight:400}
-.pmx-usat.bos .br{color:transparent}
 
 @media(max-width:767px){
   .pmx-card{display:none}
