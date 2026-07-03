@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'tema.dart';
 import 'veri.dart';
 import 'tercih.dart';
+import 'bildirim.dart';
 import 'ekranlar/ana.dart';
 import 'ekranlar/tarim.dart';
 import 'ekranlar/hayvan.dart';
@@ -18,6 +19,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseAnonKey);
   await Tercih.yukle();
+  await bildirimBaslat();
+  gunlukOzetEsitle(); // beklenmez — açılışı yavaşlatmasın
   final prefs = await SharedPreferences.getInstance();
   final acik = prefs.getBool('acikTema') ?? false;
   paletUygula(acik);

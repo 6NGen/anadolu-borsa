@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../tema.dart';
 import '../tercih.dart';
 import '../veri.dart';
+import '../bildirim.dart';
 import 'urun_sec.dart';
 
 class AyarlarEkran extends StatefulWidget {
@@ -16,6 +17,15 @@ class AyarlarEkran extends StatefulWidget {
 class _AyarlarEkranState extends State<AyarlarEkran> {
   late bool _acik = widget.acik;
   late bool _buyuk = Tercih.buyukYazi;
+  bool _ozet = false;
+
+  @override
+  void initState() {
+    super.initState();
+    gunlukOzetAcik().then((v) {
+      if (mounted) setState(() => _ozet = v);
+    });
+  }
 
   Widget _bolum(String s) => Padding(
         padding: const EdgeInsets.only(top: 16, bottom: 8),
@@ -58,6 +68,35 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
               if (mounted) setState(() {});
             },
           )),
+          _bolum('BİLDİRİMLER'),
+          _kart(SwitchListTile(
+            value: _ozet,
+            activeThumbColor: C.green,
+            onChanged: (v) async {
+              if (v) {
+                final mesajci = ScaffoldMessenger.of(context); // await öncesi al (lint)
+                final oldu = await gunlukOzetAc();
+                if (mounted) setState(() => _ozet = oldu);
+                if (!oldu && mounted) {
+                  mesajci.showSnackBar(SnackBar(
+                    backgroundColor: C.surface,
+                    content: Text(
+                      bildirimHazir
+                          ? 'Bildirim izni verilmedi. Telefon ayarlarından açabilirsin.'
+                          : 'Bildirim servisi bu sürümde hazır değil.',
+                      style: TextStyle(color: C.text, fontSize: 12),
+                    ),
+                  ));
+                }
+              } else {
+                await gunlukOzetKapat();
+                if (mounted) setState(() => _ozet = false);
+              }
+            },
+            title: Text('Günlük fiyat özeti', style: TextStyle(color: C.text, fontSize: 13)),
+            subtitle: Text('Her akşam tek bildirim: günün borsa fiyatları', style: TextStyle(color: C.muted, fontSize: 11)),
+            secondary: Icon(Icons.notifications_active_outlined, color: C.green),
+          )),
           _bolum('GÖRÜNÜM'),
           _kart(Column(children: [
             SwitchListTile(
@@ -98,7 +137,7 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
             ListTile(
               leading: Icon(Icons.info_outline, color: C.muted),
               title: Text('Anadolu Borsa', style: TextStyle(color: C.text, fontSize: 13)),
-              subtitle: Text('Türkiye tarım ve hayvancılık fiyatları · sürüm 1.2', style: TextStyle(color: C.muted, fontSize: 11)),
+              subtitle: Text('Türkiye tarım ve hayvancılık fiyatları · sürüm 1.3', style: TextStyle(color: C.muted, fontSize: 11)),
             ),
           ])),
           const SizedBox(height: 16),

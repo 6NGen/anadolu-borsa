@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1067245779898",
+    "project_id": "anadolu-borsa-2447e",
+    "storage_bucket": "anadolu-borsa-2447e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1067245779898:android:eaaa3a4d0cecfa4db1fb83",
+        "android_client_info": {
+          "package_name": "com.anadoluborsa.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPzFjrvB3ayylgWoMc9Tsko5CcpgqVVlg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

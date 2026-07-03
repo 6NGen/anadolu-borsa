@@ -604,6 +604,13 @@ def main():
     except Exception as e:
         print(f"[HATA] Alarm kontrol: {e}")
 
+    # GUNLUK OZET PUSH (mobil v1.3) — 'gunluk_ozet' konusuna tek bildirim
+    try:
+        from alarm import gunluk_ozet_gonder
+        gunluk_ozet_gonder(get_supabase())
+    except Exception as e:
+        print(f"[HATA] Gunluk ozet: {e}")
+
     # YEDEK JSON
     tum = yem_veriler + hayvan_veriler
     Path(__file__).parent.joinpath("fiyatlar_yedek.json").write_text(

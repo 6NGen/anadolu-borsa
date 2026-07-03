@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Supabase/ağ erişimi için ZORUNLU — release manifest'inde varsayılan gelmez -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Android 13+ bildirim izni (FCM push) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="Anadolu Borsa"
         android:name="${applicationName}"

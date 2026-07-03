@@ -131,3 +131,79 @@ def alarmlari_kontrol_et(supabase) -> None:
             print(f"[HATA] FCM gonderim (id={a.get('id')}): {e}")
 
     print(f"[OK] Alarm kontrol: {gonderilen} bildirim gonderildi")
+
+
+def _tr(n: float, ondalik: int = 2) -> str:
+    """tr-TR sayi bicimi (binlik nokta, ondalik virgul) — web lib/format ile ayni."""
+    s = f"{n:,.{ondalik}f}"
+    return s.replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def gunluk_ozet_gonder(supabase) -> None:
+    """Gunluk fiyat ozetini 'gunluk_ozet' FCM konusuna gonderir (mobil v1.3).
+
+    Hesap gerektirmez: mobil uygulama konuya abone olur, buradan tek mesaj
+    tum abonelere gider. Workflow gunde bir kostugu icin dogal olarak gunluk;
+    elle tekrar kosulursa ikinci bildirim gider (kabul edilen sinirlilik).
+    Yorum/tavsiye ICERMEZ — yalnizca fiyat ve ortalamaya gore yuzde.
+    """
+    sa_raw = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if not sa_raw:
+        print("[BILGI] GOOGLE_SERVICE_ACCOUNT_JSON yok — gunluk ozet atlandi")
+        return
+    try:
+        sa_info = json.loads(sa_raw)
+        proje_id = sa_info["project_id"]
+        token_erisim = _erisim_token(sa_info)
+    except Exception as e:
+        print(f"[HATA] Gunluk ozet: FCM erisimi kurulamadi: {e}")
+        return
+
+    # Yem: fiyat_sinyal (bugun + 30g ortalamaya gore yuzde) — web ile ayni kaynak
+    parcalar = []
+    try:
+        rows = supabase.table("fiyat_sinyal").select("urun_norm, ort_30gun, bugun").execute().data or []
+        for r in rows:
+            bugun, ort = r.get("bugun"), r.get("ort_30gun")
+            if bugun is None:
+                continue
+            metin = f"{r['urun_norm'].title()} {_tr(float(bugun))}"
+            if ort:
+                sapma = (float(bugun) - float(ort)) / float(ort) * 100
+                if abs(sapma) >= 0.05:
+                    metin += f" ({'+' if sapma > 0 else '-'}%{_tr(abs(sapma), 1)})"
+            parcalar.append(metin)
+    except Exception as e:
+        print(f"[UYARI] Gunluk ozet: sinyal okunamadi: {e}")
+
+    # Sut: gunun tavsiye/borsa fiyati
+    try:
+        hay = supabase.table("son_hayvan_fiyatlari").select("hayvan_norm, fiyat, cekilme_tarihi").eq("hayvan_norm", "SUT").execute().data or []
+        if hay:
+            en = max(hay, key=lambda r: r.get("cekilme_tarihi") or "")
+            if en.get("fiyat") is not None:
+                parcalar.append(f"Sut {_tr(float(en['fiyat']))}")
+    except Exception as e:
+        print(f"[UYARI] Gunluk ozet: sut okunamadi: {e}")
+
+    if not parcalar:
+        print("[BILGI] Gunluk ozet: veri yok, gonderilmedi")
+        return
+
+    govde = " - ".join(parcalar) + " TL"
+    try:
+        r = requests.post(
+            f"https://fcm.googleapis.com/v1/projects/{proje_id}/messages:send",
+            headers={"Authorization": f"Bearer {token_erisim}", "Content-Type": "application/json"},
+            json={"message": {
+                "topic": "gunluk_ozet",
+                "notification": {"title": "Bugunun fiyatlari", "body": govde},
+            }},
+            timeout=15,
+        )
+        if r.status_code == 200:
+            print(f"[OK] Gunluk ozet gonderildi: {govde[:80]}")
+        else:
+            print(f"[UYARI] Gunluk ozet FCM {r.status_code}: {r.text[:120]}")
+    except Exception as e:
+        print(f"[HATA] Gunluk ozet gonderim: {e}")
