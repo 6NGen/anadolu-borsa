@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<!-- ÇİFTÇİ DEFTERİ — PROTOTİP (Faz 2 fikir defteri; İNŞA EDİLMEDİ, sırada)
+     Kaynak: Haziran 2026 strateji oturumu demo'su. Gerçek sürümde fiyatlar
+     Supabase'den gelir, fiyat/verim düzenlenebilir olur, affiliate linkleri
+     gerçek takip linkine bağlanır. YOL_HARITASI.md > FİKİR DEFTERİ. -->
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Çiftçi Defteri — Anadolu Borsa</title>
+<style>
+  :root{
+    --defter:#eae3d2;        /* eski defter kağıdı */
+    --defter-koyu:#ded4bd;
+    --murekkep:#1f2a24;      /* koyu mürekkep yeşili-siyah */
+    --kirmizi:#9e3024;       /* muhasebe kırmızısı (gider) */
+    --yesil:#2f6b3d;         /* gelir yeşili */
+    --mavi-cizgi:#a8b4c4;    /* defter çizgisi */
+    --kirmizi-cizgi:#c98b86; /* defter kenar çizgisi */
+    --soluk:#6f6450;         /* soluk mürekkep, ikincil */
+    --vurgu:#b8860b;         /* başak/hardal vurgu */
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#cfc6b0;
+    color:var(--murekkep);
+    font-family:"Georgia",ui-serif,serif;
+    font-size:17px;line-height:1.5;
+    padding:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .defter{
+    max-width:560px;margin:0 auto;background:var(--defter);
+    border-radius:2px;
+    box-shadow:0 2px 0 var(--defter-koyu),0 12px 30px rgba(0,0,0,.28);
+    position:relative;overflow:hidden;
+    background-image:repeating-linear-gradient(transparent 0 35px,rgba(168,180,196,.35) 35px 36px);
+  }
+  .defter::before{
+    content:"";position:absolute;left:44px;top:0;bottom:0;width:2px;
+    background:var(--kirmizi-cizgi);opacity:.6;z-index:1;
+  }
+  .ic{position:relative;z-index:2;padding:26px 26px 26px 58px}
+
+  header{margin-bottom:8px}
+  .marka{
+    font-family:"Courier New",monospace;font-size:11px;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--vurgu);font-weight:700;
+  }
+  h1{font-size:30px;line-height:1.1;margin:4px 0 2px;font-weight:800;letter-spacing:-.01em}
+  .alt{font-size:14px;color:var(--soluk);font-style:italic}
+  .fiyat-not{
+    font-family:"Courier New",monospace;font-size:11px;color:var(--soluk);
+    margin-top:8px;padding:6px 10px;background:rgba(184,134,11,.1);
+    border-left:2px solid var(--vurgu);border-radius:0 2px 2px 0;
+  }
+
+  .sekmeler{display:flex;gap:0;margin:18px 0 4px;border-bottom:2px solid var(--murekkep)}
+  .sekme{
+    flex:1;text-align:center;padding:11px 8px;cursor:pointer;
+    font-weight:700;font-size:16px;color:var(--soluk);
+    border:2px solid transparent;border-bottom:none;background:transparent;
+    font-family:inherit;
+  }
+  .sekme.aktif{
+    color:var(--murekkep);background:var(--defter-koyu);
+    border-color:var(--murekkep);border-bottom:2px solid var(--defter-koyu);
+    margin-bottom:-2px;border-radius:3px 3px 0 0;
+  }
+
+  .sayfa{display:none;padding-top:18px}
+  .sayfa.gor{display:block}
+
+  .alan{margin:16px 0}
+  .alan label{display:block;font-weight:700;font-size:15px;margin-bottom:6px}
+  .alan .ipucu{font-size:13px;color:var(--soluk);font-style:italic;font-weight:400}
+  .satir{display:flex;gap:10px;flex-wrap:wrap}
+  input[type=number],select{
+    font-family:inherit;font-size:17px;color:var(--murekkep);
+    background:rgba(255,255,255,.5);border:1.5px solid var(--soluk);
+    border-radius:2px;padding:10px 12px;flex:1;min-width:90px;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--vurgu);background:rgba(255,255,255,.75)}
+
+  .hesapla{
+    width:100%;margin-top:18px;background:var(--murekkep);color:var(--defter);
+    font-family:"Courier New",monospace;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;font-size:15px;border:none;border-radius:2px;
+    padding:15px;cursor:pointer;
+  }
+  .hesapla:hover{background:#33453a}
+
+  .sonuc{margin-top:24px;display:none}
+  .sonuc.gor{display:block}
+  .sonuc-bas{
+    font-family:"Courier New",monospace;font-size:12px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--soluk);font-weight:700;
+    border-bottom:1px solid var(--soluk);padding-bottom:6px;margin-bottom:4px;
+    display:flex;justify-content:space-between;
+  }
+  .kalem{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:9px 0;border-bottom:1px dotted var(--mavi-cizgi);
+  }
+  .kalem .ad{font-size:15px}
+  .kalem .ad small{display:block;color:var(--soluk);font-size:12px;font-style:italic}
+  .kalem .tutar{font-family:"Courier New",monospace;font-weight:700;font-size:16px;white-space:nowrap}
+  .gider .tutar{color:var(--kirmizi)}
+  .gelir .tutar{color:var(--yesil)}
+
+  .net{
+    margin-top:14px;padding:16px;border:2.5px solid var(--murekkep);border-radius:3px;
+    background:rgba(255,255,255,.4);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .net .etiket{font-weight:800;font-size:17px}
+  .net .deger{font-family:"Courier New",monospace;font-weight:800;font-size:24px}
+  .net.kar{border-color:var(--yesil)}
+  .net.kar .deger{color:var(--yesil)}
+  .net.zarar{border-color:var(--kirmizi)}
+  .net.zarar .deger{color:var(--kirmizi)}
+
+  .uyari{
+    margin-top:16px;font-size:12px;color:var(--soluk);font-style:italic;
+    line-height:1.5;border-top:1px solid var(--mavi-cizgi);padding-top:12px;
+  }
+  .oneri{
+    margin-top:18px;border:1.5px dashed var(--vurgu);border-radius:3px;
+    padding:14px 16px;background:rgba(184,134,11,.08);
+  }
+  .oneri-bas{
+    font-family:"Courier New",monospace;font-size:11px;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--vurgu);font-weight:700;margin-bottom:10px;
+  }
+  .oneri-sat{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    padding:8px 0;border-bottom:1px dotted var(--mavi-cizgi);
+  }
+  .oneri-sat:last-child{border-bottom:none}
+  .oneri-ad{font-size:14px;font-style:normal}
+  .oneri-ad small{display:block;color:var(--soluk);font-size:12px}
+  .oneri-btn{
+    font-family:"Courier New",monospace;font-size:12px;font-weight:700;
+    color:var(--defter);background:var(--murekkep);text-decoration:none;
+    padding:7px 12px;border-radius:2px;white-space:nowrap;
+  }
+  .oneri-btn:hover{background:#33453a}
+  .oneri-dip{font-size:10px;color:var(--soluk);font-style:italic;margin-top:8px;text-align:right}
+  .canli{
+    display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--yesil);margin-right:5px;
+    animation:nb 2s infinite;
+  }
+  @keyframes nb{0%,100%{opacity:1}50%{opacity:.3}}
+
+  @media(max-width:480px){
+    body{padding:6px}
+    .ic{padding:20px 16px 20px 46px}
+    .defter::before{left:34px}
+    h1{font-size:25px}
+  }
+</style>
+</head>
+<body>
+<div class="defter">
+  <div class="ic">
+    <header>
+      <div class="marka">Anadolu Borsa · Çiftçi Defteri</div>
+      <h1>Bu sezon ne kazandım?</h1>
+      <div class="alt">Sürünü ya da tarlanı yaz — gerisini güncel fiyatlar hesaplasın.</div>
+      <div class="fiyat-not"><span class="canli"></span>Hesap, sitedeki güncel fiyatlarla yapılır. (Bu demo örnek fiyatlar kullanır.)</div>
+    </header>
+
+    <div class="sekmeler">
+      <button class="sekme aktif" onclick="sekme('hayvan')">🐄 Sürü</button>
+      <button class="sekme" onclick="sekme('tarla')">🌾 Tarla</button>
+    </div>
+
+    <!-- HAYVAN -->
+    <div class="sayfa gor" id="hayvan">
+      <div class="alan">
+        <label>Kaç büyükbaşın var? <span class="ipucu">(tek tek değil, toplam sayı)</span></label>
+        <div class="satir">
+          <input type="number" id="h_adet" placeholder="örn. 25" min="0">
+          <select id="h_tur">
+            <option value="sut">Süt ineği</option>
+            <option value="besi">Besi (tosun/dana)</option>
+          </select>
+        </div>
+      </div>
+      <div class="alan" id="h_sut_alan">
+        <label>İnek başına günlük süt <span class="ipucu">(litre — bilmiyorsan ort. 15)</span></label>
+        <input type="number" id="h_sut" placeholder="örn. 15" min="0" value="15">
+      </div>
+      <button class="hesapla" onclick="hesapHayvan()">Hesabı Çıkar</button>
+
+      <div class="sonuc" id="h_sonuc">
+        <div class="sonuc-bas"><span>Aylık Hesap</span><span>₺</span></div>
+        <div id="h_kalemler"></div>
+        <div class="net" id="h_net">
+          <span class="etiket">Aylık Net</span>
+          <span class="deger" id="h_net_deger">—</span>
+        </div>
+        <div class="uyari" id="h_uyari"></div>
+        <div id="h_oneri"></div>
+      </div>
+    </div>
+
+    <!-- TARLA -->
+    <div class="sayfa" id="tarla">
+      <div class="alan">
+        <label>Ne ektin, kaç dönüm? <span class="ipucu">(parsel parsel değil, toplam)</span></label>
+        <div class="satir">
+          <select id="t_urun">
+            <option value="bugday">Buğday</option>
+            <option value="arpa">Arpa</option>
+            <option value="misir">Mısır</option>
+          </select>
+          <input type="number" id="t_donum" placeholder="dönüm" min="0">
+        </div>
+      </div>
+      <button class="hesapla" onclick="hesapTarla()">Hesabı Çıkar</button>
+
+      <div class="sonuc" id="t_sonuc">
+        <div class="sonuc-bas"><span>Sezon Hesabı</span><span>₺</span></div>
+        <div id="t_kalemler"></div>
+        <div class="net" id="t_net">
+          <span class="etiket">Sezon Net (tahmini)</span>
+          <span class="deger" id="t_net_deger">—</span>
+        </div>
+        <div class="uyari" id="t_uyari"></div>
+        <div id="t_oneri"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ÖRNEK FİYATLAR (demo — gerçekte Supabase'den gelir)
+  const F={
+    sut:24.30,           // TL/litre (USK)
+    yem_gunluk:260,      // TL/gün/büyükbaş (sütçü inek rasyonu, örnek)
+    tosun_karkas:331,    // TL/kg karkas (ESK)
+    bugday:9.80, arpa:11.00, misir:8.50,  // TL/kg
+    girdi:{bugday:1850, arpa:1600, misir:2400},
+    verim:{bugday:450, arpa:400, misir:900}
+  };
+  const tl=n=>n.toLocaleString('tr-TR',{maximumFractionDigits:0})+' ₺';
+
+  function sekme(s){
+    document.querySelectorAll('.sayfa').forEach(p=>p.classList.remove('gor'));
+    document.querySelectorAll('.sekme').forEach(b=>b.classList.remove('aktif'));
+    document.getElementById(s).classList.add('gor');
+    event.target.classList.add('aktif');
+  }
+  document.getElementById('h_tur').addEventListener('change',e=>{
+    document.getElementById('h_sut_alan').style.display=e.target.value==='sut'?'block':'none';
+  });
+
+  function kalem(ad,alt,tutar,tip){
+    return `<div class="kalem ${tip}"><span class="ad">${ad}<small>${alt}</small></span><span class="tutar">${tl(tutar)}</span></div>`;
+  }
+
+  function oneriKutusu(baslik,urunler){
+    let s=`<div class="oneri"><div class="oneri-bas">${baslik}</div>`;
+    urunler.forEach(u=>{
+      s+=`<div class="oneri-sat"><span class="oneri-ad">${u.ad}<small>${u.alt}</small></span>`+
+         `<a class="oneri-btn" href="#" onclick="return false">Fiyatları gör</a></div>`;
+    });
+    s+=`<div class="oneri-dip">Anlaşmalı satıcılara yönlendirir · satıştan komisyon alınır</div></div>`;
+    return s;
+  }
+
+  function hesapHayvan(){
+    const adet=+document.getElementById('h_adet').value||0;
+    const tur=document.getElementById('h_tur').value;
+    if(adet<=0){return;}
+    const gun=30;
+    let k='',gelir=0,gider=0;
+    const yem=adet*F.yem_gunluk*gun;
+    gider+=yem;
+    k+=kalem('Yem gideri',`${adet} baş × ${F.yem_gunluk}₺/gün × 30 gün`,yem,'gider');
+    if(tur==='sut'){
+      const sutL=+document.getElementById('h_sut').value||0;
+      gelir=adet*sutL*gun*F.sut;
+      k+=kalem('Süt geliri',`${adet} × ${sutL} lt × 30 gün × ${F.sut}₺ (USK)`,gelir,'gelir');
+    }else{
+      k+=kalem('Besi geliri',`satış sezonluktur — aylık gelir hesaplanmaz`,0,'gelir');
+      document.getElementById('h_kalemler').innerHTML=k;
+      const ne=document.getElementById('h_net'),nd=document.getElementById('h_net_deger');
+      ne.querySelector('.etiket').textContent='Aylık Yem Gideri';
+      nd.textContent=tl(gider);
+      ne.className='net';
+      document.getElementById('h_uyari').innerHTML=
+        'Besi geliri satışta (sezonluk) oluşur; aylık tabloda yalnızca gider izlenir. '+
+        'Örnek fiyatlarla kaba hesaptır — gerçek sürümde fiyatlar düzenlenebilir olacak.';
+      document.getElementById('h_sonuc').classList.add('gor');
+      const oneriler=[{ad:'Besi yemi / arpa kırması',alt:'besi performansı'},
+         {ad:'Vitamin-mineral katkı',alt:'günlük canlı ağırlık artışı'}];
+      document.getElementById('h_oneri').innerHTML=
+        oneriKutusu('Bu hesaba göre işine yarayabilir',oneriler);
+      return;
+    }
+    const net=gelir-gider;
+    document.getElementById('h_kalemler').innerHTML=k;
+    const ne=document.getElementById('h_net'),nd=document.getElementById('h_net_deger');
+    ne.querySelector('.etiket').textContent='Aylık Net';
+    nd.textContent=(net>=0?'+':'')+tl(net);
+    ne.className='net '+(net>=0?'kar':'zarar');
+    document.getElementById('h_uyari').innerHTML=
+      'Örnek fiyatlarla kaba hesaptır. Gerçekte yem rasyonu, süt fiyatı ve verim '+
+      'değişir; bu yüzden gerçek sürümde fiyatlar düzenlenebilir olacak. '+
+      'Tavsiye değil, fiyat aynası.';
+    document.getElementById('h_sonuc').classList.add('gor');
+    const oneriler=tur==='sut'
+      ? [{ad:'Süt yemi / küspe',alt:'yem giderini en çok bu belirler'},
+         {ad:'Mineral yalama taşı',alt:'süt verimi + hayvan sağlığı'},
+         {ad:'Sağım makinesi ekipmanı',alt:'işçilik azaltır'}]
+      : [{ad:'Besi yemi / arpa kırması',alt:'besi performansı'},
+         {ad:'Vitamin-mineral katkı',alt:'günlük canlı ağırlık artışı'}];
+    document.getElementById('h_oneri').innerHTML=
+      oneriKutusu('Bu hesaba göre işine yarayabilir',oneriler);
+  }
+
+  function hesapTarla(){
+    const urun=document.getElementById('t_urun').value;
+    const donum=+document.getElementById('t_donum').value||0;
+    if(donum<=0){return;}
+    const ad={bugday:'Buğday',arpa:'Arpa',misir:'Mısır'}[urun];
+    const girdi=donum*F.girdi[urun];
+    const verimKg=donum*F.verim[urun];
+    const gelir=verimKg*F[urun];
+    let k='';
+    k+=kalem('Girdi gideri',`${donum} dönüm × ${tl(F.girdi[urun])}/dönüm (tohum+gübre+mazot)`,girdi,'gider');
+    k+=kalem('Hasat geliri',`${donum} × ${F.verim[urun]}kg × ${F[urun]}₺ = ${verimKg.toLocaleString('tr-TR')}kg`,gelir,'gelir');
+    const net=gelir-girdi;
+    document.getElementById('t_kalemler').innerHTML=k;
+    const ne=document.getElementById('t_net'),nd=document.getElementById('t_net_deger');
+    nd.textContent=(net>=0?'+':'')+tl(net);
+    ne.className='net '+(net>=0?'kar':'zarar');
+    document.getElementById('t_uyari').innerHTML=
+      `Verim TAHMİNİDİR (${F.verim[urun]} kg/dönüm örnek) — gerçek hasat hava, `+
+      `toprak ve bakıma göre değişir. Girdi ve fiyatlar örnektir. Gerçek sürümde `+
+      `bunlar düzenlenebilir + sezon boyu güncel fiyatla yenilenir. Tavsiye değil, hesap.`;
+    document.getElementById('t_sonuc').classList.add('gor');
+    const tOneriler=[
+      {ad:`${ad} sertifikalı tohum`,alt:'girdi giderinin parçası'},
+      {ad:'Taban + üst gübre',alt:'dönüm verimini doğrudan etkiler'},
+      {ad:'İlaçlama pompası',alt:'sezonluk bakım'}
+    ];
+    document.getElementById('t_oneri').innerHTML=
+      oneriKutusu('Girdi için işine yarayabilir',tOneriler);
+  }
+</script>
+</body>
+</html>

@@ -55,6 +55,41 @@ export default function PariteMatris({
         <button className={yon === "gu" ? "aktif" : ""} onClick={() => setYon("gu")}>Girdi → Ürün</button>
       </div>
 
+      {/* MOBİL (md altı): tablo yerine ürün kartları — yatay kaydırma yok (GÜNCELLEME 1) */}
+      <div className="pmx-kartlar">
+        {urunKeys.map((uk) => {
+          const u = urunler[uk];
+          const bayat = (gunFarki(u.tarih) ?? 0) >= BAYAT_ESIK_GUN;
+          return (
+            <div key={uk} className="pmx-ukart">
+              <div className="pmx-ukart-bas">
+                <span className="ua">{u.ikon} {u.ad}</span>
+                {bayat && <span className="bayat" title="Veri 3+ gün eski">⚠</span>}
+                <span className="ub">1 {birimAd(u.birim)}</span>
+              </div>
+              {girdiKeys.map((gk) => {
+                const g = girdiler[gk];
+                const h = hucre(gk, uk);
+                const secili = gk === seciliGirdi && uk === seciliUrun;
+                return (
+                  <div
+                    key={gk}
+                    className={`pmx-usat${secili ? " secili" : ""}${h.bos ? " bos" : ""}`}
+                    onClick={() => !h.bos && onSec(gk, uk)}
+                  >
+                    <span className="ga">{g.ikon} {g.ad}</span>
+                    <span className="ok">→</span>
+                    <span className="deg mono">{h.deger}</span>
+                    <span className="br">{h.birim}</span>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* MASAÜSTÜ (md ve üstü): matris tablosu */}
       <div className="pmx-card">
         <div className="pmx-scroll">
           <table>
@@ -118,7 +153,7 @@ export default function PariteMatris({
 
       <div className="pmx-dip">
         <span className="vt" /> Tüm fiyatlar Anadolu Borsa'nın güncel verisinden gelir.
-        Hücreye dokun → aşağıdaki grafik o pariteye geçer. <b>⚠</b> işareti veri 3+ gün eski demektir;
+        Hücreye/satıra dokun → aşağıdaki grafik o pariteye geçer. <b>⚠</b> işareti veri 3+ gün eski demektir;
         boş hücre o ikili için güncel veri olmadığını belirtir. Matris yalnızca oranı gösterir, alım-satım tavsiyesi vermez.
       </div>
     </div>
@@ -220,6 +255,37 @@ const CSS = `
 .pmx .vt{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4AE870;
   margin-right:6px;vertical-align:middle;box-shadow:0 0 6px rgba(74,232,112,.6)}
 
+/* MOBİL KART GÖRÜNÜMÜ (GÜNCELLEME 1): md altında tablo gizli, kartlar açık */
+.pmx-kartlar{display:none;flex-direction:column;gap:12px}
+.pmx-ukart{
+  background:var(--kart);border:1px solid var(--cizgi2);border-radius:10px;
+  overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.3);
+}
+.pmx-ukart-bas{
+  display:flex;align-items:baseline;gap:8px;
+  background:var(--zemin2);padding:11px 14px;border-bottom:1px solid var(--cizgi);
+}
+.pmx-ukart-bas .ua{color:var(--basak);font-size:15px;font-weight:700}
+.pmx-ukart-bas .bayat{color:var(--basak)}
+.pmx-ukart-bas .ub{margin-left:auto;color:var(--soluk);font-size:12px;font-family:ui-monospace,monospace}
+.pmx-usat{
+  display:flex;align-items:baseline;gap:8px;padding:12px 14px;
+  border-bottom:1px solid var(--cizgi);cursor:pointer;transition:background .12s;
+}
+.pmx-usat:last-child{border-bottom:none}
+.pmx-usat .ga{color:var(--yesil);font-size:14px;font-weight:600}
+.pmx-usat .ok{color:var(--soluk);font-size:13px}
+.pmx-usat .deg{margin-left:auto;color:var(--murekkep);font-size:18px;font-weight:700}
+.pmx-usat .br{color:var(--soluk);font-size:12px;font-family:ui-monospace,monospace;min-width:44px;text-align:left}
+.pmx-usat.secili{background:rgba(224,169,59,.13);box-shadow:inset 3px 0 0 var(--basak)}
+.pmx-usat.bos{cursor:default}
+.pmx-usat.bos .deg{color:var(--cizgi2);font-weight:400}
+.pmx-usat.bos .br{color:transparent}
+
+@media(max-width:767px){
+  .pmx-card{display:none}
+  .pmx-kartlar{display:flex}
+}
 @media(max-width:480px){
   .pmx-h{font-size:23px}
   .pmx td.h .deg{font-size:17px}

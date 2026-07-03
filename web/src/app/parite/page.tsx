@@ -36,38 +36,41 @@ const TUIK_URUN: Record<string, { ad: string; ikon: string; renk: string; birim:
   },
 };
 
-// Elektrik verisi DB'de yok → tahmini seri, seçici çipte pasif ("yakında").
-const ELEKTRIK_HIST = [
-  { y: "2010", f: 0.14 }, { y: "2015", f: 0.22 }, { y: "2018", f: 0.35 }, { y: "2020", f: 0.48 },
-  { y: "2022", f: 0.85 }, { y: "2023", f: 1.60 }, { y: "2024", f: 2.10 }, { y: "2025", f: 2.45 }, { y: "2026", f: 2.80 },
-];
+// GİRDİ SÜTUNLARI (matris GÜNCELLEME 2): mazot + elektrik + üre + DAP.
+// Tümü girdi_fiyat tablosundan canlı; DB'de verisi olmayan tür PASİF kalır
+// (sütun görünmez — sahte veri yok). Manuel giriş: scraper/girdi_guncelle.py
+// Kaynaklar: mazot EPDK/pompa · elektrik EPDK tarımsal sulama ·
+// üre/DAP Tarım Kredi/Gübretaş liste.
+const GIRDI_TANIM: Record<string, { ad: string; ikon: string; renk: string; birim: string }> = {
+  mazot: { ad: "Motorin", ikon: "⛽", renk: "#E86040", birim: "TL/litre" },
+  elektrik: { ad: "Elektrik", ikon: "⚡", renk: "#E8C840", birim: "TL/kWh" },
+  ure: { ad: "Üre", ikon: "⚪", renk: "#8FB8C8", birim: "TL/kg" },
+  dap: { ad: "DAP", ikon: "🟤", renk: "#C89060", birim: "TL/kg" },
+};
 
 export default async function ParitePage() {
-  const [{ data: mazotRows }, { data: yem30 }, { data: hay30 }] = await Promise.all([
-    supabaseServer.from("girdi_fiyat").select("fiyat, gecerlilik_tarihi").eq("girdi_turu", "mazot").order("gecerlilik_tarihi"),
+  const [{ data: girdiRows }, { data: yem30 }, { data: hay30 }] = await Promise.all([
+    supabaseServer.from("girdi_fiyat").select("girdi_turu, fiyat, gecerlilik_tarihi").in("girdi_turu", Object.keys(GIRDI_TANIM)).order("gecerlilik_tarihi"),
     supabaseServer.from("son_30_gun").select("urun_norm, borsa, cekilme_tarihi, ortalama").in("urun_norm", ["ARPA", "BUGDAY", "MISIR"]).order("cekilme_tarihi"),
     supabaseServer.from("son_30_gun_hayvan").select("hayvan_norm, kaynak, cekilme_tarihi, fiyat").in("hayvan_norm", ["SUT", "KUZU"]).order("cekilme_tarihi"),
   ]);
 
-  // Mazot: gerçek tarihsel seri (girdi_fiyat 1995→bugün)
-  const mazotHist = (mazotRows ?? [])
-    .filter((r) => r.fiyat != null && r.gecerlilik_tarihi)
-    .map((r) => ({ y: String(r.gecerlilik_tarihi).slice(0, 4), f: Number(r.fiyat) }));
-  const mazotGuncel = mazotHist.at(-1)?.f ?? null;
-  const mazotCanli = mazotHist.length > 1 && mazotGuncel != null;
-  // M4: geçerlilik tarihi UI'da gösterilir; 14+ gün eskiyse PariteClient uyarı basar
-  const mazotTarih = (mazotRows ?? []).at(-1)?.gecerlilik_tarihi ?? null;
-
-  const girdiler: Record<string, Girdi> = {
-    mazot: {
-      ad: "Motorin", ikon: "⛽", renk: "#E86040", birim: "TL/litre",
-      hist: mazotCanli ? mazotHist : [],
-      guncel: mazotGuncel ?? 0,
-      aktif: mazotCanli,
-      tarih: mazotTarih ? String(mazotTarih) : null,
-    },
-    elektrik: { ad: "Elektrik", ikon: "⚡", renk: "#E8C840", birim: "TL/kWh", hist: ELEKTRIK_HIST, guncel: 2.80, aktif: false, tarih: null },
-  };
+  const girdiler: Record<string, Girdi> = {};
+  for (const [tur, t] of Object.entries(GIRDI_TANIM)) {
+    // Gerçek tarihsel seri (girdi_fiyat; mazot 1995→bugün, diğerleri girildikçe)
+    const hist = (girdiRows ?? [])
+      .filter((r) => r.girdi_turu === tur && r.fiyat != null && r.gecerlilik_tarihi)
+      .map((r) => ({ y: String(r.gecerlilik_tarihi).slice(0, 4), f: Number(r.fiyat) }));
+    const guncel = hist.at(-1)?.f ?? null;
+    const tarih = (girdiRows ?? []).filter((r) => r.girdi_turu === tur).at(-1)?.gecerlilik_tarihi ?? null;
+    girdiler[tur] = {
+      ...t,
+      hist,
+      guncel: guncel ?? 0,
+      aktif: guncel != null, // tek kayıt bile sütunu açar; grafik ≥2 yıl isteyince görünür
+      tarih: tarih ? String(tarih) : null,
+    };
+  }
 
   const urunler: Record<string, Urun> = {};
   for (const [k, v] of Object.entries(TUIK_URUN)) {
