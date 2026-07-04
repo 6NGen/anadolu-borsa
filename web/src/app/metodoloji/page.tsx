@@ -24,17 +24,17 @@ const KAYNAKLAR = [
   },
   {
     ad: "ESK (Et ve Süt Kurumu)",
-    ne: "Karkas et alım fiyatları (tosun, kuzu, toklu vb.)",
+    ne: "Karkas et ALIM (taban) fiyatları (tosun, kuzu, toklu vb.) — kurumun alım fiyatıdır; serbest piyasa genelde üzerindedir",
     siklik: "Her gün 23:00 (TSİ)",
   },
   {
     ad: "USK (Ulusal Süt Konseyi)",
-    ne: "Çiğ süt tavsiye fiyatı (dönemsel belirlenir; yürürlükteki değer günlük teyit edilir)",
+    ne: "Çiğ süt TAVSİYE fiyatı (üreticiden sanayiye, dönemsel) — doğrudan satış/saha fiyatı belirgin farklı olabilir",
     siklik: "Her gün 23:00 (TSİ)",
   },
   {
     ad: "UKON (Ulusal Kırmızı Et Konseyi)",
-    ne: "Canlı hayvan / karkas fiyatları",
+    ne: "Serbest piyasa karkas fiyatı (dana/kuzu, 7 bölge ortalaması) — ESK taban fiyatıyla kıyas için",
     siklik: "Her gün 23:00 (TSİ)",
   },
   {

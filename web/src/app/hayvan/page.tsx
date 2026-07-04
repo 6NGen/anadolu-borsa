@@ -30,6 +30,12 @@ export default async function HayvanPage() {
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>HAYVAN BORSASI</h1>
         <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>ESK karkas alım fiyatları + Çiğ süt · Günlük güncellenir</p>
+        {/* Faz 0.1 "yarı fiyat" bağlamı: resmi ≠ saha — kaynak kapsamı açıkça yazılır */}
+        <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px", lineHeight: 1.55 }}>
+          ESK fiyatları kurumun <b style={{ color: RENKLER.text }}>alım (taban)</b> fiyatıdır; serbest piyasa genelde üzerindedir
+          (UKON bölge ortalaması karşılaştırma içindir). Çiğ süt, USK&apos;nın üreticiden sanayiye{" "}
+          <b style={{ color: RENKLER.text }}>tavsiye</b> fiyatıdır — doğrudan satış/saha fiyatı belirgin farklı olabilir.
+        </p>
       </div>
 
       {fiyatlar.length === 0 ? (

@@ -184,7 +184,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
 
       <div style={{ fontSize: 12, color: "#6B9478", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>
         Güncel fiyatlar canlı borsa verisidir (TOBB/KTB hububat · ESK karkas · USK çiğ süt) · Matris yalnızca oranı gösterir, tavsiye vermez.<br />
-        Tarihsel ürün serileri TÜİK tahminidir.
+        Çiğ süt USK <b>tavsiye</b> fiyatıdır (üreticiden sanayiye) — saha fiyatı farklı olabilir · Tarihsel ürün serileri TÜİK tahminidir.
       </div>
     </div>
   );

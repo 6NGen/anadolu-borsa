@@ -192,3 +192,39 @@ class TestAlarmTetikleyen:
     def test_bos_liste(self):
         from alarm import _tetikleyen
         assert _tetikleyen("yukari", [], 12.0) is None
+
+
+class TestUkonTablo:
+    """UKON sayfa duzeni: satir=bolge, sutun=Dana/Kuzu (2026-07 kirilma dersi)."""
+
+    HTML = """
+    <p>Dana ve Yagsiz Kuzu Fiyatlari (TL/KG) - 02.07.2026</p>
+    <table>
+      <tr><th>Bolge</th><th>Dana Bicak Yagsiz TL / KG</th><th>Kuzu Bicak Yagsiz TL / KG</th></tr>
+      <tr><td>Ege Bolgesi</td><td>583,30</td><td>655,00</td></tr>
+      <tr><td>Ortalama</td><td>584,76</td><td>608,57</td></tr>
+      <tr><td>Gecen Aya Gore Degisim (%)</td><td>-1,5</td><td>-0,1</td></tr>
+    </table>
+    """
+
+    def _ayikla(self, html):
+        from bs4 import BeautifulSoup
+        from scraper import _ukon_tablo_ayikla
+        return _ukon_tablo_ayikla(BeautifulSoup(html, "html.parser"))
+
+    def test_yalniz_ortalama_satiri_iki_kayit(self):
+        kayitlar = self._ayikla(self.HTML)
+        assert len(kayitlar) == 2  # bolgeler ve % satirlari atlanir
+        normlar = {k["hayvan_norm"]: k["fiyat"] for k in kayitlar}
+        assert normlar == {"DANA": 584.76, "KUZU": 608.57}
+
+    def test_sayfa_tarihi_kullanilir(self):
+        kayitlar = self._ayikla(self.HTML)
+        assert all(k["cekilme_tarihi"] == "2026-07-02" for k in kayitlar)
+
+    def test_ad_birimden_arindirilir(self):
+        adlar = {k["hayvan_norm"]: k["hayvan"] for k in self._ayikla(self.HTML)}
+        assert adlar["DANA"] == "Dana Bicak Yagsiz"
+
+    def test_tablo_yoksa_bos(self):
+        assert self._ayikla("<p>tablo yok</p>") == []

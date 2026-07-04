@@ -272,3 +272,22 @@ DAMLA GELİR ADAYLARI (güven bozmayan):
 TASARIM NOTU:
 [x] Çevrimdışı-öncelikli: mobil v1.2'de önbellek + çevrimdışı şeridi ✅
     (web tarafı için hâlâ denetim maddesi)
+
+NAKLİYE MODÜLÜ (ayrı oturum handoff'u, 3 Temmuz — şartlı kabul):
+[ ] /nakliye: tarımsal nakliye İLAN PANOSU (hasat taşıma, hububat,
+    canlı hayvan, balya). Aynı repo/Supabase/auth — ayrı uygulama YOK.
+    Komisyonsuz (WhatsApp'a karşı tek koşul), para akışına GİRME (TİO
+    belgesi tetiklenmesin), iletişim doğrudan telefon.
+    ⚠️ AÇIK ÇELİŞKİ UYARISI: bu, reddedilen "iki taraflı marketplace"in
+    niş versiyonu — cold-start riski AYNEN geçerli (arıcılık dersi).
+    Kırılma şansı: hasat sezonu + WhatsApp gruplarındaki hazır trafiği
+    panoya taşıyabilmek. Taşınamazsa modül ölü doğar; launch > build.
+    KAPSAM KİLİDİ: v1 = ilan + il/ilçe filtre + harita. PostGIS dönüş
+    yükü eşleşmesi "50 aktif ilan" eşiğinden SONRA (likiditesiz killer
+    feature yoktur). Canlı hayvan ilanında belge alanı + avukat sorusu
+    (nakil mevzuatı) STRATEJIK_KONTROL'e.
+    ASIL SİNERJİ (spec'e girmeli): pano doğal NAKLİYE FİYAT VERİSİ
+    üretir (güzergâh × ürün × ton ₺) — kimsede olmayan 4. veri katmanı;
+    Çiftçi Defteri'ne nakliye gideri kalemi + B2B paketi.
+    ÖN KOŞUL: mevcut açık işler (UKON tamiri, TÜRİB e-postası, ✅matris
+    mobil, ERİŞİLEBİLİRLİK) + Anadolu Borsa'nın KENDİ dağıtımı önce.

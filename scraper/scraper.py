@@ -465,6 +465,64 @@ def usk_sut_scrape() -> list:
 
 
 # --- UKON SCRAPER ---
+# Sayfa duzeni (2026-07 itibariyle): satir = BOLGE, sutunlar = Dana / Kuzu
+# "Bicak Yagsiz TL/KG". Eski parser satir=hayvan bekledigi icin 0 donuyordu.
+# Yalniz "Ortalama" satiri alinir (Turkiye bolge ortalamasi) — bolgesel 7 satir
+# view'da ayni (kaynak,norm) icin cift kayit yaratirdi. UKON = SERBEST PIYASA
+# karkasi; ESK alim/taban fiyatiyla yan yana "yari fiyat" farkini gosterir.
+def _ukon_tablo_ayikla(soup) -> list:
+    tablo = soup.find("table")
+    if not tablo:
+        return []
+    satirlar = tablo.find_all("tr")
+    if not satirlar:
+        return []
+
+    # Kolon -> norm eslemesi basliktan (sutun sirasi degisirse de calissin)
+    baslik = [c.get_text(strip=True) for c in satirlar[0].find_all(["td", "th"])]
+    kolon_norm = {}
+    for i, b in enumerate(baslik):
+        nb = normalize(b)
+        if "DANA" in nb:
+            kolon_norm[i] = ("DANA", b)
+        elif "KUZU" in nb:
+            kolon_norm[i] = ("KUZU", b)
+    if not kolon_norm:
+        return []
+
+    # Sayfadaki veri tarihi ("Fiyatlari (TL/KG) - 02.07.2026") — bulunamazsa bugun.
+    # Sayfa birkac gun eski olabilir; gercek tarihi yazmak tazelik rozetiyle durust.
+    tarih = bugun_tr()
+    m = re.search(r"Fiyatlar[^-]{0,30}-\s*(\d{2})\.(\d{2})\.(\d{4})", soup.get_text(" ", strip=True))
+    if m:
+        tarih = f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
+
+    sonuclar = []
+    for satir in satirlar[1:]:
+        h = [td.get_text(strip=True) for td in satir.find_all("td")]
+        if not h or normalize(h[0]) != "ORTALAMA":
+            continue  # bolge satirlari ve % degisim satirlari atlanir
+        for i, (norm, kolon_ad) in kolon_norm.items():
+            if i >= len(h):
+                continue
+            fiyat = sinirla(parse_fiyat(h[i]), HAYVAN_FIYAT_SINIR)
+            if not fiyat:
+                continue
+            ad = re.sub(r"\s*TL\s*/\s*KG\s*$", "", kolon_ad, flags=re.I).strip()
+            sonuclar.append({
+                "kaynak":         "UKON",
+                "hayvan":         ad,  # "Dana Bicak Yagsiz"
+                "hayvan_norm":    norm,
+                "kategori":       "buyukbas" if norm == "DANA" else "kucukbas",
+                "bolge":          "Türkiye (bölge ort.)",
+                "fiyat":          fiyat,
+                "birim":          "TL/kg karkas",
+                "cekilme_tarihi": tarih,
+            })
+        break  # tek Ortalama satiri yeter
+    return sonuclar
+
+
 def ukon_scrape() -> list:
     url = "https://www.ukon.org.tr/fiyatlar"
     headers = {"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"}
@@ -472,33 +530,13 @@ def ukon_scrape() -> list:
         resp = requests.get(url, headers=headers, timeout=15)
         resp.encoding = "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
-        tablo = soup.find("table")
-        if not tablo:
-            return ukon_playwright()
-        sonuclar = []
-        for satir in tablo.find_all("tr")[1:]:
-            h = [td.get_text(strip=True) for td in satir.find_all("td")]
-            if len(h) < 3:
-                continue
-            fiyat = sinirla(parse_fiyat(h[2]), HAYVAN_FIYAT_SINIR)
-            if not fiyat:
-                continue
-            n = normalize(h[0])
-            norm = "DANA" if "DANA" in n else "KUZU" if "KUZU" in n else None
-            if not norm:
-                continue
-            sonuclar.append({
-                "kaynak":         "UKON",
-                "hayvan":         h[0],
-                "hayvan_norm":    norm,
-                "kategori":       "buyukbas" if norm == "DANA" else "kucukbas",
-                "bolge":          h[1] if len(h) > 1 else None,
-                "fiyat":          fiyat,
-                "birim":          "TL/kg karkas",
-                "cekilme_tarihi": bugun_tr(),
-            })
+        sonuclar = _ukon_tablo_ayikla(soup)
+        if not sonuclar:
+            sonuclar = ukon_playwright()
+        if not sonuclar:
+            raise ValueError("tabloda Ortalama satiri / Dana-Kuzu kolonu bulunamadi")
         log_yaz("UKON", "basarili", len(sonuclar))
-        print(f"[OK] UKON: {len(sonuclar)} fiyat")
+        print(f"[OK] UKON: {len(sonuclar)} fiyat ({sonuclar[0]['cekilme_tarihi']})")
         return sonuclar
     except Exception as e:
         log_yaz("UKON", "hata", hata=e)
@@ -511,7 +549,6 @@ def ukon_playwright() -> list:
         from playwright.sync_api import sync_playwright
     except ImportError:
         return []
-    sonuclar = []
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
@@ -519,33 +556,11 @@ def ukon_playwright() -> list:
             page.goto("https://www.ukon.org.tr/fiyatlar", timeout=30000)
             page.wait_for_selector("table", timeout=15000)
             soup = BeautifulSoup(page.content(), "html.parser")
-            for tablo in soup.find_all("table"):
-                for satir in tablo.find_all("tr")[1:]:
-                    h = [td.get_text(strip=True) for td in satir.find_all("td")]
-                    if len(h) < 3:
-                        continue
-                    fiyat = sinirla(parse_fiyat(h[2]), HAYVAN_FIYAT_SINIR)
-                    if not fiyat:
-                        continue
-                    n = normalize(h[0])
-                    norm = "DANA" if "DANA" in n else "KUZU" if "KUZU" in n else None
-                    if not norm:
-                        continue
-                    sonuclar.append({
-                        "kaynak":         "UKON",
-                        "hayvan":         h[0],
-                        "hayvan_norm":    norm,
-                        "kategori":       "buyukbas" if norm == "DANA" else "kucukbas",
-                        "bolge":          h[1] if len(h) > 1 else None,
-                        "fiyat":          fiyat,
-                        "birim":          "TL/kg karkas",
-                        "cekilme_tarihi": bugun_tr(),
-                    })
+            return _ukon_tablo_ayikla(soup)
         except Exception:
-            pass
+            return []
         finally:
             browser.close()
-    return sonuclar
 
 
 # --- HAVA ---
