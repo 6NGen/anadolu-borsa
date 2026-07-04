@@ -3,6 +3,7 @@ import '../tema.dart';
 import '../parcalar.dart';
 import 'hesap.dart';
 import 'hedef.dart';
+import 'defter.dart';
 
 // Araçlar sekmesi — hesap makineleri tek çatı altında (ileride Maliyet de buraya).
 class AraclarEkran extends StatelessWidget {
@@ -51,6 +52,11 @@ class AraclarEkran extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       children: [
         bolumBaslik('ÇİFTÇİ ARAÇLARI'),
+        _arac(context,
+          emoji: '📒', ad: 'Çiftçi Defteri',
+          aciklama: 'Bu sezon ne kazandım? Sürü/tarla gelir-gider hesabı — güncel fiyatlarla',
+          onTap: () => _ac(context, 'ÇİFTÇİ DEFTERİ', const DefterEkran()),
+        ),
         _arac(context,
           emoji: '🧮', ad: 'Kaç Para Eder?',
           aciklama: 'Elindeki ürün bugünkü borsa fiyatıyla ne eder — ton, kg, baş, litre',

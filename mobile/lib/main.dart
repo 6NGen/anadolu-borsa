@@ -170,7 +170,7 @@ class _AnaKabukState extends State<AnaKabuk> {
           selectedFontSize: 10.5,
           unselectedFontSize: 10.5,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Ana'),
+            BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Anasayfa'),
             BottomNavigationBarItem(icon: Icon(Icons.grass_rounded), label: 'Tarım'),
             BottomNavigationBarItem(icon: Icon(Icons.pets_rounded), label: 'Hayvan'),
             BottomNavigationBarItem(icon: Icon(Icons.sync_alt_rounded), label: 'Parite'),

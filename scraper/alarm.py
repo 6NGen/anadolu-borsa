@@ -115,7 +115,11 @@ def alarmlari_kontrol_et(supabase) -> None:
             r = requests.post(
                 f"https://fcm.googleapis.com/v1/projects/{proje_id}/messages:send",
                 headers={"Authorization": f"Bearer {token_erisim}", "Content-Type": "application/json"},
-                json={"message": {"token": a["fcm_token"], "notification": {"title": baslik, "body": govde}}},
+                json={"message": {
+                    "token": a["fcm_token"],
+                    "notification": {"title": baslik, "body": govde},
+                    "android": {"priority": "high"},
+                }},
                 timeout=15,
             )
             if r.status_code == 200:
@@ -198,6 +202,9 @@ def gunluk_ozet_gonder(supabase) -> None:
             json={"message": {
                 "topic": "gunluk_ozet",
                 "notification": {"title": "Bugunun fiyatlari", "body": govde},
+                # Doze'da normal oncelik saatlerce bekletilebiliyor — gunluk
+                # ozet kullanicinin bekledigi zamanli bildirim, high mesru.
+                "android": {"priority": "high"},
             }},
             timeout=15,
         )
