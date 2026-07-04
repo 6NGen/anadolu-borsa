@@ -137,7 +137,7 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
             ListTile(
               leading: Icon(Icons.info_outline, color: C.muted),
               title: Text('Anadolu Borsa', style: TextStyle(color: C.text, fontSize: 13)),
-              subtitle: Text('Türkiye tarım ve hayvancılık fiyatları · sürüm 1.4', style: TextStyle(color: C.muted, fontSize: 11)),
+              subtitle: Text('Türkiye tarım ve hayvancılık fiyatları · sürüm 1.4.1', style: TextStyle(color: C.muted, fontSize: 11)),
             ),
           ])),
           const SizedBox(height: 16),

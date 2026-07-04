@@ -75,7 +75,9 @@ Future<List<Fiyat>> yemFiyatlari() => _onbellekli('cache_yem', () async {
       return [
         for (final r in rows)
           Fiyat(
-            norm: r['urun_norm'], ad: r['urun_ad'] ?? r['urun_norm'],
+            norm: r['urun_norm'],
+            // Görünen ad düzgün Türkçe katalogdan (DB "Bugday"/"Misir" ASCII)
+            ad: tumUrunler[r['urun_norm']] ?? r['urun_ad'] ?? r['urun_norm'],
             fiyat: (r['ortalama'] as num?)?.toDouble(),
             miktar: (r['islem_miktari'] as num?)?.toDouble(),
             kaynak: r['borsa'] ?? '', tarih: r['cekilme_tarihi'] ?? '', birim: r['birim'] ?? 'TL/KG',
@@ -109,13 +111,13 @@ Future<List<Fiyat>> hayvanFiyatlari() => _onbellekli('cache_hayvan', () async {
 // verilmez ya da o kaynakta veri yoksa en güncel kaydın kaynağına düşülür.
 Future<List<GrafikNoktasi>> yemSeri(String norm, {String? kaynak}) async {
   final rows = await sb.from('son_30_gun').select('borsa, cekilme_tarihi, ortalama')
-      .eq('urun_norm', norm).order('cekilme_tarihi');
+      .eq('urun_norm', norm).order('cekilme_tarihi', ascending: true);
   return _tekKaynakSeri(rows, 'borsa', 'ortalama', kaynak);
 }
 
 Future<List<GrafikNoktasi>> hayvanSeri(String norm, {String? kaynak}) async {
   final rows = await sb.from('son_30_gun_hayvan').select('kaynak, cekilme_tarihi, fiyat')
-      .eq('hayvan_norm', norm).order('cekilme_tarihi');
+      .eq('hayvan_norm', norm).order('cekilme_tarihi', ascending: true);
   return _tekKaynakSeri(rows, 'kaynak', 'fiyat', kaynak);
 }
 
@@ -140,7 +142,7 @@ class BorsaSatir {
 
 Future<List<BorsaSatir>> borsaSonlari(String norm) async {
   final rows = await sb.from('son_30_gun').select('borsa, cekilme_tarihi, ortalama, islem_miktari')
-      .eq('urun_norm', norm).order('cekilme_tarihi');
+      .eq('urun_norm', norm).order('cekilme_tarihi', ascending: true);
   final sonlar = <String, BorsaSatir>{}; // sıralı geldiği için sonuncusu en güncel
   for (final r in rows) {
     if (r['ortalama'] == null) continue;
@@ -165,7 +167,7 @@ class Sinyal {
 
 Future<List<Sinyal>> sinyaller() async {
   final rows = await sb.from('fiyat_sinyal')
-      .select('urun_norm, ort_30gun, bugun, veri_gun_sayisi').order('urun_norm');
+      .select('urun_norm, ort_30gun, bugun, veri_gun_sayisi').order('urun_norm', ascending: true);
   return [
     for (final r in rows)
       Sinyal(
@@ -196,7 +198,7 @@ Future<List<Girdi>> girdiFiyatlari() async {
   final p = await SharedPreferences.getInstance();
   try {
     final rows = await sb.from('girdi_fiyat').select('girdi_turu, fiyat, birim, gecerlilik_tarihi')
-        .inFilter('girdi_turu', _girdiSira).order('gecerlilik_tarihi');
+        .inFilter('girdi_turu', _girdiSira).order('gecerlilik_tarihi', ascending: true);
     final son = <String, Girdi>{}; // sıralı geldiği için sonuncusu en güncel
     for (final r in rows) {
       final f = (r['fiyat'] as num?)?.toDouble();
