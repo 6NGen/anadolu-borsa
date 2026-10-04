@@ -214,11 +214,35 @@ TOBB_BORSALAR = {
 }
 
 
+# borsa.tobb.org.tr ara sertifikayi (Sectigo DV R36) gondermiyor (26.08.2026
+# sertifika yenilemesinden beri). Tarayicilar AIA ile tamamliyor, requests
+# tamamlamiyor -> CERTIFICATE_VERIFY_FAILED. verify=False yerine certifi koklerine
+# eksik ara sertifikayi ekleyip dogrulamayi koruyoruz.
+TOBB_ARA_SERTIFIKA = Path(__file__).parent / "certs" / "sectigo_dv_r36.pem"
+_tobb_ca_yolu: str | None = None
+
+
+def tobb_ca_bundle() -> str:
+    global _tobb_ca_yolu
+    if _tobb_ca_yolu is None:
+        import certifi
+        import tempfile
+        yol = Path(tempfile.gettempdir()) / "anadolu_tobb_ca.pem"
+        yol.write_text(
+            Path(certifi.where()).read_text(encoding="utf-8") + "\n"
+            + TOBB_ARA_SERTIFIKA.read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        _tobb_ca_yolu = str(yol)
+    return _tobb_ca_yolu
+
+
 def tobb_scrape(borsa_adi: str, borsa_kod: str) -> list:
     url = f"https://borsa.tobb.org.tr/fiyat_borsa.php?borsakod={borsa_kod}"
     headers = {"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"}
     try:
-        resp = requests.get(url, headers=headers, timeout=15)
+        resp = requests.get(url, headers=headers, timeout=15, verify=tobb_ca_bundle())
+        resp.raise_for_status()
         resp.encoding = "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
         tablo = soup.find("table")

@@ -228,3 +228,13 @@ class TestUkonTablo:
 
     def test_tablo_yoksa_bos(self):
         assert self._ayikla("<p>tablo yok</p>") == []
+
+
+def test_tobb_ca_bundle_ara_sertifikayi_icerir():
+    import scraper
+    # borsa.tobb.org.tr zinciri eksik gonderiyor; paket certifi + Sectigo DV R36 olmali
+    yol = scraper.tobb_ca_bundle()
+    icerik = open(yol, encoding="utf-8").read()
+    ara = scraper.TOBB_ARA_SERTIFIKA.read_text(encoding="utf-8").strip()
+    assert ara in icerik
+    assert icerik.count("BEGIN CERTIFICATE") > 100  # certifi kokleri de var
