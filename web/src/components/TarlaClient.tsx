@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { RENKLER, YEM_RENK } from "@/lib/theme";
+import { RENKLER, YEM_RENK, alfa } from "@/lib/theme";
 import { formatFiyat, parseFiyatGirdi, kisaTarih } from "@/lib/format";
 import { useBolgem } from "@/lib/bolgem";
 import { ILLER } from "@/lib/iller";
@@ -99,10 +99,10 @@ export default function TarlaClient({ mazot, borsa }: Props) {
             <div style={{ display: "flex", gap: "7px", flexWrap: "wrap" }}>
               {TARLA_URUNLER.map((x) => {
                 const r = YEM_RENK[x.urunNorm] ?? RENKLER.green; const aktif = x.key === urunKey;
-                return <button key={x.key} onClick={() => setUrunKey(x.key)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 13px", fontSize: "13px", background: aktif ? `${r}22` : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}><span style={{ fontSize: "13px" }}>{x.emoji}</span>{x.ad}</button>;
+                return <button key={x.key} onClick={() => setUrunKey(x.key)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "8px 13px", fontSize: "13px", background: aktif ? alfa(r, 0.13) : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}><span style={{ fontSize: "13px" }}>{x.emoji}</span>{x.ad}</button>;
               })}
             </div>
-            <div style={{ fontSize: "12px", color: sezonda ? RENKLER.green : "#E9B949", marginTop: "10px" }}>
+            <div style={{ fontSize: "12px", color: sezonda ? RENKLER.green : "var(--warn)", marginTop: "10px" }}>
               {sezonda ? `● ${u.ad} ekim sezonu (${aylarMetni(u.ekimAylar)}) — şimdi açabilirsin` : `⏳ ${u.ad} ekim sezonu: ${aylarMetni(u.ekimAylar)} · hasat: ${aylarMetni(u.hasatAylar)}`}
             </div>
           </div>
@@ -124,7 +124,7 @@ export default function TarlaClient({ mazot, borsa }: Props) {
             </div>
           )}
           {!bf && <div style={{ fontSize: "13px", color: RENKLER.red }}>Bu ürün için canlı fiyat yok.</div>}
-          <button onClick={tarlaAc} disabled={!sezonda || !bf} style={{ padding: "13px", fontSize: "13px", background: sezonda && bf ? RENKLER.green : "#15211A", color: sezonda && bf ? "#0E1511" : RENKLER.muted, border: "none", borderRadius: "8px", cursor: sezonda && bf ? "pointer" : "not-allowed", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+          <button onClick={tarlaAc} disabled={!sezonda || !bf} style={{ padding: "13px", fontSize: "13px", background: sezonda && bf ? RENKLER.green : "#15211A", color: sezonda && bf ? "var(--inset)" : RENKLER.muted, border: "none", borderRadius: "8px", cursor: sezonda && bf ? "pointer" : "not-allowed", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
             {sezonda ? "Tarlayı Aç" : `${aylarMetni(u.ekimAylar)}'da açılır`}
           </button>
         </div>
@@ -138,7 +138,7 @@ export default function TarlaClient({ mazot, borsa }: Props) {
     return (
       <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)", textAlign: "center" }}>
         <p style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "14px" }}>Tarla kaydı okunamadı (eski sürüm olabilir).</p>
-        <button onClick={tarlayiKapat} style={{ padding: "10px 20px", background: RENKLER.green, color: "#0E1511", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Sıfırla</button>
+        <button onClick={tarlayiKapat} style={{ padding: "10px 20px", background: RENKLER.green, color: "var(--inset)", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Sıfırla</button>
       </main>
     );
   }
@@ -187,12 +187,12 @@ export default function TarlaClient({ mazot, borsa }: Props) {
       </div>
 
       {hasatZamani && !hasatModu && (
-        <button onClick={() => setHasatModu(true)} style={{ width: "100%", padding: "13px", fontSize: "13px", background: `${renk}22`, color: renk, border: `1px solid ${renk}`, borderRadius: "8px", cursor: "pointer", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Hasat Et</button>
+        <button onClick={() => setHasatModu(true)} style={{ width: "100%", padding: "13px", fontSize: "13px", background: alfa(renk, 0.13), color: renk, border: `1px solid ${renk}`, borderRadius: "8px", cursor: "pointer", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Hasat Et</button>
       )}
       {!hasatZamani && !hasatModu && (
         <div style={{ ...kart, textAlign: "center", padding: "16px" }}>
           <div style={{ fontSize: "12px", color: RENKLER.muted, lineHeight: 1.6 }}>⏳ Hasat zamanı: <b style={{ color: RENKLER.text }}>{aylarMetni(u.hasatAylar)}</b><br /><span style={{ fontSize: "12px" }}>O zamana kadar değerini izle; istersen şu anki durumu paylaş.</span></div>
-          <button onClick={() => window.open(kartUrl, "_blank")} style={{ marginTop: "12px", padding: "10px 20px", background: "transparent", color: RENKLER.green, border: `1px solid ${RENKLER.green}55`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)", fontWeight: 700 }}>Durumu Paylaş</button>
+          <button onClick={() => window.open(kartUrl, "_blank")} style={{ marginTop: "12px", padding: "10px 20px", background: "transparent", color: RENKLER.green, border: `1px solid ${alfa(RENKLER.green, 0.33)}`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)", fontWeight: 700 }}>Durumu Paylaş</button>
         </div>
       )}
       {hasatModu && (
@@ -201,7 +201,7 @@ export default function TarlaClient({ mazot, borsa }: Props) {
           <div style={{ fontSize: "34px", color: netPoz ? RENKLER.pos : RENKLER.red, fontWeight: 800, margin: "6px 0" }}>{netPoz ? "+" : ""}{formatFiyat(net, 0)} ₺</div>
           <div style={{ fontSize: "13px", color: RENKLER.muted, marginBottom: "14px" }}>maliyet {formatFiyat(tarla.acilisMaliyet, 0)} → değer {formatFiyat(guncelDeger, 0)} ₺ · fiyat {degisimPoz ? "+" : ""}%{formatFiyat(degisim, 1)}</div>
           <div style={{ display: "flex", gap: "8px" }}>
-            <button onClick={() => window.open(kartUrl, "_blank")} style={{ flex: 1, padding: "11px", background: RENKLER.green, color: "#0E1511", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Kart Oluştur</button>
+            <button onClick={() => window.open(kartUrl, "_blank")} style={{ flex: 1, padding: "11px", background: RENKLER.green, color: "var(--inset)", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Kart Oluştur</button>
             <button onClick={tarlayiKapat} style={{ flex: 1, padding: "11px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)" }}>Yeni Tarla</button>
           </div>
         </div>

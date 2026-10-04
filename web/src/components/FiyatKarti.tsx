@@ -1,3 +1,4 @@
+import { alfa } from "@/lib/theme";
 import Link from "next/link";
 import { formatFiyat } from "@/lib/format";
 import VeriTazelik from "./VeriTazelik";
@@ -25,7 +26,7 @@ export default function FiyatKarti({ href, ad, renk, fiyat, birim, kaynak, tarih
     <div className="ab-card ab-card-hover" style={{ padding: "14px", height: "100%", display: "flex", flexDirection: "column", gap: "12px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
         <span style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0 }}>
-          <span aria-hidden style={{ width: 8, height: 8, borderRadius: "50%", background: renk, flexShrink: 0, boxShadow: `0 0 0 3px ${renk}22` }} />
+          <span aria-hidden style={{ width: 8, height: 8, borderRadius: "50%", background: renk, flexShrink: 0, boxShadow: `0 0 0 3px ${alfa(renk, 0.13)}` }} />
           <span style={{ fontSize: "14.5px", fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ad}</span>
         </span>
         <span style={{ fontSize: "11.5px", fontWeight: 600, color: "var(--muted)", background: "var(--surface-2)", border: "1px solid var(--border)", borderRadius: "6px", padding: "2px 7px", whiteSpace: "nowrap" }}>
@@ -43,7 +44,7 @@ export default function FiyatKarti({ href, ad, renk, fiyat, birim, kaynak, tarih
       {aralik && (
         <div>
           <div style={{ position: "relative", height: "4px", borderRadius: "4px", background: "var(--border)" }}>
-            <div style={{ position: "absolute", inset: 0, borderRadius: "4px", background: `linear-gradient(90deg, ${renk}33, ${renk}aa)` }} />
+            <div style={{ position: "absolute", inset: 0, borderRadius: "4px", background: `linear-gradient(90deg, ${alfa(renk, 0.2)}, ${alfa(renk, 0.67)})` }} />
             {konum != null && (
               <span style={{ position: "absolute", top: "50%", left: `${konum}%`, width: 10, height: 10, marginLeft: -5, marginTop: -5, borderRadius: "50%", background: "var(--text)", border: `2px solid ${renk}` }} />
             )}

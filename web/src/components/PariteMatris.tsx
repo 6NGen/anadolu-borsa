@@ -112,7 +112,7 @@ export default function PariteMatris({
                     <th
                       key={gk}
                       className="girdi-bas"
-                      style={hg === gk ? { background: "#17211B" } : undefined}
+                      style={hg === gk ? { background: "var(--surface-2)" } : undefined}
                     >
                       {g.ikon} {g.ad}
                       <span className="birim">{birimAd(g.birim)} başına</span>
@@ -141,7 +141,7 @@ export default function PariteMatris({
                         <td
                           key={gk}
                           className={`h${h.bos ? " bos" : ""}${secili ? " secili" : ""}`}
-                          style={sutunVurgu && !secili ? { background: "#0E2014" } : undefined}
+                          style={sutunVurgu && !secili ? { background: "var(--surface-2)" } : undefined}
                           onClick={() => !h.bos && onSec(gk, uk)}
                           onMouseEnter={() => { setHg(gk); setHu(uk); }}
                           onMouseLeave={() => { setHg(undefined); setHu(undefined); }}
@@ -170,9 +170,9 @@ export default function PariteMatris({
 
 const CSS = `
 .pmx{
-  --zemin2:#0E1511; --kart:#0E1511; --kart2:#0E1E12; --murekkep:#E8EFEA;
-  --yesil:#4CC38A; --yesil-koyu:#2E8B57; --yesil-soluk:#A8DCBC;
-  --cizgi:#223029; --cizgi2:#244A30; --soluk:#94A89B; --basak:#E9B949;
+  --zemin2:var(--inset); --kart:var(--inset); --kart2:var(--surface-2); --murekkep:var(--text);
+  --yesil:var(--green); --yesil-koyu:#2E8B57; --yesil-soluk:color-mix(in srgb, var(--green) 45%, var(--text));
+  --cizgi:var(--border); --cizgi2:var(--border-2); --soluk:var(--muted); --basak:var(--warn);
   position:relative; margin-bottom:24px; color:var(--murekkep);
   font-family:inherit;
 }
@@ -251,7 +251,7 @@ const CSS = `
 .pmx td.h.bos .deg{color:var(--cizgi2);font-weight:400}
 .pmx td.h.bos .br{color:transparent}
 .pmx td.h.secili{background:rgba(232,192,64,.14);outline:1px solid rgba(232,192,64,.55);outline-offset:-1px}
-.pmx tbody tr.vurgu td.cikti-bas{background:#17211B}
+.pmx tbody tr.vurgu td.cikti-bas{background:var(--surface-2)}
 
 .pmx .mono{font-variant-numeric:tabular-nums}
 
@@ -260,7 +260,7 @@ const CSS = `
   padding:14px 16px;background:var(--kart);border:1px solid var(--cizgi2);border-radius:8px;
 }
 .pmx-dip b{color:var(--yesil-soluk)}
-.pmx .vt{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4CC38A;
+.pmx .vt{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);
   margin-right:6px;vertical-align:middle;box-shadow:0 0 6px rgba(74,232,112,.6)}
 
 /* MOBİL KART GÖRÜNÜMÜ (GÜNCELLEME 1): md altında tablo gizli, kartlar açık */

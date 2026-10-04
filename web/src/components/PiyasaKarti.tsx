@@ -18,12 +18,12 @@ export default function PiyasaKarti({ urun_ad, borsa, piyasa }: Props) {
     piyasa?.agirlikli_ortalama != null && borsa.fiyat != null && borsa.fiyat > 0
       ? ((piyasa.agirlikli_ortalama - borsa.fiyat) / borsa.fiyat) * 100
       : null;
-  const farkRenk = fark == null ? RENKLER.muted : fark >= 0 ? "#F07167" : "#4CC38A";
+  const farkRenk = fark == null ? RENKLER.muted : fark >= 0 ? "var(--red)" : "var(--green)";
   return (
     <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "14px" }}>
       <div style={{ fontSize: "12px", color: RENKLER.text, fontWeight: 600, marginBottom: "10px" }}>{urun_ad}</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-        <div style={{ padding: "10px", background: "#0B100D", borderRadius: "6px", border: `1px solid ${RENKLER.border}` }}>
+        <div style={{ padding: "10px", background: "var(--bg)", borderRadius: "6px", border: `1px solid ${RENKLER.border}` }}>
           <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", marginBottom: "4px" }}>BORSA · {borsa.kaynak}</div>
           <div style={{ fontSize: "20px", color: RENKLER.green, fontWeight: 700 }}>{formatFiyat(borsa.fiyat)}</div>
           <div style={{ fontSize: "12px", color: RENKLER.muted }}>{borsa.birim}</div>
@@ -33,16 +33,16 @@ export default function PiyasaKarti({ urun_ad, borsa, piyasa }: Props) {
           </div>
         </div>
         {piyasa ? (
-          <div style={{ padding: "10px", background: "#0B100D", borderRadius: "6px", border: "1px solid #2A4545" }}>
-            <div style={{ fontSize: "12px", color: "#7BA9A9", letterSpacing: "0.06em", marginBottom: "4px" }}>PİYASA · {piyasa.il} · {piyasa.bildirim_sayisi} bildirim</div>
+          <div style={{ padding: "10px", background: "var(--bg)", borderRadius: "6px", border: "1px solid #2A4545" }}>
+            <div style={{ fontSize: "12px", color: "var(--muted)", letterSpacing: "0.06em", marginBottom: "4px" }}>PİYASA · {piyasa.il} · {piyasa.bildirim_sayisi} bildirim</div>
             <div style={{ fontSize: "20px", color: "#70D0D0", fontWeight: 700 }}>{formatFiyat(piyasa.agirlikli_ortalama)}</div>
-            <div style={{ fontSize: "12px", color: "#7BA9A9" }}>{borsa.birim} · ağırlıklı</div>
+            <div style={{ fontSize: "12px", color: "var(--muted)" }}>{borsa.birim} · ağırlıklı</div>
             {piyasaAralik && (
-              <div style={{ fontSize: "12px", color: "#7BA9A9", marginTop: "4px" }}>↓{formatFiyat(piyasa.en_az)} ↑{formatFiyat(piyasa.en_cok)}</div>
+              <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "4px" }}>↓{formatFiyat(piyasa.en_az)} ↑{formatFiyat(piyasa.en_cok)}</div>
             )}
           </div>
         ) : (
-          <div style={{ padding: "10px", background: "#0B100D", borderRadius: "6px", border: `1px solid ${RENKLER.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ padding: "10px", background: "var(--bg)", borderRadius: "6px", border: `1px solid ${RENKLER.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ fontSize: "12px", color: RENKLER.muted, textAlign: "center" }}>Piyasa verisi yok<br />(min 3 bildirim)</div>
           </div>
         )}

@@ -25,7 +25,7 @@ export interface VarlikItem {
   hist: { y: string; f: number }[];
 }
 
-const C = { bg: "#0E1511", surf: "#0E1511", brd: "#223029", mut: "#94A89B", txt: "#E8EFEA", pos: "#4CC38A", neg: "#F07167" };
+const C = { bg: "var(--inset)", surf: "var(--inset)", brd: "var(--border)", mut: "var(--muted)", txt: "var(--text)", pos: "var(--green)", neg: "var(--red)" };
 
 function TT({ active, payload, label, sfx = "" }: { active?: boolean; payload?: { name?: string; value?: number; color?: string }[]; label?: string; sfx?: string }) {
   if (!active || !payload?.length) return null;
@@ -95,14 +95,14 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
 
   return (
     <main className="ab-container" style={{ color: C.txt, paddingTop: 28 }}>
-      <style>{`select option{background:#0E1511;}`}</style>
+      <style>{`select option{background:var(--inset);}`}</style>
       <div style={{ marginBottom: 18 }}>
         <h1 className="ab-h1">Hedef panel</h1>
         <p>Ürününün bugünkü borsa fiyatıyla traktör, tarla, arsa veya daire karşılığı. Varlık fiyatları Konya referans serisidir.</p>
       </div>
 
       {/* Panel */}
-      <div style={{ background: "#0E1511", border: "1px solid #2E3F35", borderRadius: 16, padding: 20, marginBottom: 20 }}>
+      <div style={{ background: "var(--inset)", border: "1px solid var(--border-2)", borderRadius: 16, padding: 20, marginBottom: 20 }}>
         <div className="ab-eyebrow" style={{ marginBottom: 16 }}>Hesapla</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ marginBottom: 16 }}>
           <div>
@@ -129,7 +129,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
           <div>
             <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>MİKTAR ({miktarBirimi.toUpperCase()})</div>
             <input type="number" value={miktar} min={1} onChange={(e) => setMiktar(Math.max(1, +e.target.value || 1))} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 16, fontFamily: "inherit", outline: "none" }} />
-            {hayvanMi && <div style={{ fontSize: 12, color: "#94A89B", marginTop: 4 }}>{u.karkasLabel}</div>}
+            {hayvanMi && <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>{u.karkasLabel}</div>}
           </div>
         </div>
 
@@ -145,14 +145,14 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             {kacBirim && (
               <div>
                 <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>1 {v.ad.toUpperCase()} İÇİN</div>
-                <div style={{ fontSize: 32, fontWeight: 800, color: "#F07167", letterSpacing: -1 }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: "var(--red)", letterSpacing: -1 }}>
                   {formatFiyat(Number(kacBirim), hayvanMi ? 0 : 1)}
                   <span style={{ fontSize: 14, color: C.mut, marginLeft: 5, fontWeight: 400 }}>{miktarBirimi} {u.ad.toLowerCase()}</span>
                 </div>
               </div>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "#3A7040", marginTop: 8 }}>{aciklamaMetni} · {v.aciklama}</div>
+          <div style={{ fontSize: 12, color: "var(--border-2)", marginTop: 8 }}>{aciklamaMetni} · {v.aciklama}</div>
 
           {/* Paylaşım: "1 varlık = X ton/baş ürün" kartı — bayat veride PNG pasif (KARAR) */}
           <div style={{ marginTop: 14 }}>
@@ -175,7 +175,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             <Kart key={k} renk={val.renk} onClick={() => setVarlik(k)}>
               <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>{val.ad.toUpperCase()}</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: varlik === k ? val.renk : C.txt }}>{etiket}</div>
-              <div style={{ fontSize: 12, color: "#94A89B", marginTop: 3 }}>{val.aciklama}</div>
+              <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 3 }}>{val.aciklama}</div>
             </Kart>
           );
         })}
@@ -188,7 +188,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
         </div>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={tarihsel} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-            <CartesianGrid stroke="#17211B" strokeDasharray="4 4" vertical={false} />
+            <CartesianGrid stroke="var(--surface-2)" strokeDasharray="4 4" vertical={false} />
             <XAxis dataKey="y" tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
             {/* 3.6: hover'daki gri bant (varsayılan cursor) kaldırıldı — ikinci bar gibi okunuyordu */}

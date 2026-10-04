@@ -15,11 +15,11 @@ export const metadata: Metadata = {
 // Canlı veri yoksa ürün çipi pasifleşir — statik değer asla "güncel" diye gösterilmez.
 const TUIK_URUN: Record<string, { ad: string; ikon: string; renk: string; birim: string; norm: string; tip: "yem" | "hayvan"; hist: { y: string; f: number }[] }> = {
   sut: {
-    ad: "Çiğ Süt", ikon: "🥛", renk: "#E8EFEA", birim: "TL/litre", norm: "SUT", tip: "hayvan",
+    ad: "Çiğ Süt", ikon: "🥛", renk: "var(--text)", birim: "TL/litre", norm: "SUT", tip: "hayvan",
     hist: [{ y: "1995", f: 0.08 }, { y: "2002", f: 0.28 }, { y: "2005", f: 0.50 }, { y: "2010", f: 0.80 }, { y: "2015", f: 1.10 }, { y: "2019", f: 1.80 }, { y: "2021", f: 2.60 }, { y: "2022", f: 5.20 }, { y: "2023", f: 11.0 }, { y: "2024", f: 14.5 }, { y: "2025", f: 16.5 }, { y: "2026", f: 18.0 }],
   },
   arpa: {
-    ad: "Arpa", ikon: "🌾", renk: "#E9B949", birim: "TL/kg", norm: "ARPA", tip: "yem",
+    ad: "Arpa", ikon: "🌾", renk: "var(--warn)", birim: "TL/kg", norm: "ARPA", tip: "yem",
     hist: [{ y: "1995", f: 0.03 }, { y: "2002", f: 0.12 }, { y: "2005", f: 0.25 }, { y: "2010", f: 0.42 }, { y: "2015", f: 0.55 }, { y: "2019", f: 0.90 }, { y: "2021", f: 2.10 }, { y: "2022", f: 5.50 }, { y: "2023", f: 8.50 }, { y: "2024", f: 12.5 }, { y: "2025", f: 13.8 }, { y: "2026", f: 14.60 }],
   },
   kuzu: {
@@ -31,7 +31,7 @@ const TUIK_URUN: Record<string, { ad: string; ikon: string; renk: string; birim:
     hist: [{ y: "1995", f: 0.04 }, { y: "2002", f: 0.14 }, { y: "2005", f: 0.28 }, { y: "2010", f: 0.46 }, { y: "2015", f: 0.60 }, { y: "2019", f: 0.95 }, { y: "2021", f: 2.20 }, { y: "2022", f: 6.00 }, { y: "2023", f: 9.00 }, { y: "2024", f: 13.0 }, { y: "2025", f: 14.5 }, { y: "2026", f: 15.20 }],
   },
   misir: {
-    ad: "Mısır", ikon: "🌽", renk: "#E9B949", birim: "TL/kg", norm: "MISIR", tip: "yem",
+    ad: "Mısır", ikon: "🌽", renk: "var(--warn)", birim: "TL/kg", norm: "MISIR", tip: "yem",
     hist: [{ y: "1995", f: 0.03 }, { y: "2002", f: 0.11 }, { y: "2005", f: 0.24 }, { y: "2010", f: 0.40 }, { y: "2015", f: 0.52 }, { y: "2019", f: 0.88 }, { y: "2021", f: 2.00 }, { y: "2022", f: 5.20 }, { y: "2023", f: 8.20 }, { y: "2024", f: 11.5 }, { y: "2025", f: 12.8 }, { y: "2026", f: 13.0 }],
   },
 };
@@ -42,8 +42,8 @@ const TUIK_URUN: Record<string, { ad: string; ikon: string; renk: string; birim:
 // Kaynaklar: mazot EPDK/pompa · elektrik EPDK tarımsal sulama ·
 // üre/DAP Tarım Kredi/Gübretaş liste.
 const GIRDI_TANIM: Record<string, { ad: string; ikon: string; renk: string; birim: string }> = {
-  mazot: { ad: "Motorin", ikon: "⛽", renk: "#F07167", birim: "TL/litre" },
-  elektrik: { ad: "Elektrik", ikon: "⚡", renk: "#E9B949", birim: "TL/kWh" },
+  mazot: { ad: "Motorin", ikon: "⛽", renk: "var(--red)", birim: "TL/litre" },
+  elektrik: { ad: "Elektrik", ikon: "⚡", renk: "var(--warn)", birim: "TL/kWh" },
   ure: { ad: "Üre", ikon: "⚪", renk: "#8FB8C8", birim: "TL/kg" },
   dap: { ad: "DAP", ikon: "🟤", renk: "#C89060", birim: "TL/kg" },
 };

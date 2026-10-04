@@ -8,6 +8,7 @@ import {
 import { useUser } from "@/lib/auth";
 import BolgemSecici from "./BolgemSecici";
 import Logo from "./Logo";
+import TemaDugmesi from "./TemaDugmesi";
 
 // Ana bölümler: her gün bakılan fiyat ekranları
 const ANA = [
@@ -53,7 +54,7 @@ export default function Nav() {
     <header
       style={{
         position: "sticky", top: 0, zIndex: 50,
-        background: "rgba(11,16,13,0.82)", backdropFilter: "saturate(140%) blur(12px)",
+        background: "var(--nav-bg)", backdropFilter: "saturate(140%) blur(12px)",
         WebkitBackdropFilter: "saturate(140%) blur(12px)", borderBottom: "1px solid var(--border)",
       }}
     >
@@ -104,6 +105,7 @@ export default function Nav() {
 
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px" }}>
           <BolgemSecici />
+          <span className="hidden md:inline-flex"><TemaDugmesi /></span>
           <Link href="/fiyat-bildir" className="ab-btn hidden md:inline-flex">
             <PenLine size={15} /> Fiyat Bildir
           </Link>
@@ -159,6 +161,7 @@ export default function Nav() {
               ))}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <div style={{ gridColumn: "1 / -1", display: "grid" }}><TemaDugmesi etiketli /></div>
               <Link href="/fiyat-bildir" onClick={kapat} className="ab-btn" style={{ justifyContent: "center", height: "42px" }}>
                 <PenLine size={16} /> Fiyat Bildir
               </Link>

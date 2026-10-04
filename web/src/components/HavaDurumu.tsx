@@ -7,10 +7,10 @@ import { useBolgem } from "@/lib/bolgem";
 function HavaIkon({ kod }: { kod: number }) {
   const ozellik = { size: 18, strokeWidth: 1.8 };
   if (kod === 0) return <Sun {...ozellik} color="#E9B949" />;
-  if (kod <= 2) return <CloudSun {...ozellik} color="#C9D3CC" />;
-  if (kod <= 45) return <Cloud {...ozellik} color="#94A89B" />;
+  if (kod <= 2) return <CloudSun {...ozellik} color="var(--muted)" />;
+  if (kod <= 45) return <Cloud {...ozellik} color="var(--muted)" />;
   if (kod <= 67) return <CloudRain {...ozellik} color="#70A8E8" />;
-  if (kod <= 77) return <Snowflake {...ozellik} color="#BFD8F0" />;
+  if (kod <= 77) return <Snowflake {...ozellik} color="#5B9BD5" />;
   if (kod <= 82) return <CloudDrizzle {...ozellik} color="#70A8E8" />;
   return <CloudLightning {...ozellik} color="#E9B949" />;
 }

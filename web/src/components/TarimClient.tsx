@@ -5,7 +5,7 @@ import VeriTazelik from "./VeriTazelik";
 import { YEM_AD } from "@/lib/urun-tanim";
 import { kaynakAd } from "@/lib/kaynak-ad";
 import PaylasButonlar from "./PaylasButonlar";
-import { YEM_RENK, RENKLER } from "@/lib/theme";
+import { YEM_RENK, RENKLER, alfa } from "@/lib/theme";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { enGuncelYem, distinctGun } from "@/lib/guncel";
 import { kartUretilebilir } from "@/lib/tazelik";
@@ -89,7 +89,7 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
               key={f.urun_norm}
               onClick={() => { setSecilen(f.urun_norm); setBorsaSecim(null); }}
               className="ab-chip"
-              style={aktif ? { background: `${r}22`, color: "var(--text)", borderColor: r, fontWeight: 600 } : undefined}
+              style={aktif ? { background: alfa(r, 0.13), color: "var(--text)", borderColor: r, fontWeight: 600 } : undefined}
             >
               <span aria-hidden style={{ width: 7, height: 7, borderRadius: "50%", background: r, marginRight: 7 }} />
               {YEM_AD[f.urun_norm] ?? f.urun_norm}
@@ -128,7 +128,7 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
             {guncelSatir.islem_miktari != null && (
               <span style={{ fontSize: "13px", color: RENKLER.muted }}>
                 · {tonGoster(guncelSatir.islem_miktari)} işlem
-                {guncelSatir.islem_miktari < DUSUK_HACIM_KG && <span style={{ color: "#E9B949", marginLeft: "6px" }}>⚠ düşük hacim</span>}
+                {guncelSatir.islem_miktari < DUSUK_HACIM_KG && <span style={{ color: "var(--warn)", marginLeft: "6px" }}>⚠ düşük hacim</span>}
               </span>
             )}
           </div>
@@ -156,11 +156,11 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {borsaOzet.map((x) => (
-              <div key={x.borsa} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", padding: "7px 9px", background: RENKLER.bg, borderRadius: "12px", border: x.borsa === borsa ? `1px solid ${renk}55` : `1px solid ${RENKLER.border}` }}>
+              <div key={x.borsa} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", padding: "7px 9px", background: RENKLER.bg, borderRadius: "12px", border: x.borsa === borsa ? `1px solid ${alfa(renk, 0.33)}` : `1px solid ${RENKLER.border}` }}>
                 <span style={{ color: RENKLER.text, fontWeight: 600 }}>{kaynakAd(x.borsa)} <span style={{ fontSize: "12px", color: RENKLER.muted }}>· {kisaTarih(x.tarih)}</span></span>
                 <span style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                   {x.hacim != null && (
-                    <span style={{ fontSize: "12px", color: x.hacim < DUSUK_HACIM_KG ? "#E9B949" : RENKLER.muted }}>
+                    <span style={{ fontSize: "12px", color: x.hacim < DUSUK_HACIM_KG ? "var(--warn)" : RENKLER.muted }}>
                       {tonGoster(x.hacim)}{x.hacim < DUSUK_HACIM_KG ? " ⚠" : ""}
                     </span>
                   )}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/lib/auth";
 import { useBolgem } from "@/lib/bolgem";
-import { RENKLER, YEM_RENK, HAYVAN_RENK, emoji } from "@/lib/theme";
+import { RENKLER, YEM_RENK, HAYVAN_RENK, emoji, alfa } from "@/lib/theme";
 import { ILLER } from "@/lib/iller";
 import { parseFiyatGirdi } from "@/lib/format";
 
@@ -186,7 +186,7 @@ export default function FiyatBildirPage() {
 
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Bulunduğun yerin gerçek piyasa fiyatını bildir.</p>
           <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Özellikle kaba yem ve gübrenin resmi kaynağı yok — senin bildirimin en değerlisi. En az 3 bildirim sonrası görünür.</p>
-          <Link href="/giris" style={{ display: "inline-block", marginTop: "18px", padding: "11px 26px", background: RENKLER.green, color: "#0E1511", borderRadius: "8px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
+          <Link href="/giris" style={{ display: "inline-block", marginTop: "18px", padding: "11px 26px", background: RENKLER.green, color: "var(--inset)", borderRadius: "8px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
             Google ile Giriş Yap
           </Link>
         </div>
@@ -198,7 +198,7 @@ export default function FiyatBildirPage() {
     return (
       <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
         <div style={{ padding: "32px 24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ width: "52px", height: "52px", margin: "0 auto 14px", borderRadius: "50%", background: `${RENKLER.green}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", color: RENKLER.green }}>✓</div>
+          <div style={{ width: "52px", height: "52px", margin: "0 auto 14px", borderRadius: "50%", background: alfa(RENKLER.green, 0.13), display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", color: RENKLER.green }}>✓</div>
           <h1 className="ab-h1">Teşekkürler</h1>
           <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Bildirimin topluluk ortalamasına katıldı.</p>
           {sayac != null && (
@@ -209,7 +209,7 @@ export default function FiyatBildirPage() {
             </div>
           )}
           <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
-            <button onClick={() => { setDurum("form"); mevcutGetir(urun); }} style={{ flex: 1, padding: "11px", background: RENKLER.green, color: "#0E1511", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Yeni Bildirim</button>
+            <button onClick={() => { setDurum("form"); mevcutGetir(urun); }} style={{ flex: 1, padding: "11px", background: RENKLER.green, color: "var(--inset)", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Yeni Bildirim</button>
             <Link href="/tarim" style={{ flex: 1, padding: "11px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "8px", textDecoration: "none", fontSize: "12px", textAlign: "center" }}>Borsaya Git</Link>
           </div>
         </div>
@@ -225,7 +225,7 @@ export default function FiyatBildirPage() {
         style={{
           display: "inline-flex", alignItems: "center", gap: "6px",
           padding: "7px 13px", fontSize: "13px", fontFamily: "var(--font-mono)",
-          background: aktif ? `${renk}22` : "transparent",
+          background: aktif ? alfa(renk, 0.13) : "transparent",
           color: aktif ? renk : RENKLER.muted,
           border: `1px solid ${aktif ? renk : RENKLER.border}`,
           borderRadius: "20px", cursor: "pointer", fontWeight: aktif ? 700 : 400, transition: "all .15s",
@@ -248,8 +248,8 @@ export default function FiyatBildirPage() {
 
       <form onSubmit={(e) => { e.preventDefault(); gonder(); }} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "22px", display: "flex", flexDirection: "column", gap: "18px" }}>
         {mevcut && (
-          <div style={{ fontSize: "13px", color: "#E9B949", background: "#19150622", border: "1px solid #3A301055", borderRadius: "8px", padding: "9px 11px", display: "flex", gap: "6px", alignItems: "center" }}>
-            <span>✎</span> Bugün <b style={{ color: "#E9B949" }}>{adGoster(urun)}</b> için bildirimin var — düzenliyorsun.
+          <div style={{ fontSize: "13px", color: "var(--warn)", background: "#19150622", border: "1px solid #3A301055", borderRadius: "8px", padding: "9px 11px", display: "flex", gap: "6px", alignItems: "center" }}>
+            <span>✎</span> Bugün <b style={{ color: "var(--warn)" }}>{adGoster(urun)}</b> için bildirimin var — düzenliyorsun.
           </div>
         )}
 
@@ -274,7 +274,7 @@ export default function FiyatBildirPage() {
                 const aktif = birim === k;
                 return (
                   <button key={k} type="button" onClick={() => setBirim(k)}
-                    style={{ padding: "7px 14px", fontSize: "13px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+                    style={{ padding: "7px 14px", fontSize: "13px", background: aktif ? alfa(RENKLER.green, 0.12) : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
                     {ad}
                   </button>
                 );
@@ -327,7 +327,7 @@ export default function FiyatBildirPage() {
               const aktif = kaynak === k;
               return (
                 <button key={k} type="button" onClick={() => setKaynak(k)}
-                  style={{ padding: "7px 14px", fontSize: "13px", background: aktif ? `${RENKLER.green}1F` : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+                  style={{ padding: "7px 14px", fontSize: "13px", background: aktif ? alfa(RENKLER.green, 0.12) : "transparent", color: aktif ? RENKLER.green : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
                   {k}
                 </button>
               );
@@ -335,14 +335,14 @@ export default function FiyatBildirPage() {
           </div>
         </div>
 
-        {hata && <div style={{ fontSize: "13px", color: RENKLER.red, background: `${RENKLER.red}14`, border: `1px solid ${RENKLER.red}33`, borderRadius: "8px", padding: "9px 11px" }}>{hata}</div>}
+        {hata && <div style={{ fontSize: "13px", color: RENKLER.red, background: alfa(RENKLER.red, 0.08), border: `1px solid ${alfa(RENKLER.red, 0.2)}`, borderRadius: "8px", padding: "9px 11px" }}>{hata}</div>}
 
         <div style={{ display: "flex", gap: "8px" }}>
-          <button type="submit" disabled={mesgul} style={{ flex: 1, padding: "13px", fontSize: "13px", background: RENKLER.green, color: "#0E1511", border: "none", borderRadius: "8px", cursor: mesgul ? "wait" : "pointer", fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "0.03em" }}>
+          <button type="submit" disabled={mesgul} style={{ flex: 1, padding: "13px", fontSize: "13px", background: RENKLER.green, color: "var(--inset)", border: "none", borderRadius: "8px", cursor: mesgul ? "wait" : "pointer", fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "0.03em" }}>
             {mesgul ? "…" : mevcut ? "Bildirimi Güncelle" : "Bildir"}
           </button>
           {mevcut && (
-            <button type="button" onClick={sil} disabled={mesgul} style={{ padding: "13px 18px", fontSize: "12px", background: "transparent", color: RENKLER.red, border: `1px solid ${RENKLER.red}55`, borderRadius: "8px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
+            <button type="button" onClick={sil} disabled={mesgul} style={{ padding: "13px 18px", fontSize: "12px", background: "transparent", color: RENKLER.red, border: `1px solid ${alfa(RENKLER.red, 0.33)}`, borderRadius: "8px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
               Sil
             </button>
           )}

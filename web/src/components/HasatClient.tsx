@@ -2,7 +2,7 @@
 import { useState } from "react";
 import HavaDurumu from "./HavaDurumu";
 import FiyatGrafik from "./FiyatGrafik";
-import { RENKLER, YEM_RENK, emoji } from "@/lib/theme";
+import { RENKLER, YEM_RENK, emoji, alfa } from "@/lib/theme";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { enGuncelYem, distinctGun } from "@/lib/guncel";
 import { HASAT_TAKVIMI, HASAT_URUNLER } from "@/lib/hasat-takvimi";
@@ -43,7 +43,7 @@ export default function HasatClient({ grafik }: { grafik: GrafikVeri[] }) {
           const r = YEM_RENK[u] ?? RENKLER.green;
           const aktif = u === secilen;
           return (
-            <button key={u} onClick={() => setSecilen(u)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", fontSize: "13px", background: aktif ? `${r}22` : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+            <button key={u} onClick={() => setSecilen(u)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", fontSize: "13px", background: aktif ? alfa(r, 0.13) : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
               <span style={{ fontSize: "13px" }}>{emoji(u)}</span>{AD[u]}
             </button>
           );
@@ -65,7 +65,7 @@ export default function HasatClient({ grafik }: { grafik: GrafikVeri[] }) {
                 <span style={{ fontSize: "12px", color: RENKLER.muted }}>Ekim</span>
                 <span style={{ fontSize: "15px", color: RENKLER.text, fontWeight: 600 }}>{takvim.ekim}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: RENKLER.bg, borderRadius: "8px", border: `1px solid ${renk}40` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 14px", background: RENKLER.bg, borderRadius: "8px", border: `1px solid ${alfa(renk, 0.25)}` }}>
                 <span style={{ fontSize: "12px", color: RENKLER.muted }}>Hasat</span>
                 <span style={{ fontSize: "15px", color: renk, fontWeight: 700 }}>{takvim.hasat}</span>
               </div>

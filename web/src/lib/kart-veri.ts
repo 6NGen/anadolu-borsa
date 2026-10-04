@@ -3,7 +3,7 @@
 import { supabaseServer } from "@/lib/supabase";
 import { enGuncelYem, enGuncelHayvan, GuncelFiyat } from "@/lib/guncel";
 import { PARITE_URUNLER, UrunTanim, YEM_AD } from "@/lib/urun-tanim";
-import { YEM_RENK, HAYVAN_RENK, EMOJI } from "@/lib/theme";
+import { YEM_RENK_HEX as YEM_RENK, HAYVAN_RENK_HEX as HAYVAN_RENK, EMOJI } from "@/lib/theme";
 import { HAYVAN_AD, KARKAS_KG } from "@/lib/karkas";
 import { VARLIKLAR, Varlik } from "@/lib/varliklar";
 

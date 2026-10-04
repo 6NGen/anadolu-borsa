@@ -133,7 +133,7 @@ export default async function GirdilerPage() {
         </div>
       </div>
 
-      <div style={{ fontSize: "12px", color: "#94A89B", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
+      <div style={{ fontSize: "12px", color: "var(--muted)", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
         Motorin: Opet pompa fiyatı (Ankara, Eskişehir, Çorum, Konya ilçe medyanı), her gece · Gübre ve kaba yem: kullanıcı bildirimi (en az 3)
       </div>
     </main>

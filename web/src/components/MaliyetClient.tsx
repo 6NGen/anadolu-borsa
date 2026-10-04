@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { RENKLER, YEM_RENK, emoji } from "@/lib/theme";
+import { RENKLER, YEM_RENK, emoji, alfa } from "@/lib/theme";
 import { formatFiyat, parseFiyatGirdi, kisaTarih } from "@/lib/format";
 import {
   maliyetHesapla, VERIM_TUIK, MAZOT_LITRE_DEKAR, TOHUM_VARSAYILAN, GUBRE_VARSAYILAN, MALIYET_URUNLER,
@@ -17,7 +17,7 @@ function Etiket({ children, not }: { children: React.ReactNode; not?: string }) 
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "6px" }}>
       <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", fontWeight: 600 }}>{children}</span>
-      {not && <span style={{ fontSize: "12px", color: "#3A5A40" }}>{not}</span>}
+      {not && <span style={{ fontSize: "12px", color: "var(--border-2)" }}>{not}</span>}
     </div>
   );
 }
@@ -75,7 +75,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
           const r = YEM_RENK[u] ?? RENKLER.green;
           const aktif = u === urun;
           return (
-            <button key={u} onClick={() => urunSec(u)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", fontSize: "13px", background: aktif ? `${r}22` : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
+            <button key={u} onClick={() => urunSec(u)} style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "7px 13px", fontSize: "13px", background: aktif ? alfa(r, 0.13) : "transparent", color: aktif ? r : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-mono)", fontWeight: aktif ? 700 : 400 }}>
               <span style={{ fontSize: "13px" }}>{emoji(u)}</span>{AD[u]}
             </button>
           );
@@ -116,7 +116,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
       </div>
 
       {/* Sonuç */}
-      <div style={{ ...kart, background: netPozitif ? "#0A1A10" : "#1A0E0A", border: `1px solid ${netPozitif ? "#1A5A30" : "#5A2A1A"}` }}>
+      <div style={{ ...kart, background: netPozitif ? "var(--surface-2)" : "var(--surface-2)", border: `1px solid ${netPozitif ? "var(--border-2)" : "var(--border-2)"}` }}>
         {!bf ? (
           <div style={{ fontSize: "12px", color: RENKLER.muted, textAlign: "center", padding: "8px" }}>Bu ürün için canlı borsa fiyatı yok — gelir hesaplanamıyor.</div>
         ) : (
@@ -141,7 +141,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
                 const p = new URLSearchParams({ urun, dekar: String(parseFiyatGirdi(dekar) || 1), verim, tohum, gubre, iscilik, diger });
                 window.open(`/api/kart/maliyet?${p.toString()}`, "_blank");
               }}
-              style={{ marginTop: "12px", width: "100%", padding: "10px", background: "transparent", color: RENKLER.green, border: `1px solid ${RENKLER.green}55`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)", fontWeight: 700 }}
+              style={{ marginTop: "12px", width: "100%", padding: "10px", background: "transparent", color: RENKLER.green, border: `1px solid ${alfa(RENKLER.green, 0.33)}`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)", fontWeight: 700 }}
             >
               Görsel Kart Oluştur
             </button>

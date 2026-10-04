@@ -21,7 +21,7 @@ export interface Urun {
 
 const OLAYLAR: Record<string, string> = { "2008": "Kriz", "2018": "Döviz", "2022": "Kur+Enerji" };
 const KIYAS_ESIK_GUN = 30;
-const C = { bg: "#0E1511", surf: "#0E1511", brd: "#223029", mut: "#94A89B", txt: "#E8EFEA", pos: "#4CC38A", neg: "#F07167" };
+const C = { bg: "var(--inset)", surf: "var(--inset)", brd: "var(--border)", mut: "var(--muted)", txt: "var(--text)", pos: "var(--green)", neg: "var(--red)" };
 
 function pariteHesapla(g: Girdi, u: Urun) {
   const yillar = [...new Set([...g.hist, ...u.hist].map((d) => d.y))].sort();
@@ -105,7 +105,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
 
   return (
     <div style={{ background: C.bg, color: C.txt, fontFamily: "inherit", padding: 20, maxWidth: 1200, margin: "0 auto" }}>
-      <style>{`select option{background:#0E1511;}`}</style>
+      <style>{`select option{background:var(--inset);}`}</style>
 
       {/* ÜST: MATRİS (satır=ürün, sütun=girdi, çift yön) */}
       <PariteMatris girdiler={girdiler} urunler={urunler} seciliGirdi={girdi} seciliUrun={urun} onSec={(g, u) => { setGirdi(g); setUrun(u); }} />
@@ -115,7 +115,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
         <span style={{ fontSize: 13, color: C.txt }}>Grafik: <b style={{ color: G.renk }}>{G.ikon} {G.ad}</b> / <b style={{ color: U.renk }}>{U.ikon} {U.ad}</b></span>
         <span style={{ fontSize: 13, color: C.mut }}>bugün 1 {G.birim.replace("TL/", "")} = <b style={{ color: C.txt }}>{formatFiyat(guncel, 2)}</b> {U.birim.replace("TL/", "")} {U.ad.toLowerCase()}</span>
         {kiyasHazir && degisim30 != null && (
-          <span style={{ fontSize: 13, color: degisim30 > 0 ? "#F07167" : C.pos }}>· 30g {degisim30 > 0 ? "▲" : "▼"} %{formatFiyat(Math.abs(degisim30), 1)}</span>
+          <span style={{ fontSize: 13, color: degisim30 > 0 ? "var(--red)" : C.pos }}>· 30g {degisim30 > 0 ? "▲" : "▼"} %{formatFiyat(Math.abs(degisim30), 1)}</span>
         )}
       </div>
 
@@ -128,7 +128,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
             <div style={{ display: "flex", gap: 12, marginTop: 8, flexWrap: "wrap" }}>
               {Object.entries(OLAYLAR).map(([y, metin]) => (
                 <div key={y} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: C.mut }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#F07167", opacity: 0.7 }} />{y}: {metin}
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--red)", opacity: 0.7 }} />{y}: {metin}
                 </div>
               ))}
             </div>
@@ -141,12 +141,12 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
                   <stop offset="95%" stopColor={G.renk} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="#17211B" strokeDasharray="4 4" />
+              <CartesianGrid stroke="var(--surface-2)" strokeDasharray="4 4" />
               <XAxis dataKey="y" tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} domain={[0, "auto"]} />
               <Tooltip content={<TT2 />} />
-              <ReferenceLine y={1} stroke="#3A6A3A" strokeDasharray="6 3" label={{ value: "Eşit (1.0)", position: "right", fill: C.mut, fontSize: 12 }} />
-              {Object.keys(OLAYLAR).map((y) => (<ReferenceLine key={y} x={y} stroke="#F0716750" strokeWidth={1} strokeDasharray="4 2" />))}
+              <ReferenceLine y={1} stroke="var(--border-2)" strokeDasharray="6 3" label={{ value: "Eşit (1.0)", position: "right", fill: C.mut, fontSize: 12 }} />
+              {Object.keys(OLAYLAR).map((y) => (<ReferenceLine key={y} x={y} stroke="var(--red)50" strokeWidth={1} strokeDasharray="4 2" />))}
               <Area type="monotone" dataKey="p" stroke={G.renk} strokeWidth={2.5} fill="url(#pg)" dot={{ fill: G.renk, r: 3, strokeWidth: 0 }} activeDot={{ r: 5, fill: G.renk }} name="Parite" />
             </AreaChart>
           </ResponsiveContainer>
@@ -162,7 +162,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
           <div style={{ fontSize: 12, color: C.mut, letterSpacing: 1, marginBottom: 12 }}>YIL BAZLI DEĞİŞİM (tahmini seri)</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={degVerisi} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
-              <CartesianGrid stroke="#17211B" strokeDasharray="4 4" vertical={false} />
+              <CartesianGrid stroke="var(--surface-2)" strokeDasharray="4 4" vertical={false} />
               <XAxis dataKey="y" tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} unit="%" />
               <Tooltip content={<DegTT />} cursor={{ fill: "transparent" }} />
@@ -176,13 +176,13 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
       )}
 
       {/* PAYLAŞIM — tüm matris (WhatsApp/X metni + PNG kartı) */}
-      <div style={{ background: "#0E1511", border: "1px solid #2E3F35", borderRadius: 14, padding: 20, marginBottom: 10 }}>
-        <div style={{ fontSize: 12, color: "#4CC38A", letterSpacing: 2, marginBottom: 6 }}>PARİTE MATRİSİNİ PAYLAŞ</div>
+      <div style={{ background: "var(--inset)", border: "1px solid var(--border-2)", borderRadius: 14, padding: 20, marginBottom: 10 }}>
+        <div style={{ fontSize: 12, color: "var(--green)", letterSpacing: 2, marginBottom: 6 }}>PARİTE MATRİSİNİ PAYLAŞ</div>
         <div style={{ fontSize: 13, color: C.mut, marginBottom: 12 }}>WhatsApp/X metninde ve PNG kartında matrisin tamamı görünür.</div>
         <PaylasButonlar metin={matrisMetni} pngUrl={matrisAktif ? `/api/kart/matris` : null} />
       </div>
 
-      <div style={{ fontSize: 12, color: "#94A89B", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>
+      <div style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", paddingTop: 10, lineHeight: 1.6 }}>
         Güncel fiyatlar canlı borsa verisidir (TOBB/KTB hububat · ESK karkas · USK çiğ süt) · Matris yalnızca oranı gösterir, tavsiye vermez.<br />
         Çiğ süt USK <b>tavsiye</b> fiyatıdır (üreticiden sanayiye) — saha fiyatı farklı olabilir · Tarihsel ürün serileri TÜİK tahminidir.
       </div>

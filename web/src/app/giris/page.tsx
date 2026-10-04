@@ -30,7 +30,7 @@ export default function GirisPage() {
         <h1 className="ab-h1">Giriş yapıldı</h1>
         <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px" }}>{user.email}</p>
         <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
-          <Link href="/fiyat-bildir" style={{ flex: 1, padding: "10px", background: RENKLER.green, color: "#000", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Fiyat Bildir</Link>
+          <Link href="/fiyat-bildir" style={{ flex: 1, padding: "10px", background: RENKLER.green, color: "var(--on-primary)", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Fiyat Bildir</Link>
           <button onClick={() => cikisYap()} style={{ flex: 1, padding: "10px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)" }}>Çıkış</button>
         </div>
       </main>
@@ -61,11 +61,11 @@ export default function GirisPage() {
           style={{
             display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
             width: "100%", padding: "11px", fontSize: "13px", borderRadius: "6px", fontWeight: 700, fontFamily: "var(--font-mono)",
-            background: kvkk ? "#fff" : "#1A2018", color: kvkk ? "#1A1A1A" : "#6E8276",
+            background: kvkk ? "#fff" : "var(--surface-2)", color: kvkk ? "var(--surface-2)" : "var(--faint)",
             border: "none", cursor: kvkk && !gidiliyor ? "pointer" : "not-allowed",
           }}
         >
-          <span style={{ fontSize: "15px", fontWeight: 700, color: kvkk ? "#4285F4" : "#6E8276" }}>G</span>
+          <span style={{ fontSize: "15px", fontWeight: 700, color: kvkk ? "#4285F4" : "var(--faint)" }}>G</span>
           {gidiliyor ? "Yönlendiriliyor…" : "Google ile Giriş"}
         </button>
       </div>

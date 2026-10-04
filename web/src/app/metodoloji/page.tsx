@@ -46,7 +46,7 @@ const KAYNAKLAR = [
 
 const ROZETLER = [
   { isaret: "●", renk: RENKLER.pos, anlam: "bugün — veri bugün çekildi" },
-  { isaret: "⏱", renk: "#E9B949", anlam: "1-2 gün önce — kaynak henüz yeni veri yayınlamadı" },
+  { isaret: "⏱", renk: "var(--warn)", anlam: "1-2 gün önce — kaynak henüz yeni veri yayınlamadı" },
   { isaret: "⚠", renk: RENKLER.red, anlam: "3+ gün önce — veri bayat, kaynak yayını kesilmiş olabilir" },
 ];
 

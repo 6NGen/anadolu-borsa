@@ -10,7 +10,7 @@ const SUTUNLAR = [
 
 export default function Footer() {
   return (
-    <footer style={{ marginTop: "auto", borderTop: "1px solid var(--border)", background: "rgba(14,21,17,0.6)" }}>
+    <footer style={{ marginTop: "auto", borderTop: "1px solid var(--border)", background: "var(--inset)" }}>
       <div className="ab-container" style={{ paddingTop: "40px", paddingBottom: "28px", marginTop: "48px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "28px" }}>
           <div style={{ minWidth: "220px" }}>

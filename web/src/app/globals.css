@@ -21,6 +21,77 @@
   --warn:      #E9B949;
   --radius:    12px;
   --shadow:    0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 24px -12px rgba(0,0,0,0.6);
+  --nav-bg:    rgba(11,16,13,0.82);
+  --btn-hover: #1C2821;
+  --primary-hover: #5ED39A;
+  --on-primary: #06120B;
+  --glow-1:    rgba(76,195,138,0.07);
+  --glow-2:    rgba(233,185,73,0.035);
+  color-scheme: dark;
+}
+
+/* Aydınlık tema: kullanıcı seçtiyse ya da seçim yok + sistem aydınlıksa */
+:root[data-theme="light"] {
+  --bg:        #F5F7F5;
+  --inset:     #EEF2EF;
+  --surface:   #FFFFFF;
+  --surface-2: #F1F4F2;
+  --border:    #DCE4DF;
+  --border-2:  #C6D2CA;
+  --muted:     #4D6155;
+  --faint:     #7A8C81;
+  --text:      #12201A;
+  --green:     #16915A;
+  --green-soft: rgba(22, 145, 90, 0.10);
+  --red:       #D2443A;
+  --pos:       #16915A;
+  --neg:       #D2443A;
+  --warn:      #A87908;
+  --shadow:    0 1px 2px rgba(16,32,24,0.05), 0 8px 24px -14px rgba(16,32,24,0.18);
+  --nav-bg:    rgba(255,255,255,0.85);
+  --btn-hover: #E7ECE9;
+  --primary-hover: #12804E;
+  --on-primary: #FFFFFF;
+  --glow-1:    rgba(22,145,90,0.06);
+  --glow-2:    rgba(168,121,8,0.04);
+  color-scheme: light;
+  /* Ürün renkleri: açık zeminde okunur koyu tonlar (karanlıkta hex varsayılanı) */
+  --c-arpa: #B7791F; --c-bugday: #A0551F; --c-misir: #9A7E00; --c-saman: #6E8A3E;
+  --c-yonca: #2F8A5E; --c-yulaf: #A35C8A; --c-cavdar: #8A6450;
+  --c-tosun: #C8483B; --c-dana: #C4554A; --c-inek: #B03A2E; --c-kuzu: #2F6FB8;
+  --c-toklu: #2A5E9E; --c-koyun: #234F8A; --c-manda: #9A4A3E; --c-oglak: #4C8A3E; --c-sut: #5F6F66;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+  --bg:        #F5F7F5;
+  --inset:     #EEF2EF;
+  --surface:   #FFFFFF;
+  --surface-2: #F1F4F2;
+  --border:    #DCE4DF;
+  --border-2:  #C6D2CA;
+  --muted:     #4D6155;
+  --faint:     #7A8C81;
+  --text:      #12201A;
+  --green:     #16915A;
+  --green-soft: rgba(22, 145, 90, 0.10);
+  --red:       #D2443A;
+  --pos:       #16915A;
+  --neg:       #D2443A;
+  --warn:      #A87908;
+  --shadow:    0 1px 2px rgba(16,32,24,0.05), 0 8px 24px -14px rgba(16,32,24,0.18);
+  --nav-bg:    rgba(255,255,255,0.85);
+  --btn-hover: #E7ECE9;
+  --primary-hover: #12804E;
+  --on-primary: #FFFFFF;
+  --glow-1:    rgba(22,145,90,0.06);
+  --glow-2:    rgba(168,121,8,0.04);
+  color-scheme: light;
+  /* Ürün renkleri: açık zeminde okunur koyu tonlar (karanlıkta hex varsayılanı) */
+  --c-arpa: #B7791F; --c-bugday: #A0551F; --c-misir: #9A7E00; --c-saman: #6E8A3E;
+  --c-yonca: #2F8A5E; --c-yulaf: #A35C8A; --c-cavdar: #8A6450;
+  --c-tosun: #C8483B; --c-dana: #C4554A; --c-inek: #B03A2E; --c-kuzu: #2F6FB8;
+  --c-toklu: #2A5E9E; --c-koyun: #234F8A; --c-manda: #9A4A3E; --c-oglak: #4C8A3E; --c-sut: #5F6F66;
+  }
 }
 
 /* Eski font değişkenleri tek aileye bağlanır (bileşenlerdeki satır içi
@@ -52,8 +123,8 @@ body::before {
   pointer-events: none;
   z-index: -1;
   background:
-    radial-gradient(1200px 500px at 15% -10%, rgba(76,195,138,0.07), transparent 60%),
-    radial-gradient(900px 400px at 100% 0%, rgba(233,185,73,0.035), transparent 60%);
+    radial-gradient(1200px 500px at 15% -10%, var(--glow-1), transparent 60%),
+    radial-gradient(900px 400px at 100% 0%, var(--glow-2), transparent 60%);
 }
 
 h1, h2, h3 { letter-spacing: -0.015em; }
@@ -62,7 +133,7 @@ h1, h2, h3 { letter-spacing: -0.015em; }
 main { width: 100%; }
 
 a { color: inherit; }
-::selection { background: rgba(76,195,138,0.3); }
+::selection { background: color-mix(in srgb, var(--green) 30%, transparent); }
 :focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 6px; }
 
 select, input, textarea, button { font-family: inherit; font-feature-settings: inherit; }
@@ -99,9 +170,9 @@ select, input, textarea, button { font-family: inherit; font-feature-settings: i
   transition: background .15s, border-color .15s, color .15s;
   white-space: nowrap;
 }
-.ab-btn:hover { border-color: var(--faint); background: #1C2821; }
-.ab-btn-primary { background: var(--green); border-color: var(--green); color: #06120B; }
-.ab-btn-primary:hover { background: #5ED39A; border-color: #5ED39A; }
+.ab-btn:hover { border-color: var(--faint); background: var(--btn-hover); }
+.ab-btn-primary { background: var(--green); border-color: var(--green); color: var(--on-primary); }
+.ab-btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 .ab-btn-ghost { background: transparent; border-color: transparent; color: var(--muted); }
 .ab-btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: transparent; }
 
@@ -118,7 +189,7 @@ select, input, textarea, button { font-family: inherit; font-feature-settings: i
 .ab-menu {
   position: absolute; top: calc(100% + 8px); left: 0; min-width: 260px;
   background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px;
-  box-shadow: 0 16px 40px -12px rgba(0,0,0,.7); padding: 6px; z-index: 60;
+  box-shadow: 0 16px 40px -12px rgba(0,0,0,.35); padding: 6px; z-index: 60;
 }
 .ab-menu a {
   display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px;

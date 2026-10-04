@@ -4,7 +4,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/lib/auth";
 import { fcmTokenAl } from "@/lib/firebase";
-import { RENKLER } from "@/lib/theme";
+import { RENKLER, alfa } from "@/lib/theme";
 import { formatFiyat, parseFiyatGirdi } from "@/lib/format";
 import { YEM_AD } from "@/lib/urun-tanim";
 import { HAYVAN_AD } from "@/lib/karkas";
@@ -17,7 +17,7 @@ const birim = (n: string) => (n === "SUT" ? "TL/litre" : HAYVAN.includes(n) ? "T
 interface Alarm { id: number; urun_norm: string; esik_fiyat: number; yon: "asagi" | "yukari"; aktif: boolean; }
 
 const inputStil: React.CSSProperties = {
-  width: "100%", padding: "9px 12px", background: "#0B100D", border: `1px solid ${RENKLER.border}`,
+  width: "100%", padding: "9px 12px", background: "var(--bg)", border: `1px solid ${RENKLER.border}`,
   color: RENKLER.text, fontSize: "14px", borderRadius: "6px", outline: "none", fontFamily: "var(--font-mono)",
 };
 const etiketStil: React.CSSProperties = { fontSize: "12px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.06em" };
@@ -98,7 +98,7 @@ export default function AlarmlarPage() {
         <div style={{ marginTop: "20px", padding: "24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
 
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Fiyat hedefine ulaşınca telefonuna bildirim al.</p>
-          <Link href="/giris" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: RENKLER.green, color: "#000", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Google ile Giriş Yap</Link>
+          <Link href="/giris" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: RENKLER.green, color: "var(--on-primary)", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Google ile Giriş Yap</Link>
         </div>
       </main>
     );
@@ -118,7 +118,7 @@ export default function AlarmlarPage() {
              "Alarm kurmak için bildirim iznini aç."}
           </span>
           {izin !== "desteksiz" && (
-            <button onClick={bildirimleriAc} disabled={izinMesgul} style={{ padding: "8px 14px", fontSize: "13px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+            <button onClick={bildirimleriAc} disabled={izinMesgul} style={{ padding: "8px 14px", fontSize: "13px", background: RENKLER.green, color: "var(--on-primary)", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
               {izinMesgul ? "…" : "Bildirimleri Aç"}
             </button>
           )}
@@ -132,7 +132,7 @@ export default function AlarmlarPage() {
           <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
             {[...YEM, ...HAYVAN].map((u) => (
               <button key={u} type="button" onClick={() => setUrun(u)}
-                style={{ padding: "5px 11px", fontSize: "13px", background: urun === u ? RENKLER.green : "#0B100D", color: urun === u ? "#000" : RENKLER.muted, border: `1px solid ${urun === u ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
+                style={{ padding: "5px 11px", fontSize: "13px", background: urun === u ? RENKLER.green : "var(--bg)", color: urun === u ? "#000" : RENKLER.muted, border: `1px solid ${urun === u ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
                 {adGoster(u)}
               </button>
             ))}
@@ -142,8 +142,8 @@ export default function AlarmlarPage() {
         <div>
           <label style={etiketStil}>YÖN</label>
           <div style={{ display: "flex", gap: "6px" }}>
-            <button type="button" onClick={() => setYon("yukari")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "yukari" ? RENKLER.surface : "#0B100D", color: yon === "yukari" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "yukari" ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▲ Üstüne çıkınca</button>
-            <button type="button" onClick={() => setYon("asagi")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "asagi" ? RENKLER.surface : "#0B100D", color: yon === "asagi" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "asagi" ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▼ Altına inince</button>
+            <button type="button" onClick={() => setYon("yukari")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "yukari" ? RENKLER.surface : "var(--bg)", color: yon === "yukari" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "yukari" ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▲ Üstüne çıkınca</button>
+            <button type="button" onClick={() => setYon("asagi")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "asagi" ? RENKLER.surface : "var(--bg)", color: yon === "asagi" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "asagi" ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▼ Altına inince</button>
           </div>
         </div>
 
@@ -154,7 +154,7 @@ export default function AlarmlarPage() {
 
         {hata && <div style={{ fontSize: "13px", color: RENKLER.red }}>{hata}</div>}
 
-        <button type="submit" disabled={mesgul || izin !== "verildi"} style={{ padding: "10px", fontSize: "12px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "6px", cursor: izin === "verildi" ? "pointer" : "not-allowed", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+        <button type="submit" disabled={mesgul || izin !== "verildi"} style={{ padding: "10px", fontSize: "12px", background: RENKLER.green, color: "var(--on-primary)", border: "none", borderRadius: "6px", cursor: izin === "verildi" ? "pointer" : "not-allowed", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
           {mesgul ? "…" : "Alarm Kur"}
         </button>
       </form>
@@ -167,7 +167,7 @@ export default function AlarmlarPage() {
             {alarmlar.map((a) => {
               const pasif = !a.aktif; // tetiklenince scraper aktif=false yapar
               return (
-                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: RENKLER.surface, border: `1px solid ${pasif ? RENKLER.border : RENKLER.green + "44"}`, borderRadius: "8px", padding: "10px 12px", opacity: pasif ? 0.65 : 1 }}>
+                <div key={a.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: RENKLER.surface, border: `1px solid ${pasif ? RENKLER.border : alfa(RENKLER.green, 0.27)}`, borderRadius: "8px", padding: "10px 12px", opacity: pasif ? 0.65 : 1 }}>
                   <span style={{ fontSize: "12px", color: RENKLER.text, display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                     <span>{adGoster(a.urun_norm)} {a.yon === "yukari" ? "▲" : "▼"} {formatFiyat(a.esik_fiyat)} <span style={{ color: RENKLER.muted, fontSize: "12px" }}>{birim(a.urun_norm)}</span></span>
                     {pasif
