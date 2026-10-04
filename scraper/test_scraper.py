@@ -276,3 +276,44 @@ def test_sessiz_kaynaklar_hata_ve_sifir_kayit():
         "ESK_KARKAS": [sifir, sifir],            # yeterli gecmis yok -> alarm yok
     }
     assert sessiz_kaynaklar(loglar, esik=3) == ["TOBB_ILGIN", "KTB_KONYA"]
+
+
+# Gercek Eskisehir satirlari (04.10.2026): ayni tabloda Mayis'tan kalma sinif var
+TOBB_ESK_SATIRLAR = [
+    ["ARPA BEYAZ (1. GRUP)", "KG", "06.05.2026 14:48", "15.206,000", "15.206,000", "15.206,000", "12.000"],
+    ["ARPA BEYAZ (2.GRUP)", "KG", "02.10.2026 16:31", "14.300,000", "14.600,000", "14.445,000", "60.420"],
+    ["ARPA BEYAZ (3. GRUP)", "KG", "04.06.2026 15:05", "12.007,000", "12.007,000", "12.007,000", "13.000"],
+    ["BUĞDAY EKMEKLİK BEYAZ YARI SERT (3.DERECE)", "KG", "02.10.2026 16:31", "15.700,000", "15.800,000", "15.752,000", "37.720"],
+    ["BUĞDAY EKMEKLİK KIRMIZI YARI SERT (2.DERECE)", "KG", "02.10.2026 16:31", "16.000,000", "16.200,000", "16.087,000", "55.960"],
+    ["BUĞDAY ANADOLU BEYAZ SERT 3. DERECE", "KG", "17.07.2026 16:40", "13.453,000", "13.453,000", "13.453,000", "54.000"],
+    ["MISIR SARI", "KG", "29.09.2026 16:28", "14.672,000", "14.672,000", "14.672,000", "8.000"],
+    ["NOHUT", "KG", "02.10.2026 10:00", "45,000", "46,000", "45,500", "1.000"],
+]
+
+
+def test_tobb_birlestir_yalniz_son_islem_gunu_agirlikli():
+    from scraper import tobb_birlestir
+    s = {r["urun_norm"]: r for r in tobb_birlestir("ESKISEHIR", TOBB_ESK_SATIRLAR, "2026-10-04")}
+    assert set(s) == {"ARPA", "BUGDAY", "MISIR"}
+    # Arpa: Mayis (15,21) ve Haziran siniflari DEGIL, yalniz 02.10 islemi
+    a = s["ARPA"]
+    assert a["ortalama"] == pytest.approx(14.445)
+    assert a["cekilme_tarihi"] == a["son_tarih"] == "2026-10-02"
+    assert a["islem_miktari"] == 60420
+    # Bugday: 02.10'daki iki sinifin miktar-agirlikli ortalamasi; Temmuz sinifi disarida
+    b = s["BUGDAY"]
+    beklenen = (15.752 * 37720 + 16.087 * 55960) / (37720 + 55960)
+    assert b["ortalama"] == pytest.approx(beklenen, abs=1e-4)
+    assert (b["en_az"], b["en_cok"], b["islem_miktari"]) == (15.7, 16.2, 37720 + 55960)
+    assert "+1 sinif" in b["urun"]
+    # Misir: son islem 29.09 -> tarihi oyle kalir (bugun gibi gosterilmez)
+    assert s["MISIR"]["cekilme_tarihi"] == "2026-09-29"
+
+
+def test_tobb_birlestir_gelecek_ve_bozuk_tarih_atlanir():
+    from scraper import tobb_birlestir
+    satirlar = [
+        ["ARPA", "KG", "05.10.2026 10:00", "14,0", "14,0", "14,0", "1.000"],  # gelecek
+        ["ARPA", "KG", "", "13,0", "13,0", "13,0", "1.000"],                   # tarihsiz
+    ]
+    assert tobb_birlestir("CORUM", satirlar, "2026-10-04") == []

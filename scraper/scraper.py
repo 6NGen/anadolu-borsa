@@ -282,41 +282,93 @@ def tobb_ca_bundle() -> str:
     return _tobb_ca_yolu
 
 
+def istek_tekrarla(url: str, deneme: int = 3, bekleme: float = 10, **kw) -> requests.Response:
+    """Baglanti kesilmesine karsi yeniden dener (TOBB sik istekte reset atiyor).
+    HTTP 4xx/5xx yeniden denenmez, dogrudan hata firlatilir."""
+    for i in range(deneme):
+        try:
+            resp = requests.get(url, **kw)
+            resp.raise_for_status()
+            return resp
+        except (requests.ConnectionError, requests.Timeout) as e:
+            if i == deneme - 1:
+                raise
+            print(f"[TEKRAR] {url} ({type(e).__name__}) — {bekleme * (i + 1):.0f} sn sonra")
+            time.sleep(bekleme * (i + 1))
+    raise RuntimeError("ulasilamaz")
+
+
+def _tobb_tarih(s: str) -> str | None:
+    """'02.10.2026 16:31' -> '2026-10-02'"""
+    m = re.match(r"(\d{2})\.(\d{2})\.(\d{4})", s or "")
+    return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else None
+
+
+def tobb_birlestir(borsa_adi: str, satirlar: list[list[str]], bugun: str) -> list:
+    """TOBB sayfasi gunluk bulten DEGIL: her urun SINIFININ en son islem gordugu
+    fiyati listeler (ayni tabloda Mayis'tan kalma arpa sinifi da olabilir).
+    Eskiden ilk satir alinip bugunun tarihiyle yaziliyordu -> aylar onceki
+    fiyatlar "bugun" gorunuyordu. Simdi her urun_norm icin:
+      - yalniz EN SON ISLEM GUNUNUN siniflari alinir,
+      - ortalama islem miktarina gore agirlikli (miktar yoksa esit agirlik),
+      - cekilme_tarihi = son_tarih = o islem gunu (ayni gun tekrar cekilirse
+        upsert ayni satiri gunceller; tarihce gercek islem gunlerinden olusur)."""
+    gruplar: dict[str, list] = {}
+    for h in satirlar:
+        if len(h) < 6:
+            continue
+        norm = urun_norm_bul(h[0])
+        tarih = _tobb_tarih(h[2])
+        ortalama = sinirla(ton_to_kg(parse_fiyat(h[5])), YEM_FIYAT_SINIR)
+        if not norm or not tarih or tarih > bugun or ortalama is None:
+            continue  # bozuk/gelecek tarihli satir: sessizce yazma
+        miktar = parse_fiyat(h[6]) if len(h) > 6 else None
+        gruplar.setdefault(norm, []).append({
+            "ad": h[0], "birim": h[1] or "KG", "tarih": tarih, "ort": ortalama,
+            "az": sinirla(ton_to_kg(parse_fiyat(h[3])), YEM_FIYAT_SINIR),
+            "cok": sinirla(ton_to_kg(parse_fiyat(h[4])), YEM_FIYAT_SINIR),
+            "miktar": miktar if miktar and miktar > 0 else None,
+        })
+    sonuclar = []
+    for norm, rs in gruplar.items():
+        son = max(r["tarih"] for r in rs)
+        gun = [r for r in rs if r["tarih"] == son]
+        agirlik = [r["miktar"] or 1.0 for r in gun]
+        ortalama = sum(r["ort"] * a for r, a in zip(gun, agirlik)) / sum(agirlik)
+        azlar = [r["az"] for r in gun if r["az"] is not None]
+        coklar = [r["cok"] for r in gun if r["cok"] is not None]
+        miktarlar = [r["miktar"] for r in gun if r["miktar"] is not None]
+        ana = max(gun, key=lambda r: r["miktar"] or 0)
+        sonuclar.append({
+            "borsa":          borsa_adi,
+            "urun":           ana["ad"] + (f" +{len(gun) - 1} sinif (agirlikli ort.)" if len(gun) > 1 else ""),
+            "urun_norm":      norm,
+            "birim":          ana["birim"],
+            "son_tarih":      son,
+            "en_az":          min(azlar) if azlar else None,
+            "en_cok":         max(coklar) if coklar else None,
+            "ortalama":       round(ortalama, 4),
+            "islem_miktari":  sum(miktarlar) if miktarlar else None,
+            "cekilme_tarihi": son,
+        })
+    return sonuclar
+
+
 def tobb_scrape(borsa_adi: str, borsa_kod: str) -> list:
     url = f"https://borsa.tobb.org.tr/fiyat_borsa.php?borsakod={borsa_kod}"
     headers = {"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"}
     try:
-        resp = requests.get(url, headers=headers, timeout=15, verify=tobb_ca_bundle())
-        resp.raise_for_status()
+        resp = istek_tekrarla(url, headers=headers, timeout=20, verify=tobb_ca_bundle())
         resp.encoding = "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
         tablo = soup.find("table")
         if not tablo:
             raise Exception("Tablo bulunamadi")
-        sonuclar = []
-        for satir in tablo.find_all("tr")[1:]:
-            h = [td.get_text(strip=True) for td in satir.find_all("td")]
-            if len(h) < 6:
-                continue
-            norm = urun_norm_bul(h[0])
-            if not norm:
-                continue
-            ortalama = sinirla(ton_to_kg(parse_fiyat(h[5])) if len(h) > 5 else None, YEM_FIYAT_SINIR)
-            if ortalama is None:
-                # Site yapisi degisti/bozuk deger geldi: sessizce yazma, atla
-                continue
-            sonuclar.append({
-                "borsa":          borsa_adi,
-                "urun":           h[0],
-                "urun_norm":      norm,
-                "birim":          h[1] if len(h) > 1 else "KG",
-                "son_tarih":      None,
-                "en_az":          sinirla(ton_to_kg(parse_fiyat(h[3])) if len(h) > 3 else None, YEM_FIYAT_SINIR),
-                "en_cok":         sinirla(ton_to_kg(parse_fiyat(h[4])) if len(h) > 4 else None, YEM_FIYAT_SINIR),
-                "ortalama":       ortalama,
-                "islem_miktari":  parse_fiyat(h[6]) if len(h) > 6 else None,
-                "cekilme_tarihi": bugun_tr(),
-            })
+        satirlar = [
+            [td.get_text(strip=True) for td in tr.find_all("td")]
+            for tr in tablo.find_all("tr")[1:]
+        ]
+        sonuclar = tobb_birlestir(borsa_adi, satirlar, bugun_tr())
         log_yaz(f"TOBB_{borsa_adi}", "basarili", len(sonuclar))
         print(f"[OK] TOBB {borsa_adi}: {len(sonuclar)} urun")
         return sonuclar
