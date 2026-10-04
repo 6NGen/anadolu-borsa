@@ -41,3 +41,24 @@ int? gunFarki(String? iso, [DateTime? simdi]) {
   final s = simdi ?? DateTime.now();
   return DateTime(s.year, s.month, s.day).difference(DateTime(t.year, t.month, t.day)).inDays;
 }
+
+// Veri tarihinden sonra bugüne kadar geçen İŞ GÜNÜ (Pzt-Cuma). Borsa satırları
+// gerçek işlem günüyle geliyor (2026-10-04); hafta sonu borsa kapalı olduğundan
+// cuma işlemi pazartesi bayat sayılmasın. Web lib/tazelik.isGunuFarki ile aynı.
+int? isGunuFarki(String? iso, [DateTime? simdi]) {
+  if (iso == null || iso.length < 10) return null;
+  final t = DateTime.tryParse(iso.substring(0, 10));
+  if (t == null) return null;
+  final s = simdi ?? DateTime.now();
+  final bugun = DateTime(s.year, s.month, s.day);
+  var g = DateTime(t.year, t.month, t.day);
+  var n = 0;
+  while (g.isBefore(bugun)) {
+    g = DateTime(g.year, g.month, g.day + 1);
+    if (g.weekday != DateTime.saturday && g.weekday != DateTime.sunday) n++;
+  }
+  return n;
+}
+
+// ESK karkas / USK süt: dönem dönem ilan edilen resmî fiyat — "bugün güncellendi" denmez.
+bool donemselKaynak(String? kaynak) => kaynak == 'ESK' || kaynak == 'USK';

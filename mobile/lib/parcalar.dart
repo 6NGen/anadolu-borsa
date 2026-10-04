@@ -168,36 +168,44 @@ class _FiyatSeridiState extends State<FiyatSeridi> {
   }
 }
 
-// Veri tazeliği rozeti — web VeriTazelik ile aynı dil (tek eşik: bayatEsikGun)
+// Veri tazeliği rozeti — web VeriTazelik ile aynı dil (tek eşik: bayatEsikGun,
+// İŞ GÜNÜ sayılır). ESK/USK dönemsel resmî fiyat: kontrol tazeyse "resmî".
 class TazelikRozet extends StatelessWidget {
   final String? tarih;
-  const TazelikRozet(this.tarih, {super.key});
+  final String? kaynak;
+  const TazelikRozet(this.tarih, {this.kaynak, super.key});
 
   @override
   Widget build(BuildContext context) {
     final g = gunFarki(tarih);
-    if (g == null) return const SizedBox.shrink();
+    final ig = isGunuFarki(tarih);
+    if (g == null || ig == null) return const SizedBox.shrink();
     final String metin;
     final Color renk;
-    if (g <= 0) {
-      metin = 'bugün';
-      renk = C.pos;
-    } else if (g == 1) {
-      metin = 'dün';
-      renk = C.muted;
-    } else if (g < bayatEsikGun) {
-      metin = '$g gün önce';
-      renk = C.muted;
-    } else {
+    final bayat = ig >= bayatEsikGun;
+    if (bayat) {
       metin = '⚠ $g gün önce';
       renk = C.orange;
+    } else if (donemselKaynak(kaynak)) {
+      metin = 'resmî';
+      renk = C.pos;
+    } else if (g <= 0) {
+      metin = 'bugün';
+      renk = C.pos;
+    } else if (ig <= 1) {
+      metin = 'son işlem';
+      renk = C.pos;
+    } else {
+      metin = '$g gün önce';
+      renk = C.muted;
     }
+    final nokta = !bayat && renk == C.pos;
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      if (g <= 0) ...[
+      if (nokta) ...[
         Container(width: 6, height: 6, decoration: BoxDecoration(color: renk, shape: BoxShape.circle)),
         const SizedBox(width: 4),
       ],
-      Text(metin, style: TextStyle(color: renk, fontSize: 10, fontWeight: g >= bayatEsikGun ? FontWeight.w700 : FontWeight.w500)),
+      Text(metin, style: TextStyle(color: renk, fontSize: 10, fontWeight: bayat ? FontWeight.w700 : FontWeight.w500)),
     ]);
   }
 }
@@ -239,7 +247,7 @@ class FiyatKarti extends StatelessWidget {
             Row(children: [
               Flexible(child: Text('${f.kaynak} · ${kisaTarih(f.tarih)}', overflow: TextOverflow.ellipsis, style: TextStyle(color: C.muted, fontSize: 10.5))),
               const SizedBox(width: 6),
-              TazelikRozet(f.tarih),
+              TazelikRozet(f.tarih, kaynak: f.kaynak),
             ]),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [

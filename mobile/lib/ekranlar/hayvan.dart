@@ -72,7 +72,7 @@ class _HayvanEkranState extends State<HayvanEkran> {
               Row(children: [
                 Flexible(child: Text('${f.ad} · ${f.kaynak} · ${kisaTarih(f.tarih)}', overflow: TextOverflow.ellipsis, style: TextStyle(color: C.muted, fontSize: 11))),
                 const SizedBox(width: 8),
-                TazelikRozet(f.tarih),
+                TazelikRozet(f.tarih, kaynak: f.kaynak),
               ]),
               const SizedBox(height: 16),
               Container(

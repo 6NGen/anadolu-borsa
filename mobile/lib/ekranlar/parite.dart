@@ -141,7 +141,7 @@ class _PariteEkranState extends State<PariteEkran> {
                         const SizedBox(width: 7),
                         Text(f.ad, style: TextStyle(color: renk, fontSize: 14.5, fontWeight: FontWeight.w800)),
                         const SizedBox(width: 8),
-                        TazelikRozet(f.tarih),
+                        TazelikRozet(f.tarih, kaynak: f.kaynak),
                         const Spacer(),
                         Text('${formatFiyat(f.fiyat)} ${f.birim} · ${f.kaynak}',
                             style: TextStyle(color: C.muted, fontSize: 10)),

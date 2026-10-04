@@ -140,7 +140,7 @@ class _HesapEkranState extends State<HesapEkran> {
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     Flexible(child: Text('${f.ad} ${formatFiyat(f.fiyat)} ${f.birim} · ${f.kaynak} · ${kisaTarih(f.tarih)}', textAlign: TextAlign.center, style: TextStyle(color: C.muted, fontSize: 10.5))),
                     const SizedBox(width: 6),
-                    TazelikRozet(f.tarih),
+                    TazelikRozet(f.tarih, kaynak: f.kaynak),
                   ]),
                   if (hayvanMi)
                     Padding(

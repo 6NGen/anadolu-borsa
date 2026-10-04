@@ -35,4 +35,14 @@ void main() {
     expect(gunFarki('bozuk', simdi), null);
     expect(bayatEsikGun, 3);
   });
+
+  test('isGunuFarki hafta sonunu saymaz (web ile aynı)', () {
+    const cuma = '2026-10-02';
+    expect(isGunuFarki(cuma, DateTime(2026, 10, 3)), 0); // cumartesi
+    expect(isGunuFarki(cuma, DateTime(2026, 10, 4)), 0); // pazar
+    expect(isGunuFarki(cuma, DateTime(2026, 10, 5)), 1); // pazartesi
+    expect(isGunuFarki(cuma, DateTime(2026, 10, 8)), 4); // perşembe
+    expect(donemselKaynak('USK'), true);
+    expect(donemselKaynak('KONYA'), false);
+  });
 }

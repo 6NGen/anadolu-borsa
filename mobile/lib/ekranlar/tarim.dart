@@ -78,7 +78,7 @@ class _TarimEkranState extends State<TarimEkran> {
               Row(children: [
                 Text('${f.kaynak} · ${kisaTarih(f.tarih)}', style: TextStyle(color: C.muted, fontSize: 11)),
                 const SizedBox(width: 8),
-                TazelikRozet(f.tarih),
+                TazelikRozet(f.tarih, kaynak: f.kaynak),
               ]),
               if (ton != null)
                 Padding(
