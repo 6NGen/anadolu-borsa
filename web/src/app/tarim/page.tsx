@@ -8,7 +8,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Tarım Ürünleri Fiyatları — Arpa, Buğday, Mısır | Anadolu Borsa",
-  description: "Arpa, buğday, mısır ve diğer hububat fiyatları — TOBB ve KTB borsa verileri, son 30 gün grafikli. Günlük güncellenir.",
+  description: "Arpa, buğday, mısır ve diğer hububat fiyatları — TOBB ve KTB borsa verileri, son 30 gün grafikli. İşlem günlerinde güncellenir.",
 };
 
 export default async function TarimPage() {
@@ -22,7 +22,7 @@ export default async function TarimPage() {
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>TARIM BORSASI</h1>
-        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>TOBB ve Konya Ticaret Borsası (KTB) verileri · Günlük güncellenir</p>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>TOBB ve Konya Ticaret Borsası (KTB) verileri · İşlem günlerinde güncellenir · tarih = son işlem günü; birden çok sınıf işlem gördüyse miktar-ağırlıklı ortalama</p>
       </div>
 
       {(sonFiyatlar ?? []).length === 0 ? (

@@ -6,6 +6,7 @@ import VeriTazelik from "@/components/VeriTazelik";
 import { RENKLER, HAYVAN_RENK } from "@/lib/theme";
 import { formatFiyat } from "@/lib/format";
 import { tekHayvanKaynak } from "@/lib/guncel";
+import { donemAnahtar, donemBaslangiclari } from "@/lib/donem";
 import { hasatSezonuMu } from "@/lib/hasat-takvimi";
 import { hayvanGorunen } from "@/lib/karkas";
 import KurbanSayaci from "@/components/KurbanSayaci";
@@ -15,9 +16,10 @@ import Link from "next/link";
 export const revalidate = 300;
 
 export default async function Dashboard() {
-  const [{ data: sonFiyatlar }, { data: sonHayvanHam }] = await Promise.all([
+  const [{ data: sonFiyatlar }, { data: sonHayvanHam }, donem] = await Promise.all([
     supabaseServer.from("son_fiyatlar").select("*").order("urun_norm"),
     supabaseServer.from("son_hayvan_fiyatlari").select("*").order("hayvan_norm"),
+    donemBaslangiclari(),
   ]);
 
   // Kaynağı değişen hayvanın (süt: ESK_SUT → USK) eski bayat kaydını ele —
@@ -124,7 +126,7 @@ export default async function Dashboard() {
                         <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "2px" }}>{h.birim}</div>
                         <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
                           <span>{h.kaynak} · {h.cekilme_tarihi}</span>
-                          <VeriTazelik tarih={h.cekilme_tarihi} />
+                          <VeriTazelik tarih={h.cekilme_tarihi} donemBaslangic={donem[donemAnahtar(h.kaynak, h.hayvan_norm)]} />
                         </div>
                       </div>
                     </div>

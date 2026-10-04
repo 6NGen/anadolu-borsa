@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // SEO M6: fiyat başlıkta — arama sonucunda görünür, revalidate ile günlük tazelenir
   return {
     title: `${data.urun_ad} Fiyatı Bugün — ${formatFiyat(data.ortalama)} ₺/kg | Anadolu Borsa`,
-    description: `Güncel ${data.urun_ad} fiyatı: ${formatFiyat(data.ortalama)} TL/kg (${data.borsa}, ${data.cekilme_tarihi}). TOBB ve Konya Ticaret Borsası verisi. Günlük güncellenir.`,
+    description: `Güncel ${data.urun_ad} fiyatı: ${formatFiyat(data.ortalama)} TL/kg (${data.borsa}, ${data.cekilme_tarihi}). TOBB ve Konya Ticaret Borsası verisi. İşlem günlerinde güncellenir.`,
     openGraph: {
       title: `${data.urun_ad} Fiyatı`,
       description: `${formatFiyat(data.ortalama)} TL/kg — ${data.cekilme_tarihi}`,

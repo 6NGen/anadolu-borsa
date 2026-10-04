@@ -6,19 +6,21 @@ import PiyasaKarti from "@/components/PiyasaKarti";
 import { tekHayvanKaynak } from "@/lib/guncel";
 import { hayvanGorunen } from "@/lib/karkas";
 import { RENKLER } from "@/lib/theme";
+import { donemAnahtar, donemBaslangiclari } from "@/lib/donem";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Canlı Hayvan ve Karkas Fiyatları — Tosun, Kuzu, Süt | Anadolu Borsa",
-  description: "ESK karkas alım fiyatları (tosun, kuzu, toklu) ve USK çiğ süt tavsiye fiyatı — günlük, kaynaklı, grafikli.",
+  description: "ESK karkas alım fiyatları (tosun, kuzu, toklu) ve USK çiğ süt tavsiye fiyatı — her gün kontrol edilen, kaynaklı, grafikli.",
 };
 
 export default async function HayvanPage() {
-  const [{ data: fiyatlarHam }, { data: grafik }, { data: piyasa }] = await Promise.all([
+  const [{ data: fiyatlarHam }, { data: grafik }, { data: piyasa }, donem] = await Promise.all([
     supabaseServer.from("son_hayvan_fiyatlari").select("*").order("hayvan_norm"),
     supabaseServer.from("son_30_gun_hayvan").select("*").order("cekilme_tarihi"),
     supabaseServer.from("piyasa_fiyatlari").select("*"),
+    donemBaslangiclari(),
   ]);
 
   // Kaynağı değişen hayvanın (süt: ESK_SUT → USK) eski bayat kaydını ele —
@@ -29,7 +31,7 @@ export default async function HayvanPage() {
     <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
       <div style={{ marginBottom: "16px" }}>
         <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>HAYVAN BORSASI</h1>
-        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>ESK karkas alım fiyatları + Çiğ süt · Günlük güncellenir</p>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>ESK karkas alım fiyatları + Çiğ süt · Her gün kontrol edilir; ESK ve USK fiyatları dönemsel ilan edilir</p>
         {/* Faz 0.1 "yarı fiyat" bağlamı: resmi ≠ saha — kaynak kapsamı açıkça yazılır */}
         <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px", lineHeight: 1.55 }}>
           ESK fiyatları kurumun <b style={{ color: RENKLER.text }}>alım (taban)</b> fiyatıdır; serbest piyasa genelde üzerindedir
@@ -44,7 +46,7 @@ export default async function HayvanPage() {
         </div>
       ) : (
         <>
-          <HayvanClient fiyatlar={fiyatlar} grafik={grafik ?? []} />
+          <HayvanClient fiyatlar={fiyatlar} grafik={grafik ?? []} donem={donem} />
 
           {/* Resmi (ESK/USK) vs Gerçek (kullanıcı bildirimi, min 3) */}
           <section style={{ marginTop: "20px" }}>
@@ -56,7 +58,7 @@ export default async function HayvanPage() {
                   <PiyasaKarti
                     key={h.hayvan_norm}
                     urun_ad={hayvanGorunen(h.hayvan_norm)}
-                    borsa={{ kaynak: h.kaynak.replace("_SUT", ""), fiyat: h.fiyat, birim: h.birim ?? "TL/kg", tarih: h.cekilme_tarihi }}
+                    borsa={{ kaynak: h.kaynak.replace("_SUT", ""), fiyat: h.fiyat, birim: h.birim ?? "TL/kg", tarih: h.cekilme_tarihi, donemBaslangic: donem[donemAnahtar(h.kaynak, h.hayvan_norm)] }}
                     piyasa={pv ? { agirlikli_ortalama: pv.agirlikli_ortalama, en_az: pv.en_az, en_cok: pv.en_cok, bildirim_sayisi: pv.bildirim_sayisi, il: pv.il } : null}
                   />
                 );

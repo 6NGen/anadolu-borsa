@@ -2,7 +2,7 @@ import { RENKLER } from "@/lib/theme";
 import { formatFiyat } from "@/lib/format";
 import VeriTazelik from "./VeriTazelik";
 
-interface BorsaVeri { kaynak: string; fiyat: number | null; birim: string; tarih: string; }
+interface BorsaVeri { kaynak: string; fiyat: number | null; birim: string; tarih: string; donemBaslangic?: string | null; }
 interface PiyasaVeri { agirlikli_ortalama: number | null; en_az: number | null; en_cok: number | null; bildirim_sayisi: number; il: string; }
 
 interface Props {
@@ -29,7 +29,7 @@ export default function PiyasaKarti({ urun_ad, borsa, piyasa }: Props) {
           <div style={{ fontSize: "12px", color: RENKLER.muted }}>{borsa.birim}</div>
           <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "4px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
             <span>{borsa.tarih}</span>
-            <VeriTazelik tarih={borsa.tarih} />
+            <VeriTazelik tarih={borsa.tarih} donemBaslangic={borsa.donemBaslangic} />
           </div>
         </div>
         {piyasa ? (

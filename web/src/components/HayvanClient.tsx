@@ -8,6 +8,7 @@ import { formatFiyat, kisaTarih } from "@/lib/format";
 import { distinctGun } from "@/lib/guncel";
 import { kartUretilebilir } from "@/lib/tazelik";
 import { hayvanGorunen } from "@/lib/karkas";
+import { donemAnahtar } from "@/lib/donem";
 
 interface HayvanFiyat {
   kaynak: string;
@@ -30,9 +31,10 @@ interface GrafikVeri {
 interface Props {
   fiyatlar: HayvanFiyat[];
   grafik: GrafikVeri[];
+  donem?: Record<string, string>;
 }
 
-export default function HayvanClient({ fiyatlar, grafik }: Props) {
+export default function HayvanClient({ fiyatlar, grafik, donem }: Props) {
   const [secilen, setSecilen] = useState<string>(fiyatlar[0]?.hayvan_norm ?? "TOSUN");
 
   const sf = fiyatlar.find((f) => f.hayvan_norm === secilen);
@@ -68,7 +70,7 @@ export default function HayvanClient({ fiyatlar, grafik }: Props) {
             <span style={{ fontSize: "36px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(sf.fiyat)}</span>
             <span style={{ fontSize: "13px", color: RENKLER.muted }}>{sf.birim}</span>
             <span style={{ fontSize: "13px", color: RENKLER.muted }}>{sf.kaynak} · {sf.cekilme_tarihi}</span>
-            <VeriTazelik tarih={sf.cekilme_tarihi} />
+            <VeriTazelik tarih={sf.cekilme_tarihi} donemBaslangic={donem?.[donemAnahtar(sf.kaynak, sf.hayvan_norm)]} />
           </div>
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
           <div style={{ marginBottom: "16px" }}>
