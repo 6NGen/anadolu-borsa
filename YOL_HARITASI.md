@@ -67,6 +67,23 @@ güven daha doğmadan ölür.
 [x] islem_miktari göster: "15,21 ₺ · 340 ton"; <20 ton → "düşük hacim"
     (manşet sayı sıçramalarının dürüst açıklaması — kart güveni için şart)
 
+## 0.5 Güven onarımı (2026-10-04 tam gözden geçirme)
+Bulgular: TOBB 38 gün sessizce veri vermedi (SSL); TOBB sayfası günlük
+bülten değil "her sınıfın son işlem fiyatı" — aylar önceki fiyatlar
+"bugün" görünüyordu, kayıtların %71'i sahte tekrar gündü; alfabetik ilk
+sınıf alınıyordu (sahte "düşük hacim" + yapay %17 borsa farkı — 0.4'teki
+"Çorum 11 / Eskişehir 15" büyük ihtimalle bu hataydı, piyasa farkı değil);
+mazot 4 aydır 67,02'de kalmıştı (pompa 96) → parite oranları ~%30 yanlış.
+[x] TOBB SSL ara sertifika tamiri
+[x] TOBB: gerçek işlem günü + sınıf miktar-ağırlıklı ortalama + retry
+[x] Konya (KTB) resmi tescil bülteni API'si — ilk kez veri; 01.08'den geri dolduruldu
+[x] Sağlık kontrolü: kaynak 3 koşu susarsa workflow kırmızı → e-posta
+[x] Mazot otomatik (Opet pompa medyanı, her gece)
+[x] Tazelik rozeti iş günü sayar; ESK/USK "resmî · X tarihinden beri aynı" (web + mobil v1.6)
+[ ] SENDE: 04.10 eski yöntem satırlarını sil (SQL proje-durum'da / sohbette)
+[ ] SENDE: Play yükleme anahtarı + Play Console (mobile/PLAY_STORE.md)
+[ ] Elektrik/üre/DAP hâlâ elle — otomatik kaynak yok
+
 FAZ 0 BİTTİ Mİ? → Bir çiftçi sürüsünü/ürününü GERÇEK fiyatıyla görüyor,
 scraper sessiz kırılamıyor, hukuki zemin net. Ancak o zaman Faz 1.
 
