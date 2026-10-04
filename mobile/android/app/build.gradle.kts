@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -6,6 +8,12 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Play Store yükleme anahtarı: android/key.properties varsa onunla imzalanır
+// (gitignore'da — ASLA commit'leme). Yoksa eskisi gibi debug anahtarı: yerel
+// APK akışı bozulmaz. Kurulum: mobile/PLAY_STORE.md
+val anahtarDosyasi = rootProject.file("key.properties")
+val anahtar = Properties().apply { if (anahtarDosyasi.exists()) anahtarDosyasi.inputStream().use { load(it) } }
 
 android {
     namespace = "com.anadoluborsa.mobile"
@@ -32,11 +40,21 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (anahtarDosyasi.exists()) {
+            create("yukleme") {
+                keyAlias = anahtar.getProperty("keyAlias")
+                keyPassword = anahtar.getProperty("keyPassword")
+                storeFile = file(anahtar.getProperty("storeFile"))
+                storePassword = anahtar.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (anahtarDosyasi.exists()) signingConfigs.getByName("yukleme")
+                            else signingConfigs.getByName("debug")
         }
     }
 }
