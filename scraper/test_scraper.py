@@ -261,3 +261,18 @@ def test_ktb_birlestir_agirlikli_ortalama():
 def test_ktb_birlestir_bos_gun():
     from scraper import ktb_birlestir
     assert ktb_birlestir([], "2026-10-04") == []
+
+
+def test_sessiz_kaynaklar_hata_ve_sifir_kayit():
+    from scraper import sessiz_kaynaklar
+    ok = {"durum": "basarili", "kayit_sayisi": 8}
+    sifir = {"durum": "basarili", "kayit_sayisi": 0}
+    hata = {"durum": "hata", "kayit_sayisi": 0}
+    loglar = {
+        "TOBB_ILGIN": [hata, hata, hata],        # 38 gunluk SSL arizasi
+        "KTB_KONYA": [sifir, sifir, sifir],      # "basarili" ama bos: o da sessiz
+        "USK_SUT": [sifir, ok, ok],              # tek bos gun (cumartesi) alarm degil
+        "UKON": [hata, sifir, ok],               # son kosu basarili -> temiz
+        "ESK_KARKAS": [sifir, sifir],            # yeterli gecmis yok -> alarm yok
+    }
+    assert sessiz_kaynaklar(loglar, esik=3) == ["TOBB_ILGIN", "KTB_KONYA"]

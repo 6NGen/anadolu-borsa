@@ -10,6 +10,7 @@ import json
 import re
 import time
 import os
+import sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -174,6 +175,49 @@ def fallback_kontrol(kaynak: str, gun_esik: int = 3):
     hatalar = [r for r in (result.data or []) if r.get("durum") == "hata"]
     if len(hatalar) >= gun_esik:
         print(f"[KRITIK] {kaynak} {gun_esik} gundir calısmiyor!")
+
+
+# --- SAGLIK KONTROLU ---
+# 26.08-04.10 TOBB 38 gun veri vermedi ama workflow hep yesildi (hata yalniz
+# scraper_log'a yaziliyordu). Bir kaynak ust uste SESSIZ_ESIK kosu boyunca hata
+# verir YA DA 0 kayit dondururse kosu kirmizi biter -> GitHub e-posta atar.
+# Esik 3: KTB cumartesi/tatil gunu dogal olarak 0 doner; tek bos gun alarm degil.
+SESSIZ_ESIK = 3
+
+
+def sessiz_kaynaklar(loglar: dict[str, list], esik: int = SESSIZ_ESIK) -> list[str]:
+    """loglar: kaynak -> en yeniden eskiye scraper_log satirlari.
+    Son `esik` kosunun hepsi hata ya da 0 kayit olan kaynaklari dondurur."""
+    sessiz = []
+    for kaynak, satirlar in loglar.items():
+        son = satirlar[:esik]
+        if len(son) >= esik and all(
+            r.get("durum") == "hata" or not r.get("kayit_sayisi") for r in son
+        ):
+            sessiz.append(kaynak)
+    return sessiz
+
+
+def saglik_kontrol() -> list[str]:
+    izlenen = [f"TOBB_{ad}" for ad in TOBB_BORSALAR] + ["KTB_KONYA", "ESK_KARKAS", "USK_SUT", "UKON"]
+    loglar = {}
+    for kaynak in izlenen:
+        try:
+            loglar[kaynak] = (
+                get_supabase().table("scraper_log")
+                .select("durum,kayit_sayisi,hata_mesaji")
+                .eq("kaynak", kaynak)
+                .order("calisma_tarihi", desc=True)
+                .limit(SESSIZ_ESIK)
+                .execute()
+            ).data or []
+        except Exception as e:
+            print(f"[UYARI] saglik kontrolu okunamadi ({kaynak}): {e}")
+    sessiz = sessiz_kaynaklar(loglar)
+    for k in sessiz:
+        son_hata = next((r.get("hata_mesaji") for r in loglar[k] if r.get("hata_mesaji")), None)
+        print(f"[KRITIK] {k}: son {SESSIZ_ESIK} kosuda veri yok" + (f" — {son_hata}" if son_hata else " (0 kayit)"))
+    return sessiz
 
 
 # --- UPSERT ---
@@ -670,6 +714,10 @@ def main():
         json.dumps(tum, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     print(f"\nToplam: {len(tum)} kayit yazildi.")
+
+    # Her sey yazildiktan SONRA: sessiz kaynak varsa kosu kirmizi biter
+    if saglik_kontrol():
+        sys.exit(1)
 
 
 if __name__ == "__main__":
