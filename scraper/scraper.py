@@ -206,8 +206,9 @@ def hayvan_kaydet(veriler: list):
 
 
 # --- TOBB SCRAPER ---
+# ANKARA (5AN10) cikarildi: TOBB sayfasinda yalniz et urunleri (dana/kuzu karkas,
+# but, kol) var, hububat yok -> Haziran'dan beri her gece 0 kayit donuyordu.
 TOBB_BORSALAR = {
-    "ANKARA":    "5AN10",
     "ESKISEHIR": "5ES10",
     "CORUM":     "5CO20",
     "ILGIN":     "5IL10",
@@ -282,53 +283,66 @@ def tobb_scrape(borsa_adi: str, borsa_kod: str) -> list:
         return []
 
 
-# --- KTB SCRAPER (Playwright) ---
-def ktb_scrape() -> list:
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        print("[UYARI] Playwright kurulu degil")
-        return []
+# --- KTB SCRAPER (Konya Ticaret Borsasi API) ---
+# Site Angular SPA; eski Playwright yolu "anlik bulten" tablosunu okuyordu ki gece
+# 23:00'te bos (ve sutunlari yanlis eslenmisti: ortalama yerine "En Cok") -> hic veri
+# gelmedi. Resmi gunluk tescil bulteni JSON olarak acik: ayni gunun kapanis verisi.
+KTB_BULTEN_URL = "https://www.ktb.org.tr/api/v1/Alpha.WebPanel/OnlineKullaniciBulten/GetTescilGunlukBulten/{tarih}"
+
+
+def ktb_birlestir(satirlar: list, tarih: str) -> list:
+    """Tescil satirlarini urun_norm basina birlestirir: ortalama islem miktarina
+    gore agirlikli, en_az/en_cok tum siniflarin min/max'i, islem_miktari toplam kg."""
+    gruplar: dict[str, list] = {}
+    for r in satirlar:
+        norm = urun_norm_bul(r.get("GrupAdi") or "") or urun_norm_bul(r.get("UrunGrubu") or "")
+        ort, kg = parse_fiyat(r.get("AvgFiyat")), r.get("TopMiktar")
+        if not norm or ort is None or not kg:
+            continue
+        gruplar.setdefault(norm, []).append((r, ort, float(kg)))
     sonuclar = []
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        try:
-            page.goto("https://www.ktb.org.tr/anlikfiyat", timeout=30000)
-            page.wait_for_selector("table", timeout=15000)
-            soup = BeautifulSoup(page.content(), "html.parser")
-            for tablo in soup.find_all("table"):
-                for satir in tablo.find_all("tr")[1:]:
-                    h = [td.get_text(strip=True) for td in satir.find_all("td")]
-                    if len(h) < 4:
-                        continue
-                    norm = urun_norm_bul(h[0])
-                    if not norm:
-                        continue
-                    ortalama = sinirla(ton_to_kg(parse_fiyat(h[2])) if len(h) > 2 else None, YEM_FIYAT_SINIR)
-                    if ortalama is None:
-                        continue
-                    sonuclar.append({
-                        "borsa":          "KTB_KONYA",
-                        "urun":           h[0],
-                        "urun_norm":      norm,
-                        "birim":          "KG",
-                        "son_tarih":      None,
-                        "en_az":          ortalama,
-                        "en_cok":         sinirla(ton_to_kg(parse_fiyat(h[3])) if len(h) > 3 else None, YEM_FIYAT_SINIR),
-                        "ortalama":       ortalama,
-                        "islem_miktari":  None,
-                        "cekilme_tarihi": bugun_tr(),
-                    })
-            log_yaz("KTB_KONYA", "basarili", len(sonuclar))
-            print(f"[OK] KTB: {len(sonuclar)} urun")
-        except Exception as e:
-            log_yaz("KTB_KONYA", "hata", hata=e)
-            fallback_kontrol("KTB_KONYA")
-            print(f"[HATA] KTB: {e}")
-        finally:
-            browser.close()
+    for norm, rs in gruplar.items():
+        toplam = sum(kg for _, _, kg in rs)
+        ortalama = sinirla(sum(o * kg for _, o, kg in rs) / toplam, YEM_FIYAT_SINIR)
+        if ortalama is None:
+            continue
+        minler = [v for v in (parse_fiyat(r.get("MinFiyat")) for r, _, _ in rs) if v is not None]
+        maxlar = [v for v in (parse_fiyat(r.get("MaxFiyat")) for r, _, _ in rs) if v is not None]
+        sonuclar.append({
+            "borsa":          "KONYA",  # diger borsalar gibi il adi: bolgem eslesmesi + gorunen ad
+            "urun":           rs[0][0].get("UrunGrubu") or norm,
+            "urun_norm":      norm,
+            "birim":          "KG",
+            "son_tarih":      None,
+            "en_az":          sinirla(min(minler), YEM_FIYAT_SINIR) if minler else None,
+            "en_cok":         sinirla(max(maxlar), YEM_FIYAT_SINIR) if maxlar else None,
+            "ortalama":       round(ortalama, 4),
+            "islem_miktari":  toplam,
+            "cekilme_tarihi": tarih,
+        })
     return sonuclar
+
+
+def ktb_scrape() -> list:
+    tarih = bugun_tr()
+    try:
+        resp = requests.get(
+            KTB_BULTEN_URL.format(tarih=tarih),
+            headers={"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"},
+            timeout=20,
+        )
+        resp.raise_for_status()
+        # Islem olmayan gun (hafta sonu/tatil) bos liste ya da 204 doner
+        satirlar = resp.json() if resp.status_code == 200 and resp.content else []
+        sonuclar = ktb_birlestir(satirlar, tarih)
+        log_yaz("KTB_KONYA", "basarili", len(sonuclar))
+        print(f"[OK] KTB: {len(sonuclar)} urun")
+        return sonuclar
+    except Exception as e:
+        log_yaz("KTB_KONYA", "hata", hata=e)
+        fallback_kontrol("KTB_KONYA")
+        print(f"[HATA] KTB: {e}")
+        return []
 
 
 # --- ESK SCRAPER (Karkas) ---

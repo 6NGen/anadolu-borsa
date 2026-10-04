@@ -238,3 +238,26 @@ def test_tobb_ca_bundle_ara_sertifikayi_icerir():
     ara = scraper.TOBB_ARA_SERTIFIKA.read_text(encoding="utf-8").strip()
     assert ara in icerik
     assert icerik.count("BEGIN CERTIFICATE") > 100  # certifi kokleri de var
+
+
+def test_ktb_birlestir_agirlikli_ortalama():
+    from scraper import ktb_birlestir
+    satirlar = [
+        {"GrupAdi": "Kırmızı Sert Buğday", "UrunGrubu": "BUĞDAYLAR", "MinFiyat": "19,0000",
+         "AvgFiyat": "20,0000", "MaxFiyat": "21,0000", "TopMiktar": 3000},
+        {"GrupAdi": "Makarnalık Buğday", "UrunGrubu": "BUĞDAYLAR", "MinFiyat": "15,0000",
+         "AvgFiyat": "16,0000", "MaxFiyat": "17,0000", "TopMiktar": 1000},
+        {"GrupAdi": "Nohut", "UrunGrubu": "NOHUT", "MinFiyat": "45,0000",
+         "AvgFiyat": "46,0000", "MaxFiyat": "47,0000", "TopMiktar": 500},
+    ]
+    sonuc = ktb_birlestir(satirlar, "2026-10-02")
+    assert len(sonuc) == 1  # nohut hedef urun degil
+    b = sonuc[0]
+    assert b["urun_norm"] == "BUGDAY" and b["borsa"] == "KONYA"
+    assert b["ortalama"] == pytest.approx(19.0)  # (20*3000 + 16*1000) / 4000
+    assert (b["en_az"], b["en_cok"], b["islem_miktari"]) == (15.0, 21.0, 4000.0)
+
+
+def test_ktb_birlestir_bos_gun():
+    from scraper import ktb_birlestir
+    assert ktb_birlestir([], "2026-10-04") == []
