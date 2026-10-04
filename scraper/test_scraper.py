@@ -317,3 +317,14 @@ def test_tobb_birlestir_gelecek_ve_bozuk_tarih_atlanir():
         ["ARPA", "KG", "", "13,0", "13,0", "13,0", "1.000"],                   # tarihsiz
     ]
     assert tobb_birlestir("CORUM", satirlar, "2026-10-04") == []
+
+
+def test_opet_motorin_medyan():
+    from scraper import opet_motorin_medyan
+    def ilce(f, kod="A128"):
+        return {"prices": [{"productCode": "A100", "amount": 85.6}, {"productCode": kod, "amount": f}]}
+    ankara = [ilce(96.06), ilce(96.08)]
+    konya = [ilce(96.50), ilce(95.90, kod="A121")]  # UltraForce sayilmaz
+    assert opet_motorin_medyan([ankara, konya]) == pytest.approx(96.08)
+    assert opet_motorin_medyan([[ilce(5000.0)]]) is None  # birim hatasi -> yazma
+    assert opet_motorin_medyan([[], None]) is None

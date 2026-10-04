@@ -199,7 +199,7 @@ def sessiz_kaynaklar(loglar: dict[str, list], esik: int = SESSIZ_ESIK) -> list[s
 
 
 def saglik_kontrol() -> list[str]:
-    izlenen = [f"TOBB_{ad}" for ad in TOBB_BORSALAR] + ["KTB_KONYA", "ESK_KARKAS", "USK_SUT", "UKON"]
+    izlenen = [f"TOBB_{ad}" for ad in TOBB_BORSALAR] + ["KTB_KONYA", "ESK_KARKAS", "USK_SUT", "UKON", "OPET_MAZOT"]
     loglar = {}
     for kaynak in izlenen:
         try:
@@ -697,6 +697,60 @@ def ukon_playwright() -> list:
             browser.close()
 
 
+# --- MAZOT (Opet pompa fiyati) ---
+# 2026-10-04'e kadar mazot elle giriliyordu (mazot_guncelle.py); son kayit
+# 08.06'da 67,02 kalmisti, pompa 96,06 olmustu -> tum parite oranlari ~%30 yanlis.
+# Opet'in acik fiyat API'si il bazinda ilce fiyatlarini verir. Referans: borsalarimizin
+# oldugu illerdeki standart motorin (EcoForce) ilce fiyatlarinin medyani.
+OPET_FIYAT_URL = "https://api.opet.com.tr/api/fuelprices/prices?ProvinceCode={il}&IncludeAllProducts=true"
+OPET_ILLER = {"ANKARA": 6, "ESKISEHIR": 26, "CORUM": 19, "KONYA": 42}
+OPET_MOTORIN_KODU = "A128"  # Motorin EcoForce (standart motorin)
+MAZOT_SINIR = (10.0, 300.0)
+
+
+def opet_motorin_medyan(il_yanitlari: list[list]) -> float | None:
+    """Saf: her il yanitindaki tum ilcelerin standart motorin fiyatlarinin medyani."""
+    import statistics
+    fiyatlar = [
+        float(p["amount"])
+        for yanit in il_yanitlari
+        for ilce in (yanit or [])
+        for p in ilce.get("prices", [])
+        if p.get("productCode") == OPET_MOTORIN_KODU and p.get("amount")
+    ]
+    if not fiyatlar:
+        return None
+    return sinirla(round(statistics.median(fiyatlar), 2), MAZOT_SINIR)
+
+
+def mazot_guncelle_otomatik():
+    try:
+        yanitlar = []
+        for il in OPET_ILLER.values():
+            r = istek_tekrarla(OPET_FIYAT_URL.format(il=il), timeout=20,
+                               headers={"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"})
+            yanitlar.append(r.json())
+            time.sleep(1)
+        fiyat = opet_motorin_medyan(yanitlar)
+        if fiyat is None:
+            raise Exception("Opet yanitinda motorin fiyati yok/makul degil")
+        get_supabase().table("girdi_fiyat").upsert(
+            {
+                "girdi_turu":        "mazot",
+                "fiyat":             fiyat,
+                "birim":             "TL/litre",
+                "kaynak":            "Opet pompa (Ankara/Eskisehir/Corum/Konya medyan)",
+                "gecerlilik_tarihi": bugun_tr(),
+            },
+            on_conflict="girdi_turu,gecerlilik_tarihi",
+        ).execute()
+        log_yaz("OPET_MAZOT", "basarili", 1)
+        print(f"[OK] Mazot (Opet): {fiyat} TL/litre")
+    except Exception as e:
+        log_yaz("OPET_MAZOT", "hata", hata=e)
+        print(f"[HATA] Mazot (Opet): {e}")
+
+
 # --- HAVA ---
 def hava_guncelle():
     from hava import hava_cek
@@ -739,6 +793,9 @@ def main():
     hayvan_veriler.extend(ukon_scrape())
     if hayvan_veriler:
         hayvan_kaydet(hayvan_veriler)
+
+    # MAZOT (parite + gunluk ozet bundan once guncel olmali)
+    mazot_guncelle_otomatik()
 
     # HAVA
     try:
