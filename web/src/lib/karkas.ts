@@ -27,6 +27,14 @@ export const HAYVAN_GORUNEN: Record<string, string> = {
 };
 export const hayvanGorunen = (norm: string) => HAYVAN_GORUNEN[norm] ?? norm;
 
+// Arayüz için normal yazım ("Dana", "Çiğ süt"). Büyük harfli HAYVAN_GORUNEN
+// PNG paylaşım kartlarında (app/api/kart) kullanılmaya devam eder.
+export const HAYVAN_AD_UI: Record<string, string> = {
+  TOSUN: "Tosun", DANA: "Dana", INEK: "İnek", MANDA: "Manda",
+  KUZU: "Kuzu", TOKLU: "Toklu", KOYUN: "Koyun", OGLAK: "Oğlak", SUT: "Çiğ süt",
+};
+export const hayvanAd = (norm: string) => HAYVAN_AD_UI[norm] ?? norm;
+
 // "baş (ort. 450kg, %50 karkas)" — canlı ağırlık = karkas × 2 varsayımı
 export function karkasLabel(norm: string): string {
   const kg = KARKAS_KG[norm];

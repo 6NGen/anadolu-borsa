@@ -26,12 +26,12 @@ export default function GirisPage() {
   if (!yukleniyor && user) {
     return (
       <main style={{ maxWidth: "420px", margin: "48px auto", padding: "0 16px", fontFamily: "var(--font-mono)", textAlign: "center" }}>
-        <div style={{ fontSize: "32px", marginBottom: "10px" }}>👤</div>
-        <h1 style={{ fontSize: "15px", color: RENKLER.text, fontWeight: 700 }}>Giriş yapıldı</h1>
+
+        <h1 className="ab-h1">Giriş yapıldı</h1>
         <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px" }}>{user.email}</p>
         <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
-          <Link href="/fiyat-bildir" style={{ flex: 1, padding: "10px", background: RENKLER.green, color: "#000", borderRadius: "3px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Fiyat Bildir</Link>
-          <button onClick={() => cikisYap()} style={{ flex: 1, padding: "10px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)" }}>Çıkış</button>
+          <Link href="/fiyat-bildir" style={{ flex: 1, padding: "10px", background: RENKLER.green, color: "#000", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Fiyat Bildir</Link>
+          <button onClick={() => cikisYap()} style={{ flex: 1, padding: "10px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)" }}>Çıkış</button>
         </div>
       </main>
     );
@@ -39,12 +39,12 @@ export default function GirisPage() {
 
   return (
     <main style={{ maxWidth: "420px", margin: "48px auto", padding: "0 16px", fontFamily: "var(--font-mono)" }}>
-      <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>GİRİŞ</h1>
+      <h1 className="ab-h1">Giriş yap</h1>
       <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px", marginBottom: "20px" }}>
         Google hesabınla tek tıkla giriş — şifre yok.
       </p>
 
-      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
+      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px" }}>
         <label style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "13px", color: RENKLER.muted, lineHeight: 1.5, cursor: "pointer" }}>
           <input type="checkbox" checked={kvkk} onChange={(e) => setKvkk(e.target.checked)} style={{ marginTop: "2px", accentColor: RENKLER.green }} />
           <span>
@@ -60,12 +60,12 @@ export default function GirisPage() {
           disabled={!kvkk || gidiliyor}
           style={{
             display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-            width: "100%", padding: "11px", fontSize: "13px", borderRadius: "3px", fontWeight: 700, fontFamily: "var(--font-mono)",
-            background: kvkk ? "#fff" : "#1A2018", color: kvkk ? "#1A1A1A" : "#587D62",
+            width: "100%", padding: "11px", fontSize: "13px", borderRadius: "6px", fontWeight: 700, fontFamily: "var(--font-mono)",
+            background: kvkk ? "#fff" : "#1A2018", color: kvkk ? "#1A1A1A" : "#6E8276",
             border: "none", cursor: kvkk && !gidiliyor ? "pointer" : "not-allowed",
           }}
         >
-          <span style={{ fontSize: "15px", fontWeight: 700, color: kvkk ? "#4285F4" : "#587D62" }}>G</span>
+          <span style={{ fontSize: "15px", fontWeight: 700, color: kvkk ? "#4285F4" : "#6E8276" }}>G</span>
           {gidiliyor ? "Yönlendiriliyor…" : "Google ile Giriş"}
         </button>
       </div>

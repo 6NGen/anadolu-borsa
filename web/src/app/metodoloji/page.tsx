@@ -46,22 +46,22 @@ const KAYNAKLAR = [
 
 const ROZETLER = [
   { isaret: "●", renk: RENKLER.pos, anlam: "bugün — veri bugün çekildi" },
-  { isaret: "⏱", renk: "#E8C040", anlam: "1-2 gün önce — kaynak henüz yeni veri yayınlamadı" },
+  { isaret: "⏱", renk: "#E9B949", anlam: "1-2 gün önce — kaynak henüz yeni veri yayınlamadı" },
   { isaret: "⚠", renk: RENKLER.red, anlam: "3+ gün önce — veri bayat, kaynak yayını kesilmiş olabilir" },
 ];
 
 const S = {
-  h2: { fontSize: "12px", color: RENKLER.green, letterSpacing: "0.15em", margin: "28px 0 10px", fontWeight: 700 } as const,
+  h2: { fontSize: "12px", color: RENKLER.green, letterSpacing: "0.06em", margin: "28px 0 10px", fontWeight: 700 } as const,
   p: { fontSize: "12px", color: RENKLER.text, lineHeight: 1.7, margin: "6px 0" } as const,
   mut: { fontSize: "13px", color: RENKLER.muted, lineHeight: 1.7 } as const,
-  kutu: { background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px 16px" } as const,
+  kutu: { background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "14px 16px" } as const,
   td: { padding: "8px 10px", borderBottom: `1px solid ${RENKLER.border}`, verticalAlign: "top" as const },
 };
 
 export default function MetodolojiPage() {
   return (
     <main style={{ maxWidth: "760px", margin: "32px auto", padding: "0 16px", fontFamily: "var(--font-mono)" }}>
-      <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>METODOLOJİ</h1>
+      <h1 className="ab-h1">Metodoloji</h1>
       <p style={S.mut}>
         Fiyatlar ilgili kurumların kamuya açık yayınlarından derlenir; kaynak ve veri tarihi her kartta belirtilir.
       </p>

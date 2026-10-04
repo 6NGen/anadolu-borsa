@@ -2,6 +2,8 @@
 import { useState } from "react";
 import FiyatGrafik from "./FiyatGrafik";
 import VeriTazelik from "./VeriTazelik";
+import { YEM_AD } from "@/lib/urun-tanim";
+import { kaynakAd } from "@/lib/kaynak-ad";
 import PaylasButonlar from "./PaylasButonlar";
 import { YEM_RENK, RENKLER } from "@/lib/theme";
 import { formatFiyat, kisaTarih } from "@/lib/format";
@@ -62,7 +64,6 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
 
   // Başlık fiyatı: seçili borsanın en güncel satırı
   const guncelSatir = [...seri].sort((a, b) => b.cekilme_tarihi.localeCompare(a.cekilme_tarihi))[0];
-  const sf = sonFiyatlar.find((f) => f.urun_norm === secilen);
   const renk = YEM_RENK[secilen] ?? RENKLER.green;
 
   // M2: borsa karşılaştırması — her borsanın bu ürün için en güncel satırı
@@ -87,9 +88,11 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
             <button
               key={f.urun_norm}
               onClick={() => { setSecilen(f.urun_norm); setBorsaSecim(null); }}
-              style={{ padding: "5px 12px", fontSize: "13px", background: aktif ? r : RENKLER.surface, color: aktif ? "#000" : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}
+              className="ab-chip"
+              style={aktif ? { background: `${r}22`, color: "var(--text)", borderColor: r, fontWeight: 600 } : undefined}
             >
-              {f.urun_norm}
+              <span aria-hidden style={{ width: 7, height: 7, borderRadius: "50%", background: r, marginRight: 7 }} />
+              {YEM_AD[f.urun_norm] ?? f.urun_norm}
             </button>
           );
         })}
@@ -104,9 +107,10 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
               <button
                 key={b}
                 onClick={() => setBorsaSecim(b)}
-                style={{ padding: "3px 10px", fontSize: "12px", background: aktif ? "#1A3020" : "transparent", color: aktif ? RENKLER.text : RENKLER.muted, border: `1px solid ${aktif ? RENKLER.green : RENKLER.border}`, borderRadius: "10px", cursor: "pointer", fontFamily: "var(--font-mono)" }}
+                className="ab-chip"
+                style={{ height: "28px", fontSize: "12.5px", ...(aktif ? { background: "var(--green-soft)", color: "var(--text)", borderColor: "var(--green)" } : {}) }}
               >
-                {b}
+                {kaynakAd(b)}
               </button>
             );
           })}
@@ -119,19 +123,19 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
           <div style={{ display: "flex", gap: "16px", alignItems: "baseline", marginBottom: "10px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "36px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(guncelSatir.ortalama)}</span>
             <span style={{ fontSize: "13px", color: RENKLER.muted }}>TL/KG</span>
-            <span style={{ fontSize: "13px", color: RENKLER.muted }}>{borsa} · {guncelSatir.cekilme_tarihi}</span>
+            <span style={{ fontSize: "13px", color: RENKLER.muted }}>{kaynakAd(borsa)} · {guncelSatir.cekilme_tarihi}</span>
             <VeriTazelik tarih={guncelSatir.cekilme_tarihi} />
             {guncelSatir.islem_miktari != null && (
               <span style={{ fontSize: "13px", color: RENKLER.muted }}>
                 · {tonGoster(guncelSatir.islem_miktari)} işlem
-                {guncelSatir.islem_miktari < DUSUK_HACIM_KG && <span style={{ color: "#E8C040", marginLeft: "6px" }}>⚠ düşük hacim</span>}
+                {guncelSatir.islem_miktari < DUSUK_HACIM_KG && <span style={{ color: "#E9B949", marginLeft: "6px" }}>⚠ düşük hacim</span>}
               </span>
             )}
           </div>
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
           <div style={{ marginBottom: "16px" }}>
             <PaylasButonlar
-              metin={`🌾 ${sf?.urun_ad ?? secilen} ${formatFiyat(guncelSatir.ortalama)} TL/kg\n${borsa} · ${kisaTarih(guncelSatir.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/tarim`}
+              metin={`${YEM_AD[secilen] ?? secilen} ${formatFiyat(guncelSatir.ortalama)} TL/kg\n${borsa} · ${kisaTarih(guncelSatir.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/tarim`}
               pngUrl={kartUretilebilir(guncelSatir.cekilme_tarihi) ? `/api/kart/fiyat?urun=${secilen}` : null}
             />
           </div>
@@ -140,23 +144,23 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
 
       {/* M2: Borsa karşılaştırması — aynı ürün, tüm borsalar */}
       {borsaOzet.length > 1 && (
-        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "12px", marginBottom: "16px" }}>
+        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "12px", marginBottom: "16px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-            <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em" }}>BORSALAR · {sf?.urun_ad ?? secilen}</span>
+            <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em" }}>BORSALAR · {YEM_AD[secilen] ?? secilen}</span>
             <span style={{ display: "flex", gap: "10px", alignItems: "center" }}>
               {fark != null && <span style={{ fontSize: "12px", color: RENKLER.muted }}>fark: <b style={{ color: renk }}>%{formatFiyat(fark, 1)}</b></span>}
               {kartUretilebilir(guncelSatir?.cekilme_tarihi) && (
-                <button onClick={() => window.open(`/api/kart/borsalar?urun=${secilen}`, "_blank")} style={{ background: "transparent", border: `1px solid ${RENKLER.border}`, color: RENKLER.muted, fontSize: "12px", padding: "3px 9px", borderRadius: "12px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>📷 Kart</button>
+                <button onClick={() => window.open(`/api/kart/borsalar?urun=${secilen}`, "_blank")} style={{ background: "transparent", border: `1px solid ${RENKLER.border}`, color: RENKLER.muted, fontSize: "12px", padding: "3px 9px", borderRadius: "12px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>Kart</button>
               )}
             </span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
             {borsaOzet.map((x) => (
-              <div key={x.borsa} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", padding: "7px 9px", background: RENKLER.bg, borderRadius: "4px", border: x.borsa === borsa ? `1px solid ${renk}55` : `1px solid ${RENKLER.border}` }}>
-                <span style={{ color: RENKLER.text }}>{x.borsa} <span style={{ fontSize: "12px", color: RENKLER.muted }}>· {kisaTarih(x.tarih)}</span></span>
+              <div key={x.borsa} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "12px", padding: "7px 9px", background: RENKLER.bg, borderRadius: "12px", border: x.borsa === borsa ? `1px solid ${renk}55` : `1px solid ${RENKLER.border}` }}>
+                <span style={{ color: RENKLER.text, fontWeight: 600 }}>{kaynakAd(x.borsa)} <span style={{ fontSize: "12px", color: RENKLER.muted }}>· {kisaTarih(x.tarih)}</span></span>
                 <span style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                   {x.hacim != null && (
-                    <span style={{ fontSize: "12px", color: x.hacim < DUSUK_HACIM_KG ? "#E8C040" : RENKLER.muted }}>
+                    <span style={{ fontSize: "12px", color: x.hacim < DUSUK_HACIM_KG ? "#E9B949" : RENKLER.muted }}>
                       {tonGoster(x.hacim)}{x.hacim < DUSUK_HACIM_KG ? " ⚠" : ""}
                     </span>
                   )}
@@ -172,11 +176,11 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
       )}
 
       {/* Grafik */}
-      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "12px" }}>
-        <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>
-          30 GÜN TARİHÇE · {gunSayisi}/30 gün{borsa ? ` · ${borsa}` : ""}
+      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "12px" }}>
+        <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.06em" }}>
+          30 GÜN TARİHÇE · {gunSayisi}/30 gün{borsa ? ` · ${kaynakAd(borsa)}` : ""}
         </div>
-        <FiyatGrafik data={grafikVeri} renk={renk} birim="TL/KG" urun_ad={sf?.urun_ad ?? secilen} kaynakEtiket={borsa ?? undefined} />
+        <FiyatGrafik data={grafikVeri} renk={renk} birim="TL/KG" urun_ad={YEM_AD[secilen] ?? secilen} kaynakEtiket={borsa ? kaynakAd(borsa) : undefined} />
       </div>
     </div>
   );

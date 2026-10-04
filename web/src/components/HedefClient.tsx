@@ -25,7 +25,7 @@ export interface VarlikItem {
   hist: { y: string; f: number }[];
 }
 
-const C = { bg: "#060E08", surf: "#0A140C", brd: "#1A3020", mut: "#7BA98C", txt: "#DDF0DE", pos: "#4AE870", neg: "#E84A4A" };
+const C = { bg: "#0E1511", surf: "#0E1511", brd: "#223029", mut: "#94A89B", txt: "#E8EFEA", pos: "#4CC38A", neg: "#F07167" };
 
 function TT({ active, payload, label, sfx = "" }: { active?: boolean; payload?: { name?: string; value?: number; color?: string }[]; label?: string; sfx?: string }) {
   if (!active || !payload?.length) return null;
@@ -62,7 +62,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
 
   if (!u || !v) {
     return (
-      <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 12, padding: 40, textAlign: "center", color: C.mut, fontFamily: "monospace" }}>
+      <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 12, padding: 40, textAlign: "center", color: C.mut, fontFamily: "inherit" }}>
         Ürün/varlık verisi bulunamadı. Fiyatlar çekildikten sonra görünür.
       </div>
     );
@@ -94,16 +94,20 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
   }));
 
   return (
-    <div style={{ fontFamily: "'Courier New',monospace", color: C.txt, maxWidth: 1200, margin: "0 auto", padding: 4 }}>
-      <style>{`select option{background:#0A140C;}`}</style>
+    <main className="ab-container" style={{ color: C.txt, paddingTop: 28 }}>
+      <style>{`select option{background:#0E1511;}`}</style>
+      <div style={{ marginBottom: 18 }}>
+        <h1 className="ab-h1">Hedef panel</h1>
+        <p>Ürününün bugünkü borsa fiyatıyla traktör, tarla, arsa veya daire karşılığı. Varlık fiyatları Konya referans serisidir.</p>
+      </div>
 
       {/* Panel */}
-      <div style={{ background: "#0A1810", border: "1px solid #1A4028", borderRadius: 16, padding: 20, marginBottom: 20 }}>
-        <div style={{ fontSize: 12, color: "#5FBF80", letterSpacing: 2, marginBottom: 16 }}>🎯 ÜRETİCİ HEDEF PANELİ — KONYA</div>
+      <div style={{ background: "#0E1511", border: "1px solid #2E3F35", borderRadius: 16, padding: 20, marginBottom: 20 }}>
+        <div className="ab-eyebrow" style={{ marginBottom: 16 }}>Hesapla</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" style={{ marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>ÜRÜN</div>
-            <select value={urun} onChange={(e) => setUrun(e.target.value)} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 12, fontFamily: "monospace", outline: "none" }}>
+            <select value={urun} onChange={(e) => setUrun(e.target.value)} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 12, fontFamily: "inherit", outline: "none" }}>
               {yemler.length > 0 && (
                 <optgroup label="Tahıllar & Yem">
                   {yemler.map((y) => <option key={y.norm} value={y.norm}>{y.ad}</option>)}
@@ -118,14 +122,14 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
           </div>
           <div>
             <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>HEDEF VARLIK</div>
-            <select value={varlik} onChange={(e) => setVarlik(e.target.value)} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 12, fontFamily: "monospace", outline: "none" }}>
-              {Object.entries(varliklar).map(([k, val]) => <option key={k} value={k}>{val.ikon} {val.ad}</option>)}
+            <select value={varlik} onChange={(e) => setVarlik(e.target.value)} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 12, fontFamily: "inherit", outline: "none" }}>
+              {Object.entries(varliklar).map(([k, val]) => <option key={k} value={k}>{val.ad}</option>)}
             </select>
           </div>
           <div>
             <div style={{ fontSize: 12, color: C.mut, marginBottom: 4 }}>MİKTAR ({miktarBirimi.toUpperCase()})</div>
-            <input type="number" value={miktar} min={1} onChange={(e) => setMiktar(Math.max(1, +e.target.value || 1))} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 16, fontFamily: "monospace", outline: "none" }} />
-            {hayvanMi && <div style={{ fontSize: 12, color: "#6B9478", marginTop: 4 }}>{u.karkasLabel}</div>}
+            <input type="number" value={miktar} min={1} onChange={(e) => setMiktar(Math.max(1, +e.target.value || 1))} style={{ width: "100%", background: C.bg, border: `1px solid ${C.brd}`, borderRadius: 8, padding: "8px 10px", color: C.txt, fontSize: 16, fontFamily: "inherit", outline: "none" }} />
+            {hayvanMi && <div style={{ fontSize: 12, color: "#94A89B", marginTop: 4 }}>{u.karkasLabel}</div>}
           </div>
         </div>
 
@@ -141,7 +145,7 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             {kacBirim && (
               <div>
                 <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>1 {v.ad.toUpperCase()} İÇİN</div>
-                <div style={{ fontSize: 32, fontWeight: 800, color: "#E86040", letterSpacing: -1 }}>
+                <div style={{ fontSize: 32, fontWeight: 800, color: "#F07167", letterSpacing: -1 }}>
                   {formatFiyat(Number(kacBirim), hayvanMi ? 0 : 1)}
                   <span style={{ fontSize: 14, color: C.mut, marginLeft: 5, fontWeight: 400 }}>{miktarBirimi} {u.ad.toLowerCase()}</span>
                 </div>
@@ -169,10 +173,9 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
             : `1 ${miktarBirimi} = ${formatFiyat(birimGelir / val.fiyat, 1)} m²`;
           return (
             <Kart key={k} renk={val.renk} onClick={() => setVarlik(k)}>
-              <div style={{ fontSize: 16, marginBottom: 4 }}>{val.ikon}</div>
               <div style={{ fontSize: 12, color: C.mut, marginBottom: 3 }}>{val.ad.toUpperCase()}</div>
               <div style={{ fontSize: 14, fontWeight: 700, color: varlik === k ? val.renk : C.txt }}>{etiket}</div>
-              <div style={{ fontSize: 12, color: "#6B9478", marginTop: 3 }}>{val.aciklama}</div>
+              <div style={{ fontSize: 12, color: "#94A89B", marginTop: 3 }}>{val.aciklama}</div>
             </Kart>
           );
         })}
@@ -181,11 +184,11 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
       {/* Tarihsel grafik */}
       <div style={{ background: C.surf, border: `1px solid ${C.brd}`, borderRadius: 14, padding: 20 }}>
         <div style={{ fontSize: 12, color: C.mut, letterSpacing: 1, marginBottom: 12 }}>
-          TARİHSEL — 1 {v.ikon} {v.ad.toUpperCase()} İÇİN KAÇ {miktarBirimi.toUpperCase()} {u.ad.toUpperCase()}?
+          TARİHSEL — 1 {v.ad.toUpperCase()} İÇİN KAÇ {miktarBirimi.toUpperCase()} {u.ad.toUpperCase()}?
         </div>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={tarihsel} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-            <CartesianGrid stroke="#142018" strokeDasharray="4 4" vertical={false} />
+            <CartesianGrid stroke="#17211B" strokeDasharray="4 4" vertical={false} />
             <XAxis dataKey="y" tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fill: C.mut, fontSize: 12 }} axisLine={false} tickLine={false} />
             {/* 3.6: hover'daki gri bant (varsayılan cursor) kaldırıldı — ikinci bar gibi okunuyordu */}
@@ -197,6 +200,6 @@ export default function HedefClient({ urunler, varliklar }: { urunler: UrunItem[
           Güncel ürün fiyatı canlı borsa verisidir (TOBB/ESK) · Varlık fiyatları Konya referans serisi (TÜİK/manuel)
         </div>
       </div>
-    </div>
+    </main>
   );
 }

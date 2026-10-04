@@ -7,7 +7,7 @@ import { HAYVAN_RENK, RENKLER } from "@/lib/theme";
 import { formatFiyat, kisaTarih } from "@/lib/format";
 import { distinctGun } from "@/lib/guncel";
 import { kartUretilebilir } from "@/lib/tazelik";
-import { hayvanGorunen } from "@/lib/karkas";
+import { hayvanAd } from "@/lib/karkas";
 import { donemAnahtar } from "@/lib/donem";
 
 interface HayvanFiyat {
@@ -56,9 +56,9 @@ export default function HayvanClient({ fiyatlar, grafik, donem }: Props) {
             <button
               key={`${f.kaynak}-${f.hayvan_norm}`}
               onClick={() => setSecilen(f.hayvan_norm)}
-              style={{ padding: "5px 12px", fontSize: "13px", background: aktif ? r : RENKLER.surface, color: aktif ? "#fff" : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}
+              style={{ padding: "5px 12px", fontSize: "13px", background: aktif ? r : RENKLER.surface, color: aktif ? "#fff" : RENKLER.muted, border: `1px solid ${aktif ? r : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}
             >
-              {hayvanGorunen(f.hayvan_norm)}
+              {hayvanAd(f.hayvan_norm)}
             </button>
           );
         })}
@@ -75,15 +75,15 @@ export default function HayvanClient({ fiyatlar, grafik, donem }: Props) {
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
           <div style={{ marginBottom: "16px" }}>
             <PaylasButonlar
-              metin={`🐄 ${hayvanGorunen(secilen)} ${formatFiyat(sf.fiyat)} ${sf.birim}\n${sf.kaynak.replace("_SUT", "")} · ${kisaTarih(sf.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/hayvan`}
+              metin={`🐄 ${hayvanAd(secilen)} ${formatFiyat(sf.fiyat)} ${sf.birim}\n${sf.kaynak.replace("_SUT", "")} · ${kisaTarih(sf.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/hayvan`}
               pngUrl={kartUretilebilir(sf.cekilme_tarihi) ? `/api/kart/fiyat?urun=${secilen}` : null}
             />
           </div>
         </>
       )}
 
-      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "12px" }}>
-        <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>
+      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "12px" }}>
+        <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.06em" }}>
           30 GÜN TARİHÇE · {gunSayisi}/30 gün{sf ? ` · ${sf.kaynak}` : ""}
         </div>
         <FiyatGrafik data={grafikVeri} renk={renk} birim={sf?.birim ?? "TL/kg"} urun_ad={sf?.hayvan ?? secilen} kaynakEtiket={sf?.kaynak} />

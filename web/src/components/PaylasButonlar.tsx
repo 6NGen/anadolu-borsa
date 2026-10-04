@@ -1,13 +1,23 @@
 "use client";
-// Ortak paylaşım butonu üçlüsü: WhatsApp + X + PNG kart (parite tasarımıyla aynı).
-// pngUrl null ise PNG butonu PASİF gösterilir (KARAR 2026-06-12: bayat veride
+// Ortak paylaşım butonları: WhatsApp + X + görsel kart.
+// pngUrl null ise kart butonu PASİF gösterilir (KARAR 2026-06-12: bayat veride
 // kart üretilmez) ve pasifNot ile nedeni açıkça yazılır — buton gizlenmez.
 import { useCallback } from "react";
+import { ImageDown, Lock, MessageCircle } from "lucide-react";
 
 interface Props {
   metin: string;            // WhatsApp/X paylaşım metni
   pngUrl: string | null;    // kart endpoint'i; null → pasif
   pasifNot?: string;        // pasifken gösterilen açıklama
+}
+
+// X logosu (lucide'de marka ikonu yok)
+function XLogo() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
 }
 
 export default function PaylasButonlar({ metin, pngUrl, pasifNot = "veri güncellenince paylaşım açılır" }: Props) {
@@ -19,23 +29,27 @@ export default function PaylasButonlar({ metin, pngUrl, pasifNot = "veri güncel
     else if (pngUrl) window.open(pngUrl, "_blank");
   }, [metin, pngUrl]);
 
-  const stil = (renk: string, aktif = true): React.CSSProperties => ({
-    background: "transparent",
-    border: `1px solid ${aktif ? renk : "#2E4A38"}`,
-    color: aktif ? renk : "#587D62",
-    padding: "8px 18px", borderRadius: 20, cursor: aktif ? "pointer" : "not-allowed",
-    fontSize: 13, fontFamily: "var(--font-mono), monospace",
-  });
-
   return (
-    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-      <button onClick={() => paylas("whatsapp")} style={stil("#25D366")}>📱 WhatsApp</button>
-      <button onClick={() => paylas("x")} style={stil("#E7E9EA")}>𝕏 X</button>
-      <button onClick={() => paylas("png")} disabled={!pngUrl} style={stil("#E86040", !!pngUrl)} title={pngUrl ? undefined : pasifNot}>
-        📷 PNG İndir
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+      <button onClick={() => paylas("whatsapp")} className="ab-btn" style={{ height: 34 }}>
+        <MessageCircle size={15} color="#25D366" /> WhatsApp
+      </button>
+      <button onClick={() => paylas("x")} className="ab-btn" style={{ height: 34 }}>
+        <XLogo /> Paylaş
+      </button>
+      <button
+        onClick={() => paylas("png")}
+        disabled={!pngUrl}
+        className="ab-btn"
+        style={{ height: 34, ...(pngUrl ? {} : { opacity: 0.5, cursor: "not-allowed" }) }}
+        title={pngUrl ? "Paylaşım görselini indir" : pasifNot}
+      >
+        <ImageDown size={15} /> Görsel kart
       </button>
       {!pngUrl && (
-        <span style={{ fontSize: 12, color: "#E8C040" }}>🔒 {pasifNot}</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12.5, color: "var(--warn)" }}>
+          <Lock size={13} /> {pasifNot}
+        </span>
       )}
     </div>
   );

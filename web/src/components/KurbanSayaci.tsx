@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { RENKLER } from "@/lib/theme";
+import { ArrowRight, CalendarDays } from "lucide-react";
 
 // Kurban Bayramı 1. gün tarihleri (Diyanet) — sonraki bayrama geri sayım
 const KURBAN_TARIHLERI = [
@@ -11,6 +11,8 @@ const KURBAN_TARIHLERI = [
   "2029-04-24",
   "2030-04-13",
 ];
+
+const GORUNUR_GUN = 90;
 
 function sonrakiKurban(): Date {
   const bugun = new Date();
@@ -42,35 +44,31 @@ export default function KurbanSayaci() {
     return () => clearInterval(id);
   }, []);
 
-  if (!kalan || !hedef) return null;
+  // Yalnız son 90 günde görünür: aylar önceden saniyeli geri sayım gürültüdür
+  if (!kalan || !hedef || kalan.gun > GORUNUR_GUN) return null;
 
   const Birim = ({ deger, etiket }: { deger: number; etiket: string }) => (
-    <div style={{ textAlign: "center", minWidth: "52px" }}>
-      <div style={{ fontSize: "26px", fontWeight: 700, color: RENKLER.text, fontFamily: "var(--font-mono)", lineHeight: 1 }}>
-        {String(deger).padStart(2, "0")}
-      </div>
-      <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginTop: "4px" }}>{etiket}</div>
+    <div style={{ textAlign: "center", minWidth: "48px" }}>
+      <div className="ab-num" style={{ fontSize: "22px", fontWeight: 700, lineHeight: 1 }}>{String(deger).padStart(2, "0")}</div>
+      <div style={{ fontSize: "11px", color: "var(--faint)", marginTop: "4px" }}>{etiket}</div>
     </div>
   );
 
   return (
-    <Link href="/hayvan" style={{ textDecoration: "none" }}>
-      <div style={{ background: "linear-gradient(90deg, #14241A 0%, #0F1A12 100%)", border: `1px solid ${RENKLER.border}`, borderLeft: "3px solid #68B890", borderRadius: "6px", padding: "14px 18px", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <span style={{ fontSize: "30px" }}>🐑</span>
-          <div>
-            <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>KURBAN BAYRAMI&apos;NA</div>
-            <div style={{ fontSize: "12px", color: RENKLER.muted }}>
-              {hedef.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })} · canlı hayvan fiyatları →
-            </div>
+    <Link href="/hayvan" className="ab-card ab-card-hover" style={{ textDecoration: "none", color: "inherit", padding: "14px 18px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "14px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <span style={{ width: 38, height: 38, borderRadius: 10, background: "var(--green-soft)", color: "var(--green)", display: "grid", placeItems: "center" }}><CalendarDays size={20} /></span>
+        <div>
+          <div style={{ fontSize: "14.5px", fontWeight: 600 }}>Kurban Bayramı&apos;na kalan süre</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", color: "var(--muted)" }}>
+            {hedef.toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })} · hayvan fiyatları <ArrowRight size={13} />
           </div>
         </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <Birim deger={kalan.gun} etiket="GÜN" />
-          <Birim deger={kalan.saat} etiket="SAAT" />
-          <Birim deger={kalan.dakika} etiket="DAKİKA" />
-          <Birim deger={kalan.saniye} etiket="SANİYE" />
-        </div>
+      </div>
+      <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+        <Birim deger={kalan.gun} etiket="gün" />
+        <Birim deger={kalan.saat} etiket="saat" />
+        <Birim deger={kalan.dakika} etiket="dakika" />
       </div>
     </Link>
   );

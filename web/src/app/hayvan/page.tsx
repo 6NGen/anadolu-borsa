@@ -4,7 +4,7 @@ import HayvanClient from "@/components/HayvanClient";
 import SuruDegeri from "@/components/SuruDegeri";
 import PiyasaKarti from "@/components/PiyasaKarti";
 import { tekHayvanKaynak } from "@/lib/guncel";
-import { hayvanGorunen } from "@/lib/karkas";
+import { hayvanAd } from "@/lib/karkas";
 import { RENKLER } from "@/lib/theme";
 import { donemAnahtar, donemBaslangiclari } from "@/lib/donem";
 
@@ -28,9 +28,9 @@ export default async function HayvanPage() {
   const fiyatlar = tekHayvanKaynak(fiyatlarHam ?? []);
 
   return (
-    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
+    <main className="ab-container" style={{ paddingTop: "28px" }}>
       <div style={{ marginBottom: "16px" }}>
-        <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>HAYVAN BORSASI</h1>
+        <h1 className="ab-h1">Hayvan ve süt fiyatları</h1>
         <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>ESK karkas alım fiyatları + Çiğ süt · Her gün kontrol edilir; ESK ve USK fiyatları dönemsel ilan edilir</p>
         {/* Faz 0.1 "yarı fiyat" bağlamı: resmi ≠ saha — kaynak kapsamı açıkça yazılır */}
         <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px", lineHeight: 1.55 }}>
@@ -41,7 +41,7 @@ export default async function HayvanPage() {
       </div>
 
       {fiyatlar.length === 0 ? (
-        <div style={{ padding: "40px", textAlign: "center", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
+        <div style={{ padding: "40px", textAlign: "center", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px" }}>
           Henüz veri yok. Scraper çalıştıktan sonra fiyatlar burada görünür.
         </div>
       ) : (
@@ -50,14 +50,14 @@ export default async function HayvanPage() {
 
           {/* Resmi (ESK/USK) vs Gerçek (kullanıcı bildirimi, min 3) */}
           <section style={{ marginTop: "20px" }}>
-            <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>BORSA vs PİYASA</div>
+            <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", marginBottom: "10px" }}>BORSA vs PİYASA</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "8px" }}>
               {fiyatlar.map((h) => {
                 const pv = (piyasa ?? []).find((p) => p.urun_norm === h.hayvan_norm) ?? null;
                 return (
                   <PiyasaKarti
                     key={h.hayvan_norm}
-                    urun_ad={hayvanGorunen(h.hayvan_norm)}
+                    urun_ad={hayvanAd(h.hayvan_norm)}
                     borsa={{ kaynak: h.kaynak.replace("_SUT", ""), fiyat: h.fiyat, birim: h.birim ?? "TL/kg", tarih: h.cekilme_tarihi, donemBaslangic: donem[donemAnahtar(h.kaynak, h.hayvan_norm)] }}
                     piyasa={pv ? { agirlikli_ortalama: pv.agirlikli_ortalama, en_az: pv.en_az, en_cok: pv.en_cok, bildirim_sayisi: pv.bildirim_sayisi, il: pv.il } : null}
                   />

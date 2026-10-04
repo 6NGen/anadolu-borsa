@@ -36,7 +36,7 @@ export default function SuruDegeri({ fiyatlar }: { fiyatlar: HayvanFiyat[] }) {
 
   return (
     <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "16px", marginTop: "20px" }}>
-      <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "4px", fontWeight: 600 }}>🧮 SÜRÜ DEĞERİ HESAPLAYICI</div>
+      <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", marginBottom: "4px", fontWeight: 600 }}>SÜRÜ DEĞERİ HESAPLAYICI</div>
       <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "14px" }}>Baş sayısını gir; ortalama karkas ağırlığını kendi sürüne göre düzenleyebilirsin.</div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "10px", marginBottom: "14px" }}>

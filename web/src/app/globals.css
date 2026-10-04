@@ -1,36 +1,168 @@
 @import "tailwindcss";
 
+/* ── Anadolu Borsa tasarım sistemi (2026-10) ───────────────────────────
+   Koyu yeşil tema korunur (kullanıcı kararı); tek yazı ailesi Inter,
+   rakamlar tablo hizalı (tnum). Renkler lib/theme.RENKLER ile AYNI. */
 :root {
-  --bg:      #080E09;
-  --surface: #0F1A12;
-  --border:  #1E3A22;
-  --muted:   #506A52;
-  --text:    #E8F5EA;
-  --green:   #68B890;
-  --red:     #E87060;
-  --pos:     #4AE870;
-  --neg:     #E84A4A;
+  --bg:        #0B100D;
+  --inset:     #0E1511;
+  --surface:   #121A15;
+  --surface-2: #17211B;
+  --border:    #223029;
+  --border-2:  #2E3F35;
+  --muted:     #94A89B;
+  --faint:     #6E8276;
+  --text:      #E8EFEA;
+  --green:     #4CC38A;
+  --green-soft: rgba(76, 195, 138, 0.12);
+  --red:       #F07167;
+  --pos:       #4CC38A;
+  --neg:       #F07167;
+  --warn:      #E9B949;
+  --radius:    12px;
+  --shadow:    0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 24px -12px rgba(0,0,0,0.6);
 }
 
+/* Eski font değişkenleri tek aileye bağlanır (bileşenlerdeki satır içi
+   var(--font-mono)/var(--font-syne) kullanımları otomatik Inter olur). */
+html {
+  --font-mono: var(--font-sans), system-ui, sans-serif;
+  --font-syne: var(--font-sans), system-ui, sans-serif;
+}
+
+@layer base {
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  font-feature-settings: "tnum" 1, "cv11" 1, "ss01" 1;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+/* Arka planda çok hafif yeşil ışık — düz siyah yerine derinlik */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 500px at 15% -10%, rgba(76,195,138,0.07), transparent 60%),
+    radial-gradient(900px 400px at 100% 0%, rgba(233,185,73,0.035), transparent 60%);
+}
+
+h1, h2, h3 { letter-spacing: -0.015em; }
+
+/* body flex-sütun: margin:auto'lu main içerik kadar daralmasın */
+main { width: 100%; }
+
+a { color: inherit; }
+::selection { background: rgba(76,195,138,0.3); }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 6px; }
+
+select, input, textarea, button { font-family: inherit; font-feature-settings: inherit; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 8px; border: 2px solid var(--bg); }
+}
+
+/* ── Ortak bileşen sınıfları ── */
+@layer components {
+.ab-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+@media (max-width: 640px) { .ab-container { padding: 0 14px; } }
+
+.ab-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.ab-card-hover { transition: border-color .15s, transform .15s, background .15s; }
+.ab-card-hover:hover { border-color: var(--border-2); background: var(--surface-2); }
+
+.ab-eyebrow {
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+.ab-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 14px; border-radius: 9px;
+  font-size: 13.5px; font-weight: 600; text-decoration: none; cursor: pointer;
+  border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text);
+  transition: background .15s, border-color .15s, color .15s;
+  white-space: nowrap;
+}
+.ab-btn:hover { border-color: var(--faint); background: #1C2821; }
+.ab-btn-primary { background: var(--green); border-color: var(--green); color: #06120B; }
+.ab-btn-primary:hover { background: #5ED39A; border-color: #5ED39A; }
+.ab-btn-ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.ab-btn-ghost:hover { background: var(--surface-2); color: var(--text); border-color: transparent; }
+
+.ab-navlink {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 11px; border-radius: 8px;
+  font-size: 14px; font-weight: 500; color: var(--muted); text-decoration: none;
+  transition: background .15s, color .15s; white-space: nowrap;
+  background: transparent; border: none; cursor: pointer;
+}
+.ab-navlink:hover { color: var(--text); background: var(--surface-2); }
+.ab-navlink[data-aktif="1"] { color: var(--text); background: var(--surface-2); }
+
+.ab-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; min-width: 260px;
+  background: var(--surface); border: 1px solid var(--border-2); border-radius: 12px;
+  box-shadow: 0 16px 40px -12px rgba(0,0,0,.7); padding: 6px; z-index: 60;
+}
+.ab-menu a {
+  display: flex; gap: 12px; align-items: flex-start; padding: 10px 12px;
+  border-radius: 8px; text-decoration: none; color: var(--text);
+}
+.ab-menu a:hover, .ab-menu a[data-aktif="1"] { background: var(--surface-2); }
+
+.ab-chip {
+  display: inline-flex; align-items: center; height: 30px; padding: 0 12px;
+  border-radius: 999px; font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+  transition: all .15s; white-space: nowrap;
+}
+.ab-chip:hover { color: var(--text); border-color: var(--border-2); }
+
+.ab-num { font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+
+.ab-h1 {
+  font-size: clamp(22px, 2.8vw, 28px); font-weight: 750; line-height: 1.2;
+  letter-spacing: -0.02em; color: var(--text);
+}
+.ab-h1 + p { font-size: 14px !important; color: var(--muted) !important; margin-top: 6px !important; line-height: 1.6; }
+
+}
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.3; }
+  50%       { opacity: 0.35; }
 }
 
 @keyframes ticker {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+@layer components {
+.ab-serit:hover .ab-serit-ic { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .ab-serit-ic { animation: none !important; } }
+
+.ab-arac {
+  display: flex; gap: 12px; align-items: center; padding: 9px 8px;
+  border-radius: 9px; text-decoration: none; transition: background .15s;
+}
+.ab-arac:hover { background: var(--surface-2); }
+
+footer a:hover { color: var(--text) !important; }
 }

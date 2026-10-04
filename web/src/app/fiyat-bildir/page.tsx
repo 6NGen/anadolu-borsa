@@ -74,8 +74,8 @@ const inputStil: React.CSSProperties = {
 function Etiket({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "9px" }}>
-      <span style={{ width: "3px", height: "11px", background: RENKLER.green, borderRadius: "2px" }} />
-      <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em", fontWeight: 600 }}>{children}</span>
+      <span style={{ width: "3px", height: "11px", background: RENKLER.green, borderRadius: "4px" }} />
+      <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", fontWeight: 600 }}>{children}</span>
     </div>
   );
 }
@@ -181,12 +181,12 @@ export default function FiyatBildirPage() {
   if (!user) {
     return (
       <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
-        <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>FİYAT BİLDİR</h1>
+        <h1 className="ab-h1">Fiyat bildir</h1>
         <div style={{ marginTop: "20px", padding: "28px 24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
-          <div style={{ fontSize: "30px", marginBottom: "12px" }}>📍</div>
+
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Bulunduğun yerin gerçek piyasa fiyatını bildir.</p>
           <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Özellikle kaba yem ve gübrenin resmi kaynağı yok — senin bildirimin en değerlisi. En az 3 bildirim sonrası görünür.</p>
-          <Link href="/giris" style={{ display: "inline-block", marginTop: "18px", padding: "11px 26px", background: RENKLER.green, color: "#06140C", borderRadius: "8px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
+          <Link href="/giris" style={{ display: "inline-block", marginTop: "18px", padding: "11px 26px", background: RENKLER.green, color: "#0E1511", borderRadius: "8px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>
             Google ile Giriş Yap
           </Link>
         </div>
@@ -199,7 +199,7 @@ export default function FiyatBildirPage() {
       <main style={{ maxWidth: "560px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
         <div style={{ padding: "32px 24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
           <div style={{ width: "52px", height: "52px", margin: "0 auto 14px", borderRadius: "50%", background: `${RENKLER.green}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px", color: RENKLER.green }}>✓</div>
-          <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700 }}>Teşekkürler</h1>
+          <h1 className="ab-h1">Teşekkürler</h1>
           <p style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "8px", lineHeight: 1.6 }}>Bildirimin topluluk ortalamasına katıldı.</p>
           {sayac != null && (
             <div style={{ marginTop: "16px", padding: "12px", background: RENKLER.bg, border: `1px solid ${RENKLER.border}`, borderRadius: "8px" }}>
@@ -209,7 +209,7 @@ export default function FiyatBildirPage() {
             </div>
           )}
           <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
-            <button onClick={() => { setDurum("form"); mevcutGetir(urun); }} style={{ flex: 1, padding: "11px", background: RENKLER.green, color: "#06140C", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Yeni Bildirim</button>
+            <button onClick={() => { setDurum("form"); mevcutGetir(urun); }} style={{ flex: 1, padding: "11px", background: RENKLER.green, color: "#0E1511", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>Yeni Bildirim</button>
             <Link href="/tarim" style={{ flex: 1, padding: "11px", background: "transparent", color: RENKLER.muted, border: `1px solid ${RENKLER.border}`, borderRadius: "8px", textDecoration: "none", fontSize: "12px", textAlign: "center" }}>Borsaya Git</Link>
           </div>
         </div>
@@ -242,14 +242,14 @@ export default function FiyatBildirPage() {
   return (
     <main style={{ maxWidth: "560px", margin: "32px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
       <div style={{ marginBottom: "18px" }}>
-        <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>FİYAT BİLDİR</h1>
+        <h1 className="ab-h1">Fiyat bildir</h1>
         <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Piyasa fiyatını bildirerek gerçek veri oluştur. En az 3 bildirim sonrası görünür.</p>
       </div>
 
       <form onSubmit={(e) => { e.preventDefault(); gonder(); }} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "22px", display: "flex", flexDirection: "column", gap: "18px" }}>
         {mevcut && (
-          <div style={{ fontSize: "13px", color: "#E8C040", background: "#19150622", border: "1px solid #3A301055", borderRadius: "8px", padding: "9px 11px", display: "flex", gap: "6px", alignItems: "center" }}>
-            <span>✎</span> Bugün <b style={{ color: "#E8C040" }}>{adGoster(urun)}</b> için bildirimin var — düzenliyorsun.
+          <div style={{ fontSize: "13px", color: "#E9B949", background: "#19150622", border: "1px solid #3A301055", borderRadius: "8px", padding: "9px 11px", display: "flex", gap: "6px", alignItems: "center" }}>
+            <span>✎</span> Bugün <b style={{ color: "#E9B949" }}>{adGoster(urun)}</b> için bildirimin var — düzenliyorsun.
           </div>
         )}
 
@@ -338,7 +338,7 @@ export default function FiyatBildirPage() {
         {hata && <div style={{ fontSize: "13px", color: RENKLER.red, background: `${RENKLER.red}14`, border: `1px solid ${RENKLER.red}33`, borderRadius: "8px", padding: "9px 11px" }}>{hata}</div>}
 
         <div style={{ display: "flex", gap: "8px" }}>
-          <button type="submit" disabled={mesgul} style={{ flex: 1, padding: "13px", fontSize: "13px", background: RENKLER.green, color: "#06140C", border: "none", borderRadius: "8px", cursor: mesgul ? "wait" : "pointer", fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "0.03em" }}>
+          <button type="submit" disabled={mesgul} style={{ flex: 1, padding: "13px", fontSize: "13px", background: RENKLER.green, color: "#0E1511", border: "none", borderRadius: "8px", cursor: mesgul ? "wait" : "pointer", fontWeight: 700, fontFamily: "var(--font-mono)", letterSpacing: "0.03em" }}>
             {mesgul ? "…" : mevcut ? "Bildirimi Güncelle" : "Bildir"}
           </button>
           {mevcut && (

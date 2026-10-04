@@ -26,7 +26,7 @@ export default async function HedefPage() {
   // Tahıllar (canlı): ton hesabı
   for (const r of yem ?? []) {
     if (r.ortalama == null) continue;
-    urunler.push({ norm: r.urun_norm, ad: r.urun_ad ?? r.urun_norm, renk: YEM_RENK[r.urun_norm] ?? "#D4A843", son: Number(r.ortalama), tip: "yem", tarih: r.cekilme_tarihi ?? null });
+    urunler.push({ norm: r.urun_norm, ad: r.urun_ad ?? r.urun_norm, renk: YEM_RENK[r.urun_norm] ?? "#E9B949", son: Number(r.ortalama), tip: "yem", tarih: r.cekilme_tarihi ?? null });
   }
 
   // Hayvan (canlı, karkas tanımlı olanlar): baş hesabı
@@ -37,7 +37,7 @@ export default async function HedefPage() {
     urunler.push({
       norm: r.hayvan_norm,
       ad: HAYVAN_AD[r.hayvan_norm] ?? r.hayvan_norm,
-      renk: HAYVAN_RENK[r.hayvan_norm] ?? "#E05840",
+      renk: HAYVAN_RENK[r.hayvan_norm] ?? "#F07167",
       son: Number(r.fiyat),
       tip: "hayvan",
       tarih: r.cekilme_tarihi ?? null,

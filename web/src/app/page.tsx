@@ -1,19 +1,45 @@
+import Link from "next/link";
+import { ArrowRight, BookOpen, Calculator, PenLine, Scale, Tractor, Wheat } from "lucide-react";
 import { supabaseServer } from "@/lib/supabase";
 import UrunKarti from "@/components/UrunKarti";
+import FiyatKarti from "@/components/FiyatKarti";
 import HavaDurumu from "@/components/HavaDurumu";
-import SaatGosterg from "@/components/SaatGosterg";
-import VeriTazelik from "@/components/VeriTazelik";
+import KurbanSayaci from "@/components/KurbanSayaci";
+import SinyalMotoru from "@/components/SinyalMotoru";
+import FiyatSeridi from "@/components/FiyatSeridi";
 import { RENKLER, HAYVAN_RENK } from "@/lib/theme";
 import { formatFiyat } from "@/lib/format";
 import { tekHayvanKaynak } from "@/lib/guncel";
 import { donemAnahtar, donemBaslangiclari } from "@/lib/donem";
 import { hasatSezonuMu } from "@/lib/hasat-takvimi";
-import { hayvanGorunen } from "@/lib/karkas";
-import KurbanSayaci from "@/components/KurbanSayaci";
-import SinyalMotoru from "@/components/SinyalMotoru";
-import Link from "next/link";
+import { hayvanAd } from "@/lib/karkas";
+import { YEM_AD } from "@/lib/urun-tanim";
+import { kaynakAd } from "@/lib/kaynak-ad";
 
 export const revalidate = 300;
+
+function BolumBaslik({ baslik, aciklama, href, linkMetin }: { baslik: string; aciklama?: string; href?: string; linkMetin?: string }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "12px", marginBottom: "14px" }}>
+      <div>
+        <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--text)" }}>{baslik}</h2>
+        {aciklama && <p style={{ fontSize: "13px", color: "var(--muted)", marginTop: "2px" }}>{aciklama}</p>}
+      </div>
+      {href && (
+        <Link href={href} style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "13.5px", fontWeight: 600, color: "var(--green)", textDecoration: "none", whiteSpace: "nowrap" }}>
+          {linkMetin ?? "Tümü"} <ArrowRight size={15} />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+const ARACLAR = [
+  { href: "/parite", ad: "Parite matrisi", aciklama: "1 litre motorin kaç kg arpa eder?", Icon: Scale },
+  { href: "/maliyet", ad: "Ekim maliyeti", aciklama: "Dekar başına maliyet ve başa baş fiyat", Icon: Calculator },
+  { href: "/hedef", ad: "Hedef panel", aciklama: "Kaç ton buğday bir traktör eder?", Icon: Tractor },
+  { href: "/fiyat-bildir", ad: "Fiyat bildir", aciklama: "Bölgendeki gerçek fiyatı paylaş", Icon: PenLine },
+];
 
 export default async function Dashboard() {
   const [{ data: sonFiyatlar }, { data: sonHayvanHam }, donem] = await Promise.all([
@@ -23,145 +49,130 @@ export default async function Dashboard() {
   ]);
 
   // Kaynağı değişen hayvanın (süt: ESK_SUT → USK) eski bayat kaydını ele —
-  // hayvan_norm başına tek (en güncel) satır. Ticker ve kartlar bunu kullanır.
+  // hayvan_norm başına tek (en güncel) satır. Şerit ve kartlar bunu kullanır.
   const sonHayvan = tekHayvanKaynak(sonHayvanHam ?? []);
+  const yem = sonFiyatlar ?? [];
 
-  // 3.3: her ticker öğesi TEK string — parça kopması/yetim birim olmaz
-  const tickerItems = [
-    ...(sonFiyatlar ?? []).map((f) => `${f.urun_norm} ${formatFiyat(f.ortalama)} TL/KG`),
-    ...sonHayvan.map((h) => `${hayvanGorunen(h.hayvan_norm)} ${formatFiyat(h.fiyat)} ${h.birim ?? "TL/kg"}`),
+  // Şerit: her öğe ad + fiyat + birim (parça kopması olmaz)
+  const seritOgeleri = [
+    ...yem.map((f) => ({ ad: YEM_AD[f.urun_norm] ?? f.urun_norm, fiyat: formatFiyat(f.ortalama), birim: "TL/kg" })),
+    ...sonHayvan.map((h) => ({ ad: hayvanAd(h.hayvan_norm), fiyat: formatFiyat(h.fiyat), birim: (h.birim ?? "TL/kg").replace(" karkas", "") })),
   ];
 
+  const bugun = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Istanbul" });
+
   return (
-    <main style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px" }}>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", padding: "12px 16px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
-        <div>
-          <span style={{ fontFamily: "var(--font-syne)", fontSize: "18px", fontWeight: 700, color: RENKLER.green, letterSpacing: "0.08em" }}>ANADOLU BORSA</span>
-          <span className="hidden sm:inline" style={{ marginLeft: "10px", fontSize: "12px", color: RENKLER.muted }}>Türkiye Tarım & Hayvancılık Fiyat Platformu</span>
-        </div>
-        <SaatGosterg />
-      </div>
+    <>
+      <FiyatSeridi ogeler={seritOgeleri} />
 
-      {/* Ticker */}
-      {tickerItems.length > 0 && (
-        <div style={{ overflow: "hidden", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "7px 0", marginBottom: "16px" }}>
-          <div style={{ display: "flex", animation: "ticker 40s linear infinite", width: "max-content" }}>
-            {[...tickerItems, ...tickerItems].map((item, i) => (
-              <span key={i} style={{ fontSize: "13px", color: RENKLER.muted, padding: "0 24px", whiteSpace: "nowrap", borderRight: `1px solid ${RENKLER.border}` }}>
-                {item}
-              </span>
-            ))}
+      <main className="ab-container" style={{ paddingTop: "28px", paddingBottom: "8px" }}>
+        {/* Giriş */}
+        <section style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "16px", marginBottom: "24px" }}>
+          <div>
+            <div className="ab-eyebrow" style={{ color: "var(--green)", marginBottom: "6px" }}>{bugun}</div>
+            <h1 style={{ fontSize: "clamp(24px, 3.4vw, 32px)", fontWeight: 750, lineHeight: 1.15, color: "var(--text)" }}>
+              Günün tarım ve hayvancılık fiyatları
+            </h1>
+            <p style={{ fontSize: "14.5px", color: "var(--muted)", marginTop: "8px", maxWidth: "620px" }}>
+              Ticaret borsaları ve resmî kurumlardan derlenir. Her fiyatın yanında kaynağı ve işlem tarihi yazar.
+            </p>
           </div>
-        </div>
-      )}
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <Link href="/tarim" className="ab-btn ab-btn-primary">Tarım borsası <ArrowRight size={15} /></Link>
+            <Link href="/metodoloji" className="ab-btn"><BookOpen size={15} /> Veriler nereden geliyor?</Link>
+          </div>
+        </section>
 
-      {/* Kurban sayacı */}
-      <KurbanSayaci />
+        <KurbanSayaci />
 
-      {/* Hasat dönemi giriş kartı — yalnız Mayıs–Ağustos */}
-      {hasatSezonuMu() && (
-        <Link href="/hasat" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "12px 16px", marginBottom: "16px", background: "linear-gradient(135deg,#0C1A0E,#10210F)", border: `1px solid ${RENKLER.green}40`, borderRadius: "8px", textDecoration: "none" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "20px" }}>🌾</span>
-            <span>
-              <span style={{ display: "block", fontSize: "13px", color: RENKLER.text, fontWeight: 600 }}>Hasat Paneli</span>
-              <span style={{ display: "block", fontSize: "12px", color: RENKLER.muted }}>Bölge havası · fiyat trendi · hasat takvimi</span>
+        {/* Hasat dönemi girişi — yalnız Mayıs–Ağustos */}
+        {hasatSezonuMu() && (
+          <Link href="/hasat" className="ab-card ab-card-hover" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "14px 18px", marginBottom: "20px", textDecoration: "none" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span style={{ width: 38, height: 38, borderRadius: 10, background: "var(--green-soft)", color: "var(--green)", display: "grid", placeItems: "center" }}><Wheat size={20} /></span>
+              <span>
+                <span style={{ display: "block", fontSize: "14.5px", fontWeight: 600, color: "var(--text)" }}>Hasat paneli</span>
+                <span style={{ display: "block", fontSize: "13px", color: "var(--muted)" }}>Bölge havası, fiyat trendi ve hasat takvimi</span>
+              </span>
             </span>
-          </span>
-          <span style={{ fontSize: "13px", color: RENKLER.green }}>Aç →</span>
-        </Link>
-      )}
-
-      {/* Sekmeler */}
-      <div style={{ display: "flex", gap: "6px", marginBottom: "20px", flexWrap: "wrap" }}>
-        {[
-          { href: "/tarim",  label: "TARIM BORSASI" },
-          { href: "/hayvan", label: "HAYVAN BORSASI" },
-          { href: "/parite", label: "PARİTE ENDEKSİ" },
-          { href: "/hedef",  label: "HEDEF PANEL" },
-        ].map(({ href, label }) => (
-          <Link key={href} href={href} style={{ padding: "7px 14px", fontSize: "13px", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "3px", textDecoration: "none", letterSpacing: "0.05em" }}>
-            {label}
+            <ArrowRight size={18} style={{ color: "var(--green)" }} />
           </Link>
-        ))}
-      </div>
+        )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
-        <div>
-          {/* Sinyal motoru */}
-          <SinyalMotoru />
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px]" style={{ gap: "28px" }}>
+          <div style={{ minWidth: 0 }}>
+            <SinyalMotoru />
 
-          {/* Yem */}
-          {(sonFiyatlar ?? []).length > 0 && (
-            <section style={{ marginBottom: "24px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em" }}>YEM FİYATLARI</span>
-                <Link href="/tarim" style={{ fontSize: "12px", color: RENKLER.green, textDecoration: "none" }}>Grafik & Detay →</Link>
+            {yem.length > 0 && (
+              <section style={{ marginBottom: "32px" }}>
+                <BolumBaslik baslik="Hububat" aciklama="Ürün başına en güncel işlem gören borsa" href="/tarim" linkMetin="Grafik ve borsalar" />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(158px, 1fr))", gap: "10px" }}>
+                  {yem.map((f) => (
+                    <UrunKarti key={f.urun_norm} urun_norm={f.urun_norm} urun_ad={f.urun_ad ?? f.urun_norm} renk={f.renk ?? RENKLER.green} ortalama={f.ortalama} en_az={f.en_az} en_cok={f.en_cok} borsa={f.borsa} tarih={f.cekilme_tarihi} birim={f.birim ?? "TL/KG"} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {sonHayvan.length > 0 && (
+              <section style={{ marginBottom: "32px" }}>
+                <BolumBaslik baslik="Hayvan ve süt" aciklama="ESK alım ve USK tavsiye fiyatları dönemseldir; UKON bölge ortalamasıdır" href="/hayvan" linkMetin="Grafik ve detay" />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(158px, 1fr))", gap: "10px" }}>
+                  {sonHayvan.map((h) => (
+                    <FiyatKarti
+                      key={`${h.kaynak}-${h.hayvan_norm}`}
+                      href="/hayvan"
+                      ad={hayvanAd(h.hayvan_norm)}
+                      renk={HAYVAN_RENK[h.hayvan_norm] ?? RENKLER.red}
+                      fiyat={h.fiyat}
+                      birim={h.birim ?? "TL/kg"}
+                      kaynak={kaynakAd(h.kaynak)}
+                      tarih={h.cekilme_tarihi}
+                      donemBaslangic={donem[donemAnahtar(h.kaynak, h.hayvan_norm)]}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {yem.length === 0 && sonHayvan.length === 0 && (
+              <div className="ab-card" style={{ padding: "60px 20px", textAlign: "center", color: "var(--muted)", fontSize: "14px" }}>
+                Henüz fiyat verisi yok. Veriler her iş günü akşamı güncellenir.
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: "8px" }}>
-                {(sonFiyatlar ?? []).map((f) => (
-                  <UrunKarti key={f.urun_norm} urun_norm={f.urun_norm} urun_ad={f.urun_ad ?? f.urun_norm} renk={f.renk ?? RENKLER.green} ortalama={f.ortalama} en_az={f.en_az} en_cok={f.en_cok} borsa={f.borsa} tarih={f.cekilme_tarihi} birim={f.birim ?? "TL/KG"} />
+            )}
+          </div>
+
+          {/* Sağ panel */}
+          <aside style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <HavaDurumu />
+            <div className="ab-card" style={{ padding: "16px" }}>
+              <div className="ab-eyebrow" style={{ marginBottom: "10px" }}>Araçlar</div>
+              <div style={{ display: "grid", gap: "4px" }}>
+                {ARACLAR.map(({ href, ad, aciklama, Icon }) => (
+                  <Link key={href} href={href} className="ab-arac">
+                    <span style={{ width: 34, height: 34, borderRadius: 9, background: "var(--green-soft)", color: "var(--green)", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                      <Icon size={17} />
+                    </span>
+                    <span style={{ minWidth: 0 }}>
+                      <span style={{ display: "block", fontSize: "14px", fontWeight: 600, color: "var(--text)" }}>{ad}</span>
+                      <span style={{ display: "block", fontSize: "12.5px", color: "var(--muted)" }}>{aciklama}</span>
+                    </span>
+                  </Link>
                 ))}
               </div>
-            </section>
-          )}
-
-          {/* Hayvan */}
-          {sonHayvan.length > 0 && (
-            <section>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em" }}>HAYVAN FİYATLARI</span>
-                <Link href="/hayvan" style={{ fontSize: "12px", color: RENKLER.green, textDecoration: "none" }}>Grafik & Detay →</Link>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: "8px" }}>
-                {sonHayvan.map((h) => {
-                  const renk = HAYVAN_RENK[h.hayvan_norm] ?? RENKLER.red;
-                  return (
-                    <div key={`${h.kaynak}-${h.hayvan_norm}`} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px", display: "flex", gap: "10px" }}>
-                      <div style={{ width: "3px", background: renk, borderRadius: "2px", flexShrink: 0 }} />
-                      <div>
-                        <div style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600, margin: "0 0 2px" }}>{hayvanGorunen(h.hayvan_norm)}</div>
-                        <div style={{ fontSize: "22px", color: renk, fontWeight: 700, lineHeight: 1 }}>{formatFiyat(h.fiyat)}</div>
-                        <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "2px" }}>{h.birim}</div>
-                        <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "6px", paddingTop: "6px", borderTop: `1px solid ${RENKLER.border}`, display: "flex", justifyContent: "space-between", gap: "6px", flexWrap: "wrap" }}>
-                          <span>{h.kaynak} · {h.cekilme_tarihi}</span>
-                          <VeriTazelik tarih={h.cekilme_tarihi} donemBaslangic={donem[donemAnahtar(h.kaynak, h.hayvan_norm)]} />
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
-
-          {(sonFiyatlar ?? []).length === 0 && sonHayvan.length === 0 && (
-            <div style={{ padding: "60px 20px", textAlign: "center", color: RENKLER.muted, fontSize: "13px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
-              <div style={{ fontSize: "24px", marginBottom: "12px" }}>📊</div>
-              Henüz fiyat verisi yok.<br />Scraper çalıştıktan sonra veriler burada görünür.
             </div>
-          )}
-        </div>
-
-        {/* Sağ panel */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <HavaDurumu />
-          <div style={{ padding: "14px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
-            <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>ARAÇLAR</div>
-            {[
-              { href: "/fiyat-bildir", label: "Fiyat Bildir", desc: "Gerçek piyasa fiyatını gir" },
-              { href: "/parite",       label: "Parite",       desc: "Mazot/Süt, Mazot/Arpa oranı" },
-              { href: "/hedef",        label: "Hedef Panel",  desc: "Kaç ton buğday = 1 traktör?" },
-            ].map(({ href, label, desc }) => (
-              <Link key={href} href={href} style={{ display: "block", padding: "9px 10px", marginBottom: "4px", background: "#080E09", borderRadius: "3px", textDecoration: "none", border: `1px solid ${RENKLER.border}` }}>
-                <div style={{ fontSize: "12px", color: RENKLER.text }}>{label}</div>
-                <div style={{ fontSize: "12px", color: RENKLER.muted }}>{desc}</div>
+            <div className="ab-card" style={{ padding: "16px", background: "linear-gradient(160deg, rgba(76,195,138,0.08), transparent 60%), var(--surface)" }}>
+              <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "6px" }}>Tavsiye değil, kaynaklı veri</div>
+              <p style={{ fontSize: "13px", color: "var(--muted)", lineHeight: 1.6 }}>
+                Fiyatlar TOBB, Konya Ticaret Borsası, ESK, USK ve UKON yayınlarından otomatik çekilir. Birden çok sınıf işlem gördüyse miktar ağırlıklı ortalama gösterilir.
+              </p>
+              <Link href="/metodoloji" style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "13px", fontWeight: 600, color: "var(--green)", textDecoration: "none", marginTop: "10px" }}>
+                Metodoloji <ArrowRight size={14} />
               </Link>
-            ))}
-          </div>
+            </div>
+          </aside>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

@@ -22,12 +22,21 @@ const GUBRE = [
 const C = { yesil: RENKLER.green, gubre: "#8FB8C8", mazot: "#E8804C" };
 
 export default async function GirdilerPage() {
-  const [{ data: mazotRows }, { data: gubrePiyasa }] = await Promise.all([
+  const sonGirdi = (tur: string) =>
     supabaseServer.from("girdi_fiyat").select("fiyat, birim, kaynak, gecerlilik_tarihi")
-      .eq("girdi_turu", "mazot").order("gecerlilik_tarihi", { ascending: false }).limit(1),
+      .eq("girdi_turu", tur).order("gecerlilik_tarihi", { ascending: false }).limit(1);
+  const [{ data: mazotRows }, { data: gubrePiyasa }, { data: elektrikRows }, { data: ureRows }] = await Promise.all([
+    sonGirdi("mazot"),
     supabaseServer.from("piyasa_fiyatlari").select("urun_norm, agirlikli_ortalama, bildirim_sayisi, il")
       .in("urun_norm", ["DAP", "URE", "AN33", "KOMPOZE"]),
+    sonGirdi("elektrik"),
+    sonGirdi("ure"),
   ]);
+  const elektrik = elektrikRows?.[0];
+  // Elle girilmiş liste fiyatları (girdi_guncelle.py): topluluk verisi yokken referans
+  const listeFiyat: Record<string, { fiyat: number; tarih: string; kaynak: string | null } | undefined> = {
+    URE: ureRows?.[0] ? { fiyat: Number(ureRows[0].fiyat), tarih: ureRows[0].gecerlilik_tarihi, kaynak: ureRows[0].kaynak } : undefined,
+  };
 
   const mazot = mazotRows?.[0];
   // Gübre: norm başına en çok bildirim alan il satırı (temsili topluluk değeri)
@@ -41,20 +50,20 @@ export default async function GirdilerPage() {
   }
 
   const kart: React.CSSProperties = { background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "18px" };
-  const etiket: React.CSSProperties = { fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.12em", marginBottom: "10px", fontWeight: 600 };
+  const etiket: React.CSSProperties = { fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", marginBottom: "10px", fontWeight: 600 };
 
   return (
-    <main style={{ maxWidth: "900px", margin: "0 auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
+    <main className="ab-container" style={{ maxWidth: "940px", paddingTop: "28px" }}>
       <div style={{ marginBottom: "18px" }}>
-        <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>GİRDİ FİYATLARI</h1>
-        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Üretim maliyetinin temel kalemleri. Mazot resmi; gübre topluluk bildirimiyle (resmi liste fiyatı yakında).</p>
+        <h1 className="ab-h1">Girdi fiyatları</h1>
+        <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Üretim maliyetinin temel kalemleri. Motorin her gece pompa fiyatından güncellenir; elektrik tarifesi ve gübre liste fiyatı elle girilir, bayi fiyatları topluluk bildirimidir.</p>
       </div>
 
       {/* Mazot + Elektrik */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "12px", marginBottom: "16px" }}>
         {/* Mazot */}
         <div style={kart}>
-          <div style={etiket}>⛽ MOTORİN</div>
+          <div style={etiket}>MOTORİN</div>
           {mazot ? (
             <>
               <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
@@ -71,18 +80,29 @@ export default async function GirdilerPage() {
           )}
         </div>
 
-        {/* Elektrik — yakında */}
-        <div style={{ ...kart, opacity: 0.6 }}>
-          <div style={etiket}>⚡ ELEKTRİK</div>
-          <div style={{ fontSize: "20px", color: RENKLER.muted, fontWeight: 700 }}>Yakında</div>
-          <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "8px" }}>Tarımsal sulama tarifesi eklenecek</div>
+        {/* Elektrik — tarımsal sulama tarifesi (elle, dönemsel) */}
+        <div style={kart}>
+          <div style={etiket}>ELEKTRİK · TARIMSAL SULAMA</div>
+          {elektrik ? (
+            <>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+                <span className="ab-num" style={{ fontSize: "34px", color: RENKLER.warn, fontWeight: 800, lineHeight: 1 }}>{formatFiyat(elektrik.fiyat)}</span>
+                <span style={{ fontSize: "12px", color: RENKLER.muted }}>{elektrik.birim ?? "TL/kWh"}</span>
+              </div>
+              <div style={{ fontSize: "12.5px", color: RENKLER.muted, marginTop: "10px" }}>
+                {elektrik.kaynak ?? "EPDK"} · {kisaTarih(elektrik.gecerlilik_tarihi)}.{String(elektrik.gecerlilik_tarihi).slice(0, 4)} tarifesi
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: "13px", color: RENKLER.muted }}>Tarife henüz girilmedi</div>
+          )}
         </div>
       </div>
 
       {/* Gübre */}
       <div style={{ ...kart, padding: "18px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
-          <div style={etiket}>🧪 GÜBRE · TOPLULUK FİYATI</div>
+          <div style={etiket}>GÜBRE · TOPLULUK FİYATI</div>
           <Link href="/fiyat-bildir" style={{ fontSize: "12px", color: RENKLER.green, textDecoration: "none" }}>Fiyat bildir →</Link>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px" }}>
@@ -96,8 +116,13 @@ export default async function GirdilerPage() {
                     <div style={{ fontSize: "22px", color: C.gubre, fontWeight: 800 }}>{formatFiyat(v.ort)}<span style={{ fontSize: "13px", color: RENKLER.muted, fontWeight: 400 }}> ₺/kg</span></div>
                     <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "4px" }}>{v.il} · {v.bildirim} bildirim</div>
                   </>
+                ) : listeFiyat[g.norm] ? (
+                  <>
+                    <div className="ab-num" style={{ fontSize: "22px", color: C.gubre, fontWeight: 800 }}>{formatFiyat(listeFiyat[g.norm]!.fiyat)}<span style={{ fontSize: "13px", color: RENKLER.muted, fontWeight: 400 }}> ₺/kg</span></div>
+                    <div style={{ fontSize: "12px", color: RENKLER.muted, marginTop: "4px" }}>Liste fiyatı · {kisaTarih(listeFiyat[g.norm]!.tarih)} · topluluk verisi bekleniyor</div>
+                  </>
                 ) : (
-                  <div style={{ fontSize: "12px", color: RENKLER.muted, lineHeight: 1.5 }}>Topluluk verisi bekleniyor<br />(min 3 bildirim)</div>
+                  <div style={{ fontSize: "12.5px", color: RENKLER.muted, lineHeight: 1.5 }}>Topluluk verisi bekleniyor<br />(en az 3 bildirim)</div>
                 )}
               </div>
             );
@@ -108,8 +133,8 @@ export default async function GirdilerPage() {
         </div>
       </div>
 
-      <div style={{ fontSize: "12px", color: "#6B9478", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
-        Mazot fiyatı EPDK/pompa kaynaklıdır, elle güncellenir · Gübre/kaba yem fiyatları kullanıcı bildirimidir (min 3)
+      <div style={{ fontSize: "12px", color: "#94A89B", textAlign: "center", marginTop: "16px", lineHeight: 1.6 }}>
+        Motorin: Opet pompa fiyatı (Ankara, Eskişehir, Çorum, Konya ilçe medyanı), her gece · Gübre ve kaba yem: kullanıcı bildirimi (en az 3)
       </div>
     </main>
   );

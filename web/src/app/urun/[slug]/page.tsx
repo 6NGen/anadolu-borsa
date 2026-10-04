@@ -44,7 +44,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
   if (!guncel && !meta) {
     return (
       <main style={{ maxWidth: "900px", margin: "32px auto", padding: "16px" }}>
-        <div style={{ padding: "40px", textAlign: "center", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px" }}>
+        <div style={{ padding: "40px", textAlign: "center", color: RENKLER.muted, background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px" }}>
           Ürün bulunamadı: {norm}
         </div>
       </main>
@@ -94,14 +94,14 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
             birim={guncel.birim ?? "TL/KG"}
           />
         )}
-        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "16px" }}>
-          <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.1em" }}>SON 30 GÜN</div>
+        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "16px" }}>
+          <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "8px", letterSpacing: "0.06em" }}>SON 30 GÜN</div>
           <FiyatGrafik data={grafikVeri} renk={renk} birim={guncel?.birim ?? "TL/KG"} urun_ad={guncel?.urun_ad ?? norm} />
         </div>
       </div>
 
       {/* SEO içerik */}
-      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", fontSize: "13px", color: RENKLER.muted, lineHeight: 1.8 }}>
+      <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "20px", fontSize: "13px", color: RENKLER.muted, lineHeight: 1.8 }}>
         <h2 style={{ fontSize: "14px", color: RENKLER.text, marginBottom: "12px" }}>{guncel?.urun_ad ?? norm} Fiyatı Hakkında</h2>
         <p>
           Güncel {guncel?.urun_ad ?? norm} fiyatı <strong style={{ color: RENKLER.green }}>{formatFiyat(guncel?.ortalama)} TL/kg</strong> olarak TOBB ve Konya Ticaret Borsası verilerine göre güncellenmektedir.

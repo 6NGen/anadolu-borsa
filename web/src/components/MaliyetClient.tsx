@@ -16,7 +16,7 @@ interface Props {
 function Etiket({ children, not }: { children: React.ReactNode; not?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "6px" }}>
-      <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", fontWeight: 600 }}>{children}</span>
+      <span style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", fontWeight: 600 }}>{children}</span>
       {not && <span style={{ fontSize: "12px", color: "#3A5A40" }}>{not}</span>}
     </div>
   );
@@ -65,7 +65,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
   return (
     <main style={{ maxWidth: "680px", margin: "0 auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
       <div style={{ marginBottom: "16px" }}>
-        <h1 style={{ fontSize: "17px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)", letterSpacing: "0.04em" }}>EKİM MALİYETİ</h1>
+        <h1 className="ab-h1">Ekim maliyeti</h1>
         <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "5px", lineHeight: 1.5 }}>Dekar başı maliyet ve bugünkü borsa fiyatıyla beklenen gelir. Gelecek fiyat tahmin edilmez.</p>
       </div>
 
@@ -97,7 +97,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
       <div style={{ ...kart, marginBottom: "12px" }}>
         <Etiket>MALİYET KALEMLERİ (TL/dekar)</Etiket>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: `1px solid ${RENKLER.border}` }}>
-          <span style={{ fontSize: "12px", color: RENKLER.text }}>⛽ Mazot <span style={{ fontSize: "12px", color: RENKLER.muted }}>({mazotLt} lt × {formatFiyat(mazot)} ₺ · canlı)</span></span>
+          <span style={{ fontSize: "12px", color: RENKLER.text }}>Mazot <span style={{ fontSize: "12px", color: RENKLER.muted }}>({mazotLt} lt × {formatFiyat(mazot)} ₺ · canlı)</span></span>
           <span style={{ fontSize: "13px", color: RENKLER.text, fontWeight: 600 }}>{formatFiyat(s.mazotTlDekar, 0)} ₺</span>
         </div>
         {([["Tohum", tohum, setTohum], ["Gübre", gubre, setGubre], ["İşçilik", iscilik, setIscilik], ["Diğer", diger, setDiger]] as const).map(([ad, val, set]) => (
@@ -143,7 +143,7 @@ export default function MaliyetClient({ mazot, borsa }: Props) {
               }}
               style={{ marginTop: "12px", width: "100%", padding: "10px", background: "transparent", color: RENKLER.green, border: `1px solid ${RENKLER.green}55`, borderRadius: "8px", cursor: "pointer", fontSize: "12px", fontFamily: "var(--font-mono)", fontWeight: 700 }}
             >
-              📷 Görsel Kart Oluştur
+              Görsel Kart Oluştur
             </button>
           </>
         )}

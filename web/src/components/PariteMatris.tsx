@@ -112,7 +112,7 @@ export default function PariteMatris({
                     <th
                       key={gk}
                       className="girdi-bas"
-                      style={hg === gk ? { background: "#10241A" } : undefined}
+                      style={hg === gk ? { background: "#17211B" } : undefined}
                     >
                       {g.ikon} {g.ad}
                       <span className="birim">{birimAd(g.birim)} başına</span>
@@ -170,15 +170,15 @@ export default function PariteMatris({
 
 const CSS = `
 .pmx{
-  --zemin2:#0A1810; --kart:#0A140C; --kart2:#0E1E12; --murekkep:#DDF0DE;
-  --yesil:#5FD08A; --yesil-koyu:#2E8B57; --yesil-soluk:#A8DCBC;
-  --cizgi:#1A3020; --cizgi2:#244A30; --soluk:#7BA98C; --basak:#E8C040;
+  --zemin2:#0E1511; --kart:#0E1511; --kart2:#0E1E12; --murekkep:#E8EFEA;
+  --yesil:#4CC38A; --yesil-koyu:#2E8B57; --yesil-soluk:#A8DCBC;
+  --cizgi:#223029; --cizgi2:#244A30; --soluk:#94A89B; --basak:#E9B949;
   position:relative; margin-bottom:24px; color:var(--murekkep);
-  font-family:"Segoe UI",system-ui,sans-serif;
+  font-family:inherit;
 }
 .pmx-head{margin-bottom:14px}
 .pmx-eyebrow{
-  font-family:ui-monospace,monospace; font-size:12px; letter-spacing:.28em;
+  font-family:inherit;font-variant-numeric:tabular-nums; font-size:12px; letter-spacing:.28em;
   text-transform:uppercase; color:var(--yesil); font-weight:700;
   display:flex; align-items:center; gap:8px;
 }
@@ -233,7 +233,7 @@ const CSS = `
 }
 .pmx thead th.girdi-bas .birim{
   display:block;font-size:12px;color:var(--soluk);font-weight:600;
-  margin-top:4px;font-family:ui-monospace,monospace;letter-spacing:.03em;
+  margin-top:4px;font-family:inherit;font-variant-numeric:tabular-nums;letter-spacing:.03em;
 }
 
 .pmx td.cikti-bas{
@@ -241,17 +241,17 @@ const CSS = `
   padding:13px 14px;position:sticky;left:0;z-index:2;white-space:nowrap;
   border-right:2px solid var(--cizgi2);color:var(--basak);transition:background .12s;
 }
-.pmx td.cikti-bas .birim{display:block;font-size:12px;color:var(--soluk);font-weight:500;font-family:ui-monospace,monospace;margin-top:3px}
+.pmx td.cikti-bas .birim{display:block;font-size:12px;color:var(--soluk);font-weight:500;font-family:inherit;font-variant-numeric:tabular-nums;margin-top:3px}
 .pmx td.cikti-bas .bayat{color:var(--basak);margin-left:5px}
 
 .pmx td.h{padding:14px 11px;background:transparent;cursor:pointer;transition:background .12s}
 .pmx td.h .deg{font-size:20px;font-weight:700;color:var(--murekkep);letter-spacing:-.01em}
-.pmx td.h .br{font-size:12px;color:var(--soluk);display:block;margin-top:3px;font-family:ui-monospace,monospace}
+.pmx td.h .br{font-size:12px;color:var(--soluk);display:block;margin-top:3px;font-family:inherit;font-variant-numeric:tabular-nums}
 .pmx td.h.bos{cursor:default}
 .pmx td.h.bos .deg{color:var(--cizgi2);font-weight:400}
 .pmx td.h.bos .br{color:transparent}
 .pmx td.h.secili{background:rgba(232,192,64,.14);outline:1px solid rgba(232,192,64,.55);outline-offset:-1px}
-.pmx tbody tr.vurgu td.cikti-bas{background:#10241A}
+.pmx tbody tr.vurgu td.cikti-bas{background:#17211B}
 
 .pmx .mono{font-variant-numeric:tabular-nums}
 
@@ -260,7 +260,7 @@ const CSS = `
   padding:14px 16px;background:var(--kart);border:1px solid var(--cizgi2);border-radius:8px;
 }
 .pmx-dip b{color:var(--yesil-soluk)}
-.pmx .vt{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4AE870;
+.pmx .vt{display:inline-block;width:7px;height:7px;border-radius:50%;background:#4CC38A;
   margin-right:6px;vertical-align:middle;box-shadow:0 0 6px rgba(74,232,112,.6)}
 
 /* MOBİL KART GÖRÜNÜMÜ (GÜNCELLEME 1): md altında tablo gizli, kartlar açık */
@@ -275,7 +275,7 @@ const CSS = `
 }
 .pmx-ukart-bas .ua{color:var(--basak);font-size:15px;font-weight:700}
 .pmx-ukart-bas .bayat{color:var(--basak)}
-.pmx-ukart-bas .ub{margin-left:auto;color:var(--soluk);font-size:12px;font-family:ui-monospace,monospace}
+.pmx-ukart-bas .ub{margin-left:auto;color:var(--soluk);font-size:12px;font-family:inherit;font-variant-numeric:tabular-nums}
 .pmx-usat{
   display:flex;align-items:baseline;gap:8px;padding:12px 14px;
   border-bottom:1px solid var(--cizgi);cursor:pointer;transition:background .12s;

@@ -17,10 +17,10 @@ const birim = (n: string) => (n === "SUT" ? "TL/litre" : HAYVAN.includes(n) ? "T
 interface Alarm { id: number; urun_norm: string; esik_fiyat: number; yon: "asagi" | "yukari"; aktif: boolean; }
 
 const inputStil: React.CSSProperties = {
-  width: "100%", padding: "9px 12px", background: "#080E09", border: `1px solid ${RENKLER.border}`,
-  color: RENKLER.text, fontSize: "14px", borderRadius: "3px", outline: "none", fontFamily: "var(--font-mono)",
+  width: "100%", padding: "9px 12px", background: "#0B100D", border: `1px solid ${RENKLER.border}`,
+  color: RENKLER.text, fontSize: "14px", borderRadius: "6px", outline: "none", fontFamily: "var(--font-mono)",
 };
-const etiketStil: React.CSSProperties = { fontSize: "12px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.1em" };
+const etiketStil: React.CSSProperties = { fontSize: "12px", color: RENKLER.muted, display: "block", marginBottom: "6px", letterSpacing: "0.06em" };
 
 export default function AlarmlarPage() {
   const { user, yukleniyor } = useUser();
@@ -94,11 +94,11 @@ export default function AlarmlarPage() {
   if (!user) {
     return (
       <main style={{ maxWidth: "600px", margin: "48px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
-        <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>FİYAT ALARMI</h1>
-        <div style={{ marginTop: "20px", padding: "24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", textAlign: "center" }}>
-          <div style={{ fontSize: "28px", marginBottom: "10px" }}>🔔</div>
+        <h1 className="ab-h1">Fiyat alarmları</h1>
+        <div style={{ marginTop: "20px", padding: "24px", background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", textAlign: "center" }}>
+
           <p style={{ fontSize: "13px", color: RENKLER.text, lineHeight: 1.6 }}>Fiyat hedefine ulaşınca telefonuna bildirim al.</p>
-          <Link href="/giris" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: RENKLER.green, color: "#000", borderRadius: "3px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Google ile Giriş Yap</Link>
+          <Link href="/giris" style={{ display: "inline-block", marginTop: "16px", padding: "10px 24px", background: RENKLER.green, color: "#000", borderRadius: "6px", textDecoration: "none", fontSize: "12px", fontWeight: 700 }}>Google ile Giriş Yap</Link>
         </div>
       </main>
     );
@@ -106,33 +106,33 @@ export default function AlarmlarPage() {
 
   return (
     <main style={{ maxWidth: "600px", margin: "32px auto", padding: "16px", fontFamily: "var(--font-mono)" }}>
-      <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>FİYAT ALARMI</h1>
+      <h1 className="ab-h1">Fiyat alarmları</h1>
       <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px", marginBottom: "20px" }}>Eşik fiyata ulaşınca push bildirim gelir. Bildirimler her gece fiyatlar çekildikten sonra kontrol edilir.</p>
 
       {/* Bildirim izni */}
       {izin !== "verildi" && (
-        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "14px", marginBottom: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "14px", marginBottom: "14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", flexWrap: "wrap" }}>
           <span style={{ fontSize: "13px", color: RENKLER.muted }}>
             {izin === "reddedildi" ? "Bildirim izni reddedilmiş — tarayıcı ayarlarından izin ver." :
              izin === "desteksiz" ? "Bu tarayıcı push bildirimi desteklemiyor (iOS'ta siteyi ana ekrana ekle)." :
              "Alarm kurmak için bildirim iznini aç."}
           </span>
           {izin !== "desteksiz" && (
-            <button onClick={bildirimleriAc} disabled={izinMesgul} style={{ padding: "8px 14px", fontSize: "13px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "3px", cursor: "pointer", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
-              {izinMesgul ? "…" : "🔔 Bildirimleri Aç"}
+            <button onClick={bildirimleriAc} disabled={izinMesgul} style={{ padding: "8px 14px", fontSize: "13px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+              {izinMesgul ? "…" : "Bildirimleri Aç"}
             </button>
           )}
         </div>
       )}
 
       {/* Alarm kurma formu */}
-      <form onSubmit={(e) => { e.preventDefault(); alarmKur(); }} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "4px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px", opacity: izin === "verildi" ? 1 : 0.55 }}>
+      <form onSubmit={(e) => { e.preventDefault(); alarmKur(); }} style={{ background: RENKLER.surface, border: `1px solid ${RENKLER.border}`, borderRadius: "12px", padding: "20px", display: "flex", flexDirection: "column", gap: "14px", opacity: izin === "verildi" ? 1 : 0.55 }}>
         <div>
           <label style={etiketStil}>ÜRÜN</label>
           <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
             {[...YEM, ...HAYVAN].map((u) => (
               <button key={u} type="button" onClick={() => setUrun(u)}
-                style={{ padding: "5px 11px", fontSize: "13px", background: urun === u ? RENKLER.green : "#080E09", color: urun === u ? "#000" : RENKLER.muted, border: `1px solid ${urun === u ? RENKLER.green : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
+                style={{ padding: "5px 11px", fontSize: "13px", background: urun === u ? RENKLER.green : "#0B100D", color: urun === u ? "#000" : RENKLER.muted, border: `1px solid ${urun === u ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>
                 {adGoster(u)}
               </button>
             ))}
@@ -142,8 +142,8 @@ export default function AlarmlarPage() {
         <div>
           <label style={etiketStil}>YÖN</label>
           <div style={{ display: "flex", gap: "6px" }}>
-            <button type="button" onClick={() => setYon("yukari")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "yukari" ? RENKLER.surface : "#080E09", color: yon === "yukari" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "yukari" ? RENKLER.green : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▲ Üstüne çıkınca</button>
-            <button type="button" onClick={() => setYon("asagi")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "asagi" ? RENKLER.surface : "#080E09", color: yon === "asagi" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "asagi" ? RENKLER.green : RENKLER.border}`, borderRadius: "3px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▼ Altına inince</button>
+            <button type="button" onClick={() => setYon("yukari")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "yukari" ? RENKLER.surface : "#0B100D", color: yon === "yukari" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "yukari" ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▲ Üstüne çıkınca</button>
+            <button type="button" onClick={() => setYon("asagi")} style={{ flex: 1, padding: "9px", fontSize: "13px", background: yon === "asagi" ? RENKLER.surface : "#0B100D", color: yon === "asagi" ? RENKLER.text : RENKLER.muted, border: `1px solid ${yon === "asagi" ? RENKLER.green : RENKLER.border}`, borderRadius: "6px", cursor: "pointer", fontFamily: "var(--font-mono)" }}>▼ Altına inince</button>
           </div>
         </div>
 
@@ -154,7 +154,7 @@ export default function AlarmlarPage() {
 
         {hata && <div style={{ fontSize: "13px", color: RENKLER.red }}>{hata}</div>}
 
-        <button type="submit" disabled={mesgul || izin !== "verildi"} style={{ padding: "10px", fontSize: "12px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "3px", cursor: izin === "verildi" ? "pointer" : "not-allowed", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
+        <button type="submit" disabled={mesgul || izin !== "verildi"} style={{ padding: "10px", fontSize: "12px", background: RENKLER.green, color: "#000", border: "none", borderRadius: "6px", cursor: izin === "verildi" ? "pointer" : "not-allowed", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
           {mesgul ? "…" : "Alarm Kur"}
         </button>
       </form>
@@ -162,7 +162,7 @@ export default function AlarmlarPage() {
       {/* Mevcut alarmlar */}
       {alarmlar.length > 0 && (
         <div style={{ marginTop: "20px" }}>
-          <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.1em", marginBottom: "10px" }}>KURDUĞUN ALARMLAR</div>
+          <div style={{ fontSize: "12px", color: RENKLER.muted, letterSpacing: "0.06em", marginBottom: "10px" }}>KURDUĞUN ALARMLAR</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             {alarmlar.map((a) => {
               const pasif = !a.aktif; // tetiklenince scraper aktif=false yapar

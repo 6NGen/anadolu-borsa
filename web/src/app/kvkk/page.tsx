@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 const S = {
-  h2: { fontSize: "12px", color: RENKLER.green, letterSpacing: "0.12em", margin: "24px 0 8px", fontWeight: 700 } as const,
+  h2: { fontSize: "12px", color: RENKLER.green, letterSpacing: "0.06em", margin: "24px 0 8px", fontWeight: 700 } as const,
   p: { fontSize: "12px", color: RENKLER.text, lineHeight: 1.7, margin: "6px 0" } as const,
   mut: { fontSize: "13px", color: RENKLER.muted, lineHeight: 1.7 } as const,
 };
@@ -15,8 +15,8 @@ const S = {
 export default function KvkkPage() {
   return (
     <main style={{ maxWidth: "720px", margin: "32px auto", padding: "0 16px", fontFamily: "var(--font-mono)" }}>
-      <h1 style={{ fontSize: "16px", color: RENKLER.text, fontWeight: 700, fontFamily: "var(--font-syne)" }}>
-        KVKK AYDINLATMA METNİ
+      <h1 className="ab-h1">
+        KVKK aydınlatma metni
       </h1>
       <p style={S.mut}>
         6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında, Anadolu Borsa

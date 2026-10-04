@@ -1,13 +1,19 @@
+// Tasarım sistemi renkleri — app/globals.css :root değişkenleriyle AYNI (2026-10).
 export const RENKLER = {
-  bg:      "#080E09",
-  surface: "#0F1A12",
-  border:  "#1E3A22",
-  muted:   "#7BA98C",
-  text:    "#E8F5EA",
-  green:   "#68B890",
-  red:     "#E87060",
-  pos:     "#4AE870",
-  neg:     "#E84A4A",
+  bg:       "#0B100D",
+  inset:    "#0E1511",
+  surface:  "#121A15",
+  surface2: "#17211B",
+  border:   "#223029",
+  border2:  "#2E3F35",
+  muted:    "#94A89B",
+  faint:    "#6E8276",
+  text:     "#E8EFEA",
+  green:    "#4CC38A",
+  red:      "#F07167",
+  pos:      "#4CC38A",
+  neg:      "#F07167",
+  warn:     "#E9B949",
 } as const;
 
 export const YEM_RENK: Record<string, string> = {
