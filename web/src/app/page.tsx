@@ -7,6 +7,7 @@ import HavaDurumu from "@/components/HavaDurumu";
 import KurbanSayaci from "@/components/KurbanSayaci";
 import SinyalMotoru from "@/components/SinyalMotoru";
 import FiyatSeridi from "@/components/FiyatSeridi";
+import SponsorKarti from "@/components/SponsorKarti";
 import { RENKLER, HAYVAN_RENK } from "@/lib/theme";
 import { formatFiyat } from "@/lib/format";
 import { tekHayvanKaynak } from "@/lib/guncel";
@@ -145,6 +146,7 @@ export default async function Dashboard() {
           {/* Sağ panel */}
           <aside style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <HavaDurumu />
+            <SponsorKarti yer="ana" />
             <div className="ab-card" style={{ padding: "16px" }}>
               <div className="ab-eyebrow" style={{ marginBottom: "10px" }}>Araçlar</div>
               <div style={{ display: "grid", gap: "4px" }}>

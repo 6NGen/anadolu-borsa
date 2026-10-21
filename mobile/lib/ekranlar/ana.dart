@@ -4,6 +4,7 @@ import '../veri.dart';
 import '../tercih.dart';
 import '../widget_yenile.dart';
 import '../parcalar.dart';
+import '../sponsor.dart';
 
 class _AnaVeri {
   final List<Fiyat> yem, hayvan;
@@ -75,6 +76,7 @@ class _AnaEkranState extends State<AnaEkran> {
             children: [
               markaBaslik('Türkiye tarım & hayvancılık fiyatları · günlük'),
               if (sinyalSirali.isNotEmpty) SinyalSeridi(sinyalSirali),
+              const SponsorKarti('ana'),
               if (benim.isNotEmpty) ...[
                 bolumBaslik('⭐ ÜRÜNLERİM'),
                 ...benim.map((f) => FiyatKarti(f)),

@@ -3,6 +3,7 @@ import '../tema.dart';
 import '../bicim.dart';
 import '../veri.dart';
 import '../parcalar.dart';
+import '../sponsor.dart';
 
 // Web ile aynı kural: 20 tonun altı düşük hacim uyarısı taşır.
 const _dusukHacimTon = 20.0;
@@ -147,7 +148,9 @@ class _TarimEkranState extends State<TarimEkran> {
                   ),
                 ]),
               ),
-              const SizedBox(height: 70),
+              const SizedBox(height: 14),
+              const SponsorKarti('tarim'),
+              const SizedBox(height: 56),
             ],
           ),
         );

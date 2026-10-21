@@ -1,0 +1,4 @@
+{
+  "_aciklama": "Rayiç sponsor reklamları. Hem site hem mobil uygulama bu dosyayı okur. Alanlar: firma, baslik, metin, link (https://...), yerler (bos = her yer; 'ana', 'tarim', 'hayvan'), baslangic / bitis (YYYY-AA-GG, dahil). Aktif reklam yoksa 'buraya reklam verin' karti gorunur.",
+  "sponsorlar": []
+}

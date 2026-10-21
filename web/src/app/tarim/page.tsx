@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { supabaseServer } from "@/lib/supabase";
 import TarimClient from "@/components/TarimClient";
 import PiyasaKarti from "@/components/PiyasaKarti";
+import SponsorKarti from "@/components/SponsorKarti";
 import { RENKLER } from "@/lib/theme";
 import { YEM_AD } from "@/lib/urun-tanim";
 import { kaynakAd } from "@/lib/kaynak-ad";
@@ -52,6 +53,7 @@ export default async function TarimPage() {
           </div>
         </div>
       )}
+      <div style={{ maxWidth: "560px", margin: "28px 0 8px" }}><SponsorKarti yer="tarim" /></div>
     </main>
   );
 }

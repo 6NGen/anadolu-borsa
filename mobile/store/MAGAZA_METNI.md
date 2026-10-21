@@ -1,19 +1,19 @@
-# Google Play mağaza metni — Rayiç
+﻿# Google Play mağaza metni — Rayiç
 
 Play Console → Büyüme → Mağaza girişi → Ana mağaza girişi. Kopyala-yapıştır.
 
 ## Uygulama adı (en fazla 30 karakter)
 
 ```
-Rayiç: Tarım ve Hayvan Fiyatı
+Rayiç: Fiyatın Gerçek Yüzü
 ```
 
-(29 karakter. Adda "borsa" geçmez — hukuki gerekçeyle bilinçli.)
+(26 karakter. Adda "borsa" geçmez — hukuki gerekçeyle bilinçli.)
 
 ## Kısa açıklama (en fazla 80 karakter)
 
 ```
-Arpa, buğday, canlı hayvan, süt ve mazot fiyatları her gün, kaynağıyla.
+Rayiç; Tarım ve Hayvancılığın Güncel Değerleri
 ```
 
 ## Tam açıklama (en fazla 4000 karakter)
@@ -39,7 +39,7 @@ Veriler resmî kurum ve ticaret borsası bültenlerinden günlük olarak derleni
 
 HESAP GEREKMEZ
 
-Üye olmadan kullanılır. Konum izni istemez.
+Üye olmadan, ücretsiz kullanılır. Konum izni istemez. Uygulamada sponsorlu içerik ve reklamlar yer alabilir.
 
 ÖNEMLİ
 

@@ -3,6 +3,7 @@ import '../tema.dart';
 import '../bicim.dart';
 import '../veri.dart';
 import '../parcalar.dart';
+import '../sponsor.dart';
 
 class HayvanEkran extends StatefulWidget {
   const HayvanEkran({super.key});
@@ -92,7 +93,9 @@ class _HayvanEkranState extends State<HayvanEkran> {
                   ),
                 ]),
               ),
-              const SizedBox(height: 70),
+              const SizedBox(height: 14),
+              const SponsorKarti('hayvan'),
+              const SizedBox(height: 56),
             ],
           ),
         );

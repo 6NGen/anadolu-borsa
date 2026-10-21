@@ -37,6 +37,23 @@ export default function KvkkPage() {
         Pazarlama amacıyla kullanılmaz, üçüncü kişilerle paylaşılmaz, satılmaz.
       </p>
 
+      <h2 style={S.h2}>MOBİL UYGULAMA</h2>
+      <p style={S.p}>
+        Rayiç Android uygulaması hesap gerektirmez ve konum izni istemez. Günlük fiyat özeti
+        bildirimini açarsanız, bildirimin cihazınıza ulaşabilmesi için Google Firebase tarafından
+        üretilen bir <b>cihaz bildirim anahtarı</b> kullanılır; bu anahtar yalnızca bildirim
+        gönderimi için işlenir ve paylaşılmaz. Çiftçi Defteri kayıtlarınız yalnızca kendi
+        cihazınızda tutulur, sunucularımıza gönderilmez.
+      </p>
+
+      <h2 style={S.h2}>REKLAMLAR</h2>
+      <p style={S.p}>
+        Sitede ve uygulamada &quot;Sponsorlu&quot; olarak işaretlenmiş reklamlar yer alabilir. Bu reklamlar
+        firmalarla doğrudan yapılan anlaşmalarla gösterilir; reklam kimliği, çerez veya izleme
+        teknolojisi kullanılmaz. Bir reklama dokunduğunuzda ilgili firmanın sitesi açılır ve
+        o sitenin kendi gizlilik politikası geçerli olur.
+      </p>
+
       <h2 style={S.h2}>SAKLAMA SÜRESİ</h2>
       <p style={S.p}>
         Hesabınız aktif olduğu sürece saklanır. Hesabınızı sildirdiğinizde e-posta

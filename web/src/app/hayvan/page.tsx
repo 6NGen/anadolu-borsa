@@ -3,6 +3,7 @@ import { supabaseServer } from "@/lib/supabase";
 import HayvanClient from "@/components/HayvanClient";
 import SuruDegeri from "@/components/SuruDegeri";
 import PiyasaKarti from "@/components/PiyasaKarti";
+import SponsorKarti from "@/components/SponsorKarti";
 import { tekHayvanKaynak } from "@/lib/guncel";
 import { hayvanAd } from "@/lib/karkas";
 import { RENKLER } from "@/lib/theme";
@@ -69,6 +70,7 @@ export default async function HayvanPage() {
           <SuruDegeri fiyatlar={fiyatlar} />
         </>
       )}
+      <div style={{ maxWidth: "560px", margin: "28px 0 8px" }}><SponsorKarti yer="hayvan" /></div>
     </main>
   );
 }
