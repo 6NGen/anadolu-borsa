@@ -1,5 +1,5 @@
 """
-Anadolu Borsa — Hava Durumu Scraper
+Rayiç — Hava Durumu Scraper
 Open-Meteo API — aysiz, API anahtarsiz
 Calistirilacak: main() scraper.py'den cagirilir
 """

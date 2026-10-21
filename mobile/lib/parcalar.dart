@@ -51,7 +51,7 @@ Widget markaBaslik(String altyazi) => Container(
       ),
       child: Row(children: [
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('ANADOLU BORSA', style: TextStyle(color: C.green, fontSize: 17, fontWeight: FontWeight.w800, letterSpacing: 1)),
+          Text('RAYİÇ', style: TextStyle(color: C.green, fontSize: 17, fontWeight: FontWeight.w800, letterSpacing: 1)),
           const SizedBox(height: 2),
           Text(altyazi, style: TextStyle(color: C.muted, fontSize: 10.5)),
         ])),

@@ -66,7 +66,7 @@ export async function GET(request: Request) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 19, color: C.mut }}>Kaynak: TOBB / KTB borsa bültenleri · hacim = günlük işlem</div>
-          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>borsanadolu.6ngen.com/tarim</div>
+          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>rayic.6ngen.com/tarim</div>
         </div>
       </div>
     ),
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
       fonts: await ogFontConfig(),
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
-        "Content-Disposition": `inline; filename="anadolu-borsa-borsalar-${(YEM_AD[veri.norm] ?? veri.norm).toLowerCase()}.png"`,
+        "Content-Disposition": `inline; filename="rayic-borsalar-${(YEM_AD[veri.norm] ?? veri.norm).toLowerCase()}.png"`,
       },
     }
   );

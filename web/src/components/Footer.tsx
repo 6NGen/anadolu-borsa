@@ -16,7 +16,7 @@ export default function Footer() {
           <div style={{ minWidth: "220px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
               <Logo boyut={26} />
-              <span style={{ fontWeight: 700, fontSize: "15px" }}>Anadolu Borsa</span>
+              <span style={{ fontWeight: 700, fontSize: "15px" }}>Rayiç</span>
             </div>
             <p style={{ fontSize: "13px", color: "var(--muted)", lineHeight: 1.6, maxWidth: "300px" }}>
               Resmî borsa ve kurum verilerinden derlenen hububat, hayvan, süt ve girdi fiyatları. Tavsiye vermez; kaynak ve tarih her fiyatın yanında yazar.
@@ -37,7 +37,7 @@ export default function Footer() {
         </div>
         <div style={{ marginTop: "32px", paddingTop: "18px", borderTop: "1px solid var(--border)", display: "flex", flexWrap: "wrap", gap: "8px 24px", fontSize: "12.5px", color: "var(--faint)" }}>
           <span>Veri kaynakları: TOBB · Konya Ticaret Borsası · ESK · USK · UKON · Opet · Open-Meteo</span>
-          <span style={{ marginLeft: "auto" }}>© {new Date().getFullYear()} Anadolu Borsa · 6NGen</span>
+          <span style={{ marginLeft: "auto" }}>© {new Date().getFullYear()} Rayiç · 6NGen</span>
         </div>
       </div>
     </footer>

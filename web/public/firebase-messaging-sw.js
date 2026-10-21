@@ -16,7 +16,7 @@ const messaging = firebase.messaging();
 
 // Veri-tipli mesajda bildirimi elle göster (notification-tipli mesajı tarayıcı otomatik gösterir).
 messaging.onBackgroundMessage((payload) => {
-  const baslik = payload.notification?.title || "Anadolu Borsa";
+  const baslik = payload.notification?.title || "Rayiç";
   const govde = payload.notification?.body || payload.data?.body || "";
   self.registration.showNotification(baslik, { body: govde, badge: "/favicon.ico" });
 });

@@ -6,9 +6,9 @@ import { KARKAS_KG, HAYVAN_AD } from "@/lib/karkas";
 // Statik sayfa — fiyat verisi yok, sadece yöntem anlatımı.
 
 export const metadata: Metadata = {
-  title: "Metodoloji — Anadolu Borsa",
+  title: "Metodoloji — Rayiç",
   description:
-    "Anadolu Borsa veri kaynakları, çekim sıklığı, parite hesabı ve tahmin/referans değerlerin yöntemi.",
+    "Rayiç veri kaynakları, çekim sıklığı, parite hesabı ve tahmin/referans değerlerin yöntemi.",
 };
 
 const KAYNAKLAR = [

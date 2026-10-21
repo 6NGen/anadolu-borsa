@@ -11,7 +11,7 @@ import { donemAnahtar, donemBaslangiclari } from "@/lib/donem";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Canlı Hayvan ve Karkas Fiyatları — Tosun, Kuzu, Süt | Anadolu Borsa",
+  title: "Canlı Hayvan ve Karkas Fiyatları — Tosun, Kuzu, Süt | Rayiç",
   description: "ESK karkas alım fiyatları (tosun, kuzu, toklu) ve USK çiğ süt tavsiye fiyatı — her gün kontrol edilen, kaynaklı, grafikli.",
 };
 

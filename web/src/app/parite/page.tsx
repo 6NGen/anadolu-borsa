@@ -6,7 +6,7 @@ import PariteClient, { Girdi, Urun } from "@/components/PariteClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Mazot / Süt Paritesi — 1 Litre Motorin Kaç Litre Süt? | Anadolu Borsa",
+  title: "Mazot / Süt Paritesi — 1 Litre Motorin Kaç Litre Süt? | Rayiç",
   description: "Çiftçi satın alma gücü endeksi: 1 litre motorin kaç litre çiğ süt, kaç kg arpa ediyor? Günlük, kaynaklı parite.",
 };
 

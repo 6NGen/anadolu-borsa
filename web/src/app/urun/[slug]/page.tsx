@@ -11,10 +11,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const norm = slug.toUpperCase();
   const { data } = await supabaseServer.from("son_fiyatlar").select("*").eq("urun_norm", norm).single();
-  if (!data) return { title: "Anadolu Borsa" };
+  if (!data) return { title: "Rayiç" };
   // SEO M6: fiyat başlıkta — arama sonucunda görünür, revalidate ile günlük tazelenir
   return {
-    title: `${data.urun_ad} Fiyatı Bugün — ${formatFiyat(data.ortalama)} ₺/kg | Anadolu Borsa`,
+    title: `${data.urun_ad} Fiyatı Bugün — ${formatFiyat(data.ortalama)} ₺/kg | Rayiç`,
     description: `Güncel ${data.urun_ad} fiyatı: ${formatFiyat(data.ortalama)} TL/kg (${data.borsa}, ${data.cekilme_tarihi}). TOBB ve Konya Ticaret Borsası verisi. İşlem günlerinde güncellenir.`,
     openGraph: {
       title: `${data.urun_ad} Fiyatı`,
@@ -58,7 +58,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
     "@type": "Product",
     name: `${guncel.urun_ad ?? norm} (borsa fiyatı)`,
     description: `Güncel ${guncel.urun_ad ?? norm} borsa fiyatı — kaynak: ${guncel.borsa}`,
-    url: `https://borsanadolu.6ngen.com/urun/${slug}`,
+    url: `https://rayic.6ngen.com/urun/${slug}`,
     offers: {
       "@type": "Offer",
       price: Number(guncel.ortalama),
@@ -77,7 +77,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
       )}
       {/* Breadcrumb */}
       <div style={{ fontSize: "12px", color: RENKLER.muted, marginBottom: "16px" }}>
-        Anadolu Borsa / {meta?.kategori ?? "ürün"} / {norm}
+        Rayiç / {meta?.kategori ?? "ürün"} / {norm}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "16px", marginBottom: "24px" }}>
@@ -108,7 +108,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
           Son veri tarihi: {guncel?.cekilme_tarihi ?? "—"}.
         </p>
         <p style={{ marginTop: "10px" }}>
-          Anadolu Borsa, Türkiye genelinde tarım ve hayvancılık ürünlerinin borsa fiyatlarını günlük olarak takip eden bir veri platformudur.
+          Rayiç, Türkiye genelinde tarım ve hayvancılık ürünlerinin borsa fiyatlarını günlük olarak takip eden bir veri platformudur.
           Fiyatlar TOBB, KTB ve ESK kaynaklarından otomatik olarak çekilmektedir.
         </p>
       </div>

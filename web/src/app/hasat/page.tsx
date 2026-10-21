@@ -6,7 +6,7 @@ import { HASAT_URUNLER } from "@/lib/hasat-takvimi";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Hasat Paneli — Hava, Fiyat Trendi, Hasat Takvimi | Anadolu Borsa",
+  title: "Hasat Paneli — Hava, Fiyat Trendi, Hasat Takvimi | Rayiç",
   description: "Bölge hava durumu, ürün fiyat trendi ve ortalama hasat takvimi tek ekranda. Buğday, arpa, mısır.",
 };
 

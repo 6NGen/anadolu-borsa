@@ -9,7 +9,7 @@ import { kaynakAd } from "@/lib/kaynak-ad";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Tarım Ürünleri Fiyatları — Arpa, Buğday, Mısır | Anadolu Borsa",
+  title: "Tarım Ürünleri Fiyatları — Arpa, Buğday, Mısır | Rayiç",
   description: "Arpa, buğday, mısır ve diğer hububat fiyatları — TOBB ve KTB borsa verileri, son 30 gün grafikli. İşlem günlerinde güncellenir.",
 };
 

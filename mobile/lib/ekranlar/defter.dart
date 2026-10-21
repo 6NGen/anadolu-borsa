@@ -186,7 +186,7 @@ class _DefterEkranState extends State<DefterEkran> {
   }
 
   void _paylas(String metin) {
-    SharePlus.instance.share(ShareParams(text: '$metin\n(Anadolu Borsa Çiftçi Defteri — güncel borsa fiyatlarıyla kaba hesap)\n$siteUrl'));
+    SharePlus.instance.share(ShareParams(text: '$metin\n(Rayiç Çiftçi Defteri — güncel borsa fiyatlarıyla kaba hesap)\n$siteUrl'));
   }
 
   @override

@@ -1,5 +1,5 @@
 """
-Anadolu Borsa — Ana Scraper
+Rayiç — Ana Scraper
 Calistirilacak: python scraper/scraper.py
 Ortam: scraper/.env dosyasindan SUPABASE_URL ve SUPABASE_SERVICE_KEY okunur
 CI: ayni degiskenler GitHub Secrets'tan gelir (Settings > Secrets > Actions).
@@ -772,7 +772,7 @@ def hava_guncelle():
 # --- ANA AKIS ---
 def main():
     print(f"\n{'=' * 50}")
-    print(f"Anadolu Borsa Scraper — {datetime.now().strftime('%d.%m.%Y %H:%M')}")
+    print(f"Rayiç Scraper — {datetime.now().strftime('%d.%m.%Y %H:%M')}")
     print(f"{'=' * 50}\n")
 
     # YEM

@@ -8,7 +8,7 @@ import HedefClient, { UrunItem } from "@/components/HedefClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Hedef Hesabı — 1 Traktör Kaç Ton Arpa? | Anadolu Borsa",
+  title: "Hedef Hesabı — 1 Traktör Kaç Ton Arpa? | Rayiç",
   description: "Güncel fiyatlarla hedef hesabı: traktör, araç ve diğer varlıklar kaç ton ürün ya da kaç baş hayvan ediyor?",
 };
 

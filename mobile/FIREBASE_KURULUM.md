@@ -1,8 +1,9 @@
 # Mobil Push (FCM) — Durum: KURULDU ✅ (2026-07-03)
 
 - Firebase projesi: **`anadolu-borsa-ab12d`** — web + mobil + scraper aynı projede.
-- `mobile/android/app/google-services.json` bu projenin Android kaydı
-  (`com.anadoluborsa.mobile`). Gönderim anahtarı: GitHub Secret
+- `mobile/android/app/google-services.json` bu projenin Android kayıtları
+  (`com.rayic.mobile` — 2026-10-21 Rayiç adına geçişte eklendi; eski
+  `com.anadoluborsa.mobile` kaydı eski APK kullanıcıları için duruyor). Gönderim anahtarı: GitHub Secret
   `GOOGLE_SERVICE_ACCOUNT_JSON` (PART5'ten beri kurulu).
 - Günlük özet: mobil Ayarlar → Bildirimler → "Günlük fiyat özeti" anahtarı
   cihazı `gunluk_ozet` KONUSUNA abone eder (hesap gerektirmez);

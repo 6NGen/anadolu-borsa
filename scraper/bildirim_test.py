@@ -36,7 +36,7 @@ def main() -> int:
             "topic": "gunluk_ozet",
             "notification": {
                 "title": "🔔 Test bildirimi",
-                "body": f"Anadolu Borsa bildirimleri calisiyor ({saat}). Bu bir tanilama mesajidir.",
+                "body": f"Rayiç bildirimleri calisiyor ({saat}). Bu bir tanilama mesajidir.",
             },
             "android": {"priority": "high"},
         }},

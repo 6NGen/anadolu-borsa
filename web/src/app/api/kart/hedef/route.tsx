@@ -79,7 +79,7 @@ export async function GET(request: Request) {
             </div>
           </div>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>
-            borsanadolu.6ngen.com/hedef
+            rayic.6ngen.com/hedef
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
       fonts: await ogFontConfig(),
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
-        "Content-Disposition": `inline; filename="anadolu-borsa-hedef-${urun.norm.toLowerCase()}-${varlikKey}.png"`,
+        "Content-Disposition": `inline; filename="rayic-hedef-${urun.norm.toLowerCase()}-${varlikKey}.png"`,
       },
     }
   );

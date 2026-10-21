@@ -36,7 +36,7 @@ export default function PariteMatris({
       <style>{CSS}</style>
 
       <div className="pmx-head">
-        <div className="pmx-eyebrow">Anadolu Borsa</div>
+        <div className="pmx-eyebrow">Rayiç</div>
         <h2 className="pmx-h">Parite Matrisi</h2>
         <div className="pmx-alt">Çiftçinin ürünü girdiye karşı kaç ediyor — bütün pariteler tek tabloda.</div>
       </div>
@@ -160,7 +160,7 @@ export default function PariteMatris({
       </div>
 
       <div className="pmx-dip">
-        <span className="vt" /> Tüm fiyatlar Anadolu Borsa'nın güncel verisinden gelir.
+        <span className="vt" /> Tüm fiyatlar Rayiç'in güncel verisinden gelir.
         Hücreye/satıra dokun → aşağıdaki grafik o pariteye geçer. <b>⚠</b> işareti veri 3+ gün eski demektir;
         boş hücre o ikili için güncel veri olmadığını belirtir. Matris yalnızca oranı gösterir, alım-satım tavsiyesi vermez.
       </div>

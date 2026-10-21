@@ -35,6 +35,6 @@ Future<void> widgetGuncelle(List<Fiyat> yem, List<Fiyat> hayvan) async {
       if (f != null && (enYeni == null || f.tarih.compareTo(enYeni) > 0)) enYeni = f.tarih;
     }
     await HomeWidget.saveWidgetData<String>('w_tarih', kisaTarih(enYeni));
-    await HomeWidget.updateWidget(qualifiedAndroidName: 'com.anadoluborsa.mobile.FiyatWidget');
+    await HomeWidget.updateWidget(qualifiedAndroidName: 'com.rayic.mobile.FiyatWidget');
   } catch (_) {/* widget kurulmamış olabilir — sessiz */}
 }

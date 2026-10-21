@@ -25,7 +25,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final acik = prefs.getBool('acikTema') ?? false;
   paletUygula(acik);
-  runApp(AnadoluBorsaApp(baslangic: acik));
+  runApp(RayicApp(baslangic: acik));
 }
 
 // Tarayıcıda link aç — canLaunchUrl bazı cihazlarda yanlış false döndüğü için
@@ -36,14 +36,14 @@ Future<void> linkAc(String url) async {
   } catch (_) {/* sessiz */}
 }
 
-class AnadoluBorsaApp extends StatefulWidget {
+class RayicApp extends StatefulWidget {
   final bool baslangic;
-  const AnadoluBorsaApp({super.key, required this.baslangic});
+  const RayicApp({super.key, required this.baslangic});
   @override
-  State<AnadoluBorsaApp> createState() => _AnadoluBorsaAppState();
+  State<RayicApp> createState() => _RayicAppState();
 }
 
-class _AnadoluBorsaAppState extends State<AnadoluBorsaApp> {
+class _RayicAppState extends State<RayicApp> {
   late bool _acik = widget.baslangic;
 
   Future<void> _temaDegistir(bool acik) async {
@@ -59,7 +59,7 @@ class _AnadoluBorsaAppState extends State<AnadoluBorsaApp> {
     return ValueListenableBuilder<int>(
       valueListenable: Tercih.surum,
       builder: (context, surum, child) => MaterialApp(
-        title: 'Anadolu Borsa',
+        title: 'Rayiç',
         debugShowCheckedModeBanner: false,
         theme: anadoluTema(_acik),
         builder: (context, child) {
@@ -115,7 +115,7 @@ class _AnaKabukState extends State<AnaKabuk> {
             icon: Icon(Icons.ios_share_rounded, color: C.muted, size: 21),
             tooltip: 'Paylaş',
             onPressed: () => SharePlus.instance.share(
-              ShareParams(text: 'Anadolu Borsa — güncel tarım ve hayvancılık fiyatları\n$siteUrl'),
+              ShareParams(text: 'Rayiç — güncel tarım ve hayvancılık fiyatları\n$siteUrl'),
             ),
           ),
           IconButton(

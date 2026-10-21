@@ -1,6 +1,6 @@
-# Anadolu Borsa
+# Rayiç
 
-Türkiye tarım ve hayvancılık fiyat platformu — [borsanadolu.6ngen.com](https://borsanadolu.6ngen.com)
+Türkiye tarım ve hayvancılık fiyat platformu — [rayic.6ngen.com](https://rayic.6ngen.com)
 
 - `web/` — Next.js sitesi (Vercel, push = deploy)
 - `scraper/` — günlük veri çekici (GitHub Actions, her gün 23:00 TSİ): TOBB/KTB hububat, ESK karkas, USK çiğ süt, Open-Meteo hava

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { RENKLER } from "@/lib/theme";
 
 export const metadata: Metadata = {
-  title: "KVKK Aydınlatma Metni — Anadolu Borsa",
+  title: "KVKK Aydınlatma Metni — Rayiç",
   description: "Hesap bilgisi işleme amacı, saklama süresi ve silme talebi yöntemi.",
 };
 
@@ -19,7 +19,7 @@ export default function KvkkPage() {
         KVKK aydınlatma metni
       </h1>
       <p style={S.mut}>
-        6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında, Anadolu Borsa
+        6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında, Rayiç
         olarak kişisel verilerinizi aşağıdaki şekilde işliyoruz.
       </p>
 
@@ -55,7 +55,7 @@ export default function KvkkPage() {
 
       <h2 style={S.h2}>VERİ SORUMLUSU</h2>
       <p style={S.mut}>
-        Anadolu Borsa · borsanadolu.6ngen.com · omerfarukdurna3442@gmail.com
+        Rayiç · rayic.6ngen.com · omerfarukdurna3442@gmail.com
       </p>
     </main>
   );

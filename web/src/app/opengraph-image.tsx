@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import { ogFontConfig } from "@/lib/og-font";
 import { SITE_AD } from "@/lib/urun-tanim";
 
-export const alt = "Anadolu Borsa — Türkiye Tarım ve Hayvancılık Fiyatları";
+export const alt = "Rayiç — Türkiye Tarım ve Hayvancılık Fiyatları";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

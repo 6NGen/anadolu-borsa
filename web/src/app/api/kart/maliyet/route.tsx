@@ -79,7 +79,7 @@ export async function GET(request: Request) {
           <div style={{ display: "flex", justifyContent: "center", fontSize: 18, color: C.mut }}>
             {AD[urun] ?? urun} {formatFiyat(Number(bf.ortalama))} ₺/kg · {bf.borsa} · maliyet kalemleri tahmindir
           </div>
-          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>borsanadolu.6ngen.com/maliyet</div>
+          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>rayic.6ngen.com/maliyet</div>
         </div>
       </div>
     ),
@@ -87,7 +87,7 @@ export async function GET(request: Request) {
       width: 1080, height: 1080, fonts: await ogFontConfig(),
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
-        "Content-Disposition": `inline; filename="anadolu-borsa-maliyet-${urun.toLowerCase()}.png"`,
+        "Content-Disposition": `inline; filename="rayic-maliyet-${urun.toLowerCase()}.png"`,
       },
     }
   );

@@ -1,4 +1,4 @@
-package com.anadoluborsa.mobile
+package com.rayic.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

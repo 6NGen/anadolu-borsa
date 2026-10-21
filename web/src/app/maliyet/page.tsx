@@ -6,7 +6,7 @@ import { MALIYET_URUNLER } from "@/lib/maliyet";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Ekim Maliyeti Hesaplayıcı — Dekar Başı Maliyet ve Gelir | Anadolu Borsa",
+  title: "Ekim Maliyeti Hesaplayıcı — Dekar Başı Maliyet ve Gelir | Rayiç",
   description: "Buğday, arpa, mısır için dekar başı ekim maliyeti ve bugünkü borsa fiyatıyla beklenen gelir. Mazot canlı, verim TÜİK ortalaması.",
 };
 

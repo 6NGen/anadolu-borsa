@@ -9,7 +9,7 @@ const supabaseUrl = 'https://semuedzrtqihnsexyemt.supabase.co';
 const supabaseAnonKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNlbXVlZHpydHFpaG5zZXh5ZW10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4NTExOTMsImV4cCI6MjA5NjQyNzE5M30.6_RIr0NqO6ndNSvwKmQTC39Vshu3rqHFkTk9ZEAeNzU';
 
-const siteUrl = 'https://borsanadolu.6ngen.com';
+const siteUrl = 'https://rayic.6ngen.com';
 
 SupabaseClient get sb => Supabase.instance.client;
 

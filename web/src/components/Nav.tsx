@@ -59,10 +59,10 @@ export default function Nav() {
       }}
     >
       <div className="ab-container" style={{ display: "flex", alignItems: "center", gap: "8px", height: "60px" }}>
-        <Link href="/" aria-label="Anadolu Borsa anasayfa" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginRight: "18px", flexShrink: 0 }}>
+        <Link href="/" aria-label="Rayiç anasayfa" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginRight: "18px", flexShrink: 0 }}>
           <Logo boyut={30} />
           <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
-            <span style={{ fontSize: "15.5px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.01em" }}>Anadolu Borsa</span>
+            <span style={{ fontSize: "15.5px", fontWeight: 700, color: "var(--text)", letterSpacing: "-0.01em" }}>Rayiç</span>
             <span className="hidden sm:block" style={{ fontSize: "11px", color: "var(--faint)", fontWeight: 500 }}>Tarım ve hayvancılık fiyatları</span>
           </span>
         </Link>

@@ -1,4 +1,4 @@
-package com.anadoluborsa.mobile
+package com.rayic.mobile
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager

@@ -8,7 +8,7 @@ import Link from "next/link";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Girdi Fiyatları — Mazot, Gübre, Elektrik | Anadolu Borsa",
+  title: "Girdi Fiyatları — Mazot, Gübre, Elektrik | Rayiç",
   description: "Üretim girdileri tek ekranda: motorin, gübre (DAP, üre, %33 AN, kompoze) ve elektrik. Gübre ve kaba yem topluluk verisiyle.",
 };
 

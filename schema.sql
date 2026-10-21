@@ -1,5 +1,5 @@
 -- ════════════════════════════════════════════
--- ANADOLU BORSA — Supabase Şeması
+-- RAYİÇ — Supabase Şeması
 -- ════════════════════════════════════════════
 
 -- TABLO 1: Yem fiyatları (TOBB/KTB)

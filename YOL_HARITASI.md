@@ -1,4 +1,4 @@
-# ANADOLU BORSA — YOL HARİTASI & EYLEM PLANI
+# RAYİÇ — YOL HARİTASI & EYLEM PLANI
 # Tarih: 2026-06-13 · Founder: Ömer Faruk Durna (6NGen)
 # Bu bir PLAN değil, bir PUSULA + faz faz eylem listesidir.
 # Tek cümlelik kuzey yıldızı aşağıda; her karar ona göre verilir.
@@ -6,7 +6,7 @@
 ═══════════════════════════════════════════════════════════════
 KUZEY YILDIZI
 ═══════════════════════════════════════════════════════════════
-"Türkiye'de bir çiftçi fiyata bakacaksa Anadolu Borsa'ya baksın."
+"Türkiye'de bir çiftçi fiyata bakacaksa Rayiç'e baksın."
 Bu tek cümle kazanılana kadar BAŞKA HİÇBİR ŞEY yok.
 Her özellik, her saat şunu sorar: bu, o cümleye hizmet ediyor mu?
 Etmiyorsa — ne kadar parlak olursa olsun — şimdi değil.
@@ -15,7 +15,7 @@ Etmiyorsa — ne kadar parlak olursa olsun — şimdi değil.
 STRATEJİK TEMEL (neden bu sıra)
 ═══════════════════════════════════════════════════════════════
 İki varlık, iki farklı değer:
-• ANADOLU BORSA = düşük hendek, düşük sürtünme → GÜNLÜK KAPI.
+• RAYİÇ = düşük hendek, düşük sürtünme → GÜNLÜK KAPI.
   Herkes fiyat scraper'ı yazabilir; avantaj veri disiplini + güven.
   Değeri: çiftçiyi her gün geri getiren tek mecra olmak.
 • EKİPMAN/PARÇA MODÜLÜ = yüksek hendek (mühendis+çiftçi+KOBİ
@@ -307,4 +307,4 @@ NAKLİYE MODÜLÜ (ayrı oturum handoff'u, 3 Temmuz — şartlı kabul):
     üretir (güzergâh × ürün × ton ₺) — kimsede olmayan 4. veri katmanı;
     Çiftçi Defteri'ne nakliye gideri kalemi + B2B paketi.
     ÖN KOŞUL: mevcut açık işler (UKON tamiri, TÜRİB e-postası, ✅matris
-    mobil, ERİŞİLEBİLİRLİK) + Anadolu Borsa'nın KENDİ dağıtımı önce.
+    mobil, ERİŞİLEBİLİRLİK) + Rayiç'in KENDİ dağıtımı önce.

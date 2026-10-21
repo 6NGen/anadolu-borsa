@@ -95,12 +95,12 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
   const anaG = girdiler[Object.keys(girdiler).find((k) => girdiler[k].aktif)!];
   const aBirim = anaG.birim.replace("TL/", "");
   const matrisMetni = [
-    "📊 Anadolu Borsa — Parite Matrisi",
+    "📊 Rayiç — Parite Matrisi",
     `1 ${aBirim} ${anaG.ad.toLowerCase()} (${formatFiyat(anaG.guncel)} ₺) parasıyla:`,
     "",
     ...canliUrunler.map(([, u]) => `${u.ikon} ${oranBicim(anaG.guncel / u.guncel)} ${u.birim.replace("TL/", "")} ${u.ad.toLowerCase()}`),
     "",
-    "borsanadolu.6ngen.com/parite",
+    "rayic.6ngen.com/parite",
   ].join("\n");
 
   return (

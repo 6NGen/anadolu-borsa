@@ -129,14 +129,14 @@ class _AyarlarEkranState extends State<AyarlarEkran> {
             ListTile(
               leading: Icon(Icons.public, color: C.muted),
               title: Text('Web sitesi', style: TextStyle(color: C.text, fontSize: 13)),
-              subtitle: Text('borsanadolu.6ngen.com', style: TextStyle(color: C.muted, fontSize: 11)),
+              subtitle: Text('rayic.6ngen.com', style: TextStyle(color: C.muted, fontSize: 11)),
               trailing: Icon(Icons.open_in_new, color: C.muted, size: 18),
               onTap: _siteAc,
             ),
             Divider(height: 1, color: C.border),
             ListTile(
               leading: Icon(Icons.info_outline, color: C.muted),
-              title: Text('Anadolu Borsa', style: TextStyle(color: C.text, fontSize: 13)),
+              title: Text('Rayiç', style: TextStyle(color: C.text, fontSize: 13)),
               subtitle: Text('Türkiye tarım ve hayvancılık fiyatları · sürüm 1.5', style: TextStyle(color: C.muted, fontSize: 11)),
             ),
           ])),

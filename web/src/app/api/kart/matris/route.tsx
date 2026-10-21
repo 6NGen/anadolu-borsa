@@ -86,7 +86,7 @@ export async function GET(request: Request) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 18 }}>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 17, color: C.mut }}>Kaynak: TOBB/KTB hububat · ESK karkas · USK süt · matris yalnızca oranı gösterir</div>
-          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>borsanadolu.6ngen.com/parite</div>
+          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>rayic.6ngen.com/parite</div>
         </div>
       </div>
     ),
@@ -94,7 +94,7 @@ export async function GET(request: Request) {
       width: 1080, height: 1080, emoji: "twemoji", fonts: await ogFontConfig(),
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=600",
-        "Content-Disposition": `inline; filename="anadolu-borsa-parite-matris.png"`,
+        "Content-Disposition": `inline; filename="rayic-parite-matris.png"`,
       },
     }
   );

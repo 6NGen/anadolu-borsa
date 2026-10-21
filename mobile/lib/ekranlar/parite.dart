@@ -52,7 +52,7 @@ class _PariteEkranState extends State<PariteEkran> {
     final mazot = v.girdiler.where((g) => g.tur == 'mazot').firstOrNull;
     if (mazot == null) return;
     final satirlar = [
-      '📊 Anadolu Borsa — Parite',
+      '📊 Rayiç — Parite',
       '1 ${mazot.birim} motorin (${formatFiyat(mazot.fiyat)} ₺) parasıyla:',
       '',
       for (final f in v.urunler)

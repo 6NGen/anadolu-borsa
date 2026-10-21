@@ -5,7 +5,7 @@ import TarlaClient from "@/components/TarlaClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Sanal Tarla — Çiftçiliğini Kâğıt Üzerinde Takip Et | Anadolu Borsa",
+  title: "Sanal Tarla — Çiftçiliğini Kâğıt Üzerinde Takip Et | Rayiç",
   description: "Güzlük buğday/arpa tarlanı sanal aç, açılış maliyetini sabitle, bugünkü değerini canlı borsa fiyatıyla izle, hasatta paylaş.",
 };
 
