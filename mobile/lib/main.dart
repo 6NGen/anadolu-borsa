@@ -85,7 +85,7 @@ class AnaKabuk extends StatefulWidget {
 
 class _AnaKabukState extends State<AnaKabuk> {
   int _sekme = 0;
-  static const _basliklar = ['ANA SAYFA', 'TARIM BORSASI', 'HAYVAN BORSASI', 'PARİTE', 'ARAÇLAR'];
+  static const _basliklar = ['ANA SAYFA', 'TARIM FİYATLARI', 'HAYVAN FİYATLARI', 'PARİTE', 'ARAÇLAR'];
 
   @override
   void initState() {

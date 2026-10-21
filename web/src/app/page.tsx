@@ -78,7 +78,7 @@ export default async function Dashboard() {
             </p>
           </div>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            <Link href="/tarim" className="ab-btn ab-btn-primary">Tarım borsası <ArrowRight size={15} /></Link>
+            <Link href="/tarim" className="ab-btn ab-btn-primary">Tarım fiyatları <ArrowRight size={15} /></Link>
             <Link href="/metodoloji" className="ab-btn"><BookOpen size={15} /> Veriler nereden geliyor?</Link>
           </div>
         </section>

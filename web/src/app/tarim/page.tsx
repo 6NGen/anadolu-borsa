@@ -23,7 +23,7 @@ export default async function TarimPage() {
   return (
     <main className="ab-container" style={{ paddingTop: "28px" }}>
       <div style={{ marginBottom: "16px" }}>
-        <h1 className="ab-h1">Tarım borsası</h1>
+        <h1 className="ab-h1">Tarım fiyatları</h1>
         <p style={{ fontSize: "13px", color: RENKLER.muted, marginTop: "4px" }}>TOBB ve Konya Ticaret Borsası (KTB) verileri · İşlem günlerinde güncellenir · tarih = son işlem günü; birden çok sınıf işlem gördüyse miktar-ağırlıklı ortalama</p>
       </div>
 

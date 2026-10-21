@@ -3,7 +3,7 @@ import Logo from "./Logo";
 
 // Tüm sayfalarda alt bilgi: metodoloji (güven çapası) + kaynak atfı + site haritası.
 const SUTUNLAR = [
-  { baslik: "Piyasalar", linkler: [["/tarim", "Tarım borsası"], ["/hayvan", "Hayvan ve süt"], ["/girdiler", "Girdi fiyatları"], ["/parite", "Parite matrisi"]] },
+  { baslik: "Piyasalar", linkler: [["/tarim", "Tarım fiyatları"], ["/hayvan", "Hayvan ve süt"], ["/girdiler", "Girdi fiyatları"], ["/parite", "Parite matrisi"]] },
   { baslik: "Araçlar", linkler: [["/maliyet", "Ekim maliyeti"], ["/tarla", "Sanal tarla"], ["/hasat", "Hasat paneli"], ["/hedef", "Hedef panel"]] },
   { baslik: "Kurumsal", linkler: [["/metodoloji", "Metodoloji"], ["/fiyat-bildir", "Fiyat bildir"], ["/kvkk", "KVKK ve gizlilik"]] },
 ];
