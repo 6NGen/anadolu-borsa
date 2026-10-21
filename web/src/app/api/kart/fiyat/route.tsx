@@ -66,7 +66,7 @@ export async function GET(request: Request) {
             Veriler ilgili kurumların kamuya açık yayınlarından derlenir — kaynak: {kaynakTemiz}
           </div>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>
-            rayic.6ngen.com
+            borsanadolu.6ngen.com
           </div>
         </div>
       </div>

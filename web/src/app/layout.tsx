@@ -14,7 +14,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rayic.6ngen.com"),
+  metadataBase: new URL("https://borsanadolu.6ngen.com"),
   title: "Rayiç — Arpa, Buğday, Canlı Hayvan ve Süt Fiyatları",
   description: "Arpa, buğday, canlı hayvan ve süt fiyatları — günlük, kaynaklı, tek ekranda. TOBB, KTB, ESK, USK verileri.",
 };

@@ -55,7 +55,7 @@ export default function KvkkPage() {
 
       <h2 style={S.h2}>VERİ SORUMLUSU</h2>
       <p style={S.mut}>
-        Rayiç · rayic.6ngen.com · omerfarukdurna3442@gmail.com
+        Rayiç · borsanadolu.6ngen.com · omerfarukdurna3442@gmail.com
       </p>
     </main>
   );

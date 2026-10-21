@@ -71,7 +71,7 @@ export async function GET(request: Request) {
             <div style={{ display: "flex" }}>{tanim.ad} {formatFiyat(urun.fiyat)} ₺/{birimKisa} · {kaynakTemiz} · {kisaTarih(urun.tarih)}</div>
           </div>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>
-            rayic.6ngen.com/parite
+            borsanadolu.6ngen.com/parite
           </div>
         </div>
       </div>

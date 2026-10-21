@@ -68,7 +68,7 @@ export async function GET(request: Request) {
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 18 }}>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 28, color: netPoz ? C.yesil : C.kirmizi, fontWeight: 700 }}>Net {netPoz ? "+" : ""}{formatFiyat(net, 0)} ₺</div>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 18, color: C.mut }}>{u.urunNorm} {formatFiyat(guncelFiyat)} ₺/kg · {bf.borsa} · maliyet tahmindir</div>
-          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>rayic.6ngen.com/tarla</div>
+          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>borsanadolu.6ngen.com/tarla</div>
         </div>
       </div>
     ),

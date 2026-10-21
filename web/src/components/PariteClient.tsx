@@ -100,7 +100,7 @@ export default function PariteClient({ girdiler, urunler }: { girdiler: Record<s
     "",
     ...canliUrunler.map(([, u]) => `${u.ikon} ${oranBicim(anaG.guncel / u.guncel)} ${u.birim.replace("TL/", "")} ${u.ad.toLowerCase()}`),
     "",
-    "rayic.6ngen.com/parite",
+    "borsanadolu.6ngen.com/parite",
   ].join("\n");
 
   return (

@@ -135,7 +135,7 @@ export default function TarimClient({ sonFiyatlar, grafik }: Props) {
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
           <div style={{ marginBottom: "16px" }}>
             <PaylasButonlar
-              metin={`${YEM_AD[secilen] ?? secilen} ${formatFiyat(guncelSatir.ortalama)} TL/kg\n${borsa} · ${kisaTarih(guncelSatir.cekilme_tarihi)}\nhttps://rayic.6ngen.com/tarim`}
+              metin={`${YEM_AD[secilen] ?? secilen} ${formatFiyat(guncelSatir.ortalama)} TL/kg\n${borsa} · ${kisaTarih(guncelSatir.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/tarim`}
               pngUrl={kartUretilebilir(guncelSatir.cekilme_tarihi) ? `/api/kart/fiyat?urun=${secilen}` : null}
             />
           </div>

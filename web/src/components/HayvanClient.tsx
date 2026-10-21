@@ -75,7 +75,7 @@ export default function HayvanClient({ fiyatlar, grafik, donem }: Props) {
           {/* Paylaşım: PNG kart bayat veride üretilmez (KARAR), buton pasif gösterilir */}
           <div style={{ marginBottom: "16px" }}>
             <PaylasButonlar
-              metin={`🐄 ${hayvanAd(secilen)} ${formatFiyat(sf.fiyat)} ${sf.birim}\n${sf.kaynak.replace("_SUT", "")} · ${kisaTarih(sf.cekilme_tarihi)}\nhttps://rayic.6ngen.com/hayvan`}
+              metin={`🐄 ${hayvanAd(secilen)} ${formatFiyat(sf.fiyat)} ${sf.birim}\n${sf.kaynak.replace("_SUT", "")} · ${kisaTarih(sf.cekilme_tarihi)}\nhttps://borsanadolu.6ngen.com/hayvan`}
               pngUrl={kartUretilebilir(sf.cekilme_tarihi) ? `/api/kart/fiyat?urun=${secilen}` : null}
             />
           </div>

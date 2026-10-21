@@ -58,7 +58,7 @@ export default async function UrunPage({ params }: { params: Promise<{ slug: str
     "@type": "Product",
     name: `${guncel.urun_ad ?? norm} (borsa fiyatı)`,
     description: `Güncel ${guncel.urun_ad ?? norm} borsa fiyatı — kaynak: ${guncel.borsa}`,
-    url: `https://rayic.6ngen.com/urun/${slug}`,
+    url: `https://borsanadolu.6ngen.com/urun/${slug}`,
     offers: {
       "@type": "Offer",
       price: Number(guncel.ortalama),
