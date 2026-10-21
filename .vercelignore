@@ -1,0 +1,10 @@
+# Vercel yalnizca web/ derler (Root Directory = web)
+mobile
+scraper
+prototip
+.pytest_cache
+proje_yapisi.txt
+web/node_modules
+web/.next
+web/.ss
+web/.env.local

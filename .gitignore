@@ -45,3 +45,5 @@ ss_*.png
 
 # === Ekran goruntusu araci (scripts/ss.mjs ciktilari) ===
 web/.ss/
+
+.vercel
