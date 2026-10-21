@@ -1,5 +1,5 @@
 // /parite link önizlemesi: CANLI mazot/süt paritesi — viral kanalın kendisi.
-// WhatsApp'ta "borsanadolu.6ngen.com/parite" atılınca bu kart açılır.
+// WhatsApp'ta "rayic.6ngen.com/parite" atılınca bu kart açılır.
 import { ImageResponse } from "next/og";
 import { pariteKartVeri } from "@/lib/kart-veri";
 import { ogFontConfig } from "@/lib/og-font";

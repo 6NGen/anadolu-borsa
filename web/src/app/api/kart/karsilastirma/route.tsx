@@ -64,7 +64,7 @@ export async function GET(request: Request) {
           <div style={{ display: "flex", justifyContent: "center", fontSize: 19, color: C.mut }}>
             Resmi: {kaynakTemiz} · Piyasa: {piyasa.bildirim} kullanıcı bildirimi ({piyasa.il})
           </div>
-          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.borsa }}>borsanadolu.6ngen.com</div>
+          <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.borsa }}>rayic.6ngen.com</div>
         </div>
       </div>
     ),

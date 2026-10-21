@@ -23,5 +23,5 @@ export const YEM_AD: Record<string, string> = {
   YONCA: "Yonca", YULAF: "Yulaf", CAVDAR: "Çavdar",
 };
 
-export const SITE_URL = "https://borsanadolu.6ngen.com";
+export const SITE_URL = "https://rayic.6ngen.com";
 export const SITE_AD = "RAYİÇ";

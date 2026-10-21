@@ -79,7 +79,7 @@ export async function GET(request: Request) {
             </div>
           </div>
           <div style={{ display: "flex", justifyContent: "center", fontSize: 22, color: C.yesil }}>
-            borsanadolu.6ngen.com/hedef
+            rayic.6ngen.com/hedef
           </div>
         </div>
       </div>
