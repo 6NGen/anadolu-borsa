@@ -419,31 +419,47 @@ def ktb_birlestir(satirlar: list, tarih: str) -> list:
     return sonuclar
 
 
+KTB_GERIYE_GUN = 5
+
+
 def ktb_scrape() -> list:
-    tarih = bugun_tr()
-    try:
-        resp = requests.get(
-            KTB_BULTEN_URL.format(tarih=tarih),
-            headers={"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"},
-            timeout=20,
-        )
-        resp.raise_for_status()
-        # Islem olmayan gun (hafta sonu/tatil) bos liste ya da 204 doner
-        satirlar = resp.json() if resp.status_code == 200 and resp.content else []
-        sonuclar = ktb_birlestir(satirlar, tarih)
-        log_yaz("KTB_KONYA", "basarili", len(sonuclar))
-        print(f"[OK] KTB: {len(sonuclar)} urun")
-        return sonuclar
-    except Exception as e:
-        log_yaz("KTB_KONYA", "hata", hata=e)
+    """Son KTB_GERIYE_GUN gunun bultenlerini ceker. GitHub zamanlanmis kosulari
+    saatlerce gecikip TR saatiyle ertesi gun 01-04'te calisiyor: yalniz "bugunu"
+    sormak bos bulten demekti (Ekim'de canliya hic Konya verisi yazilmadi).
+    Geriye bakis kacirilan gunleri de doldurur; upsert ayni gunu tekrar yazmaz."""
+    from datetime import date as _date
+    bugun = _date.fromisoformat(bugun_tr())
+    sonuclar, basarili_istek, son_hata = [], 0, None
+    for geri in range(KTB_GERIYE_GUN):
+        tarih = (bugun - timedelta(days=geri)).isoformat()
+        try:
+            resp = istek_tekrarla(
+                KTB_BULTEN_URL.format(tarih=tarih), deneme=3, bekleme=5,
+                headers={"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"},
+                timeout=20,
+            )
+            basarili_istek += 1
+            # Islem olmayan gun (hafta sonu/tatil) bos liste ya da 204 doner
+            satirlar = resp.json() if resp.status_code == 200 and resp.content.strip() else []
+            sonuclar.extend(ktb_birlestir(satirlar or [], tarih))
+        except Exception as e:
+            son_hata = e
+        time.sleep(1)
+    if basarili_istek == 0:
+        log_yaz("KTB_KONYA", "hata", hata=son_hata)
         fallback_kontrol("KTB_KONYA")
-        print(f"[HATA] KTB: {e}")
+        print(f"[HATA] KTB: {son_hata}")
         return []
+    log_yaz("KTB_KONYA", "basarili", len(sonuclar))
+    print(f"[OK] KTB: {len(sonuclar)} urun-gun ({KTB_GERIYE_GUN} gun geriye)")
+    return sonuclar
 
 
 # --- ESK SCRAPER (Karkas) ---
 def esk_karkas_scrape() -> list:
-    url = "https://www.esk.gov.tr/tr/11931/Alim-Fiyatlari"
+    # 2026-10: eski /tr/11931/Alim-Fiyatlari 404 oldu (09.10'dan beri 0 kayit,
+    # "basarili" gorunuyordu). Tablo ayni, yeni sayfa:
+    url = "https://www.esk.gov.tr/tr/11861/Fiyatlarimiz"
     headers = {"User-Agent": "Mozilla/5.0 (compatible; AnadoluBot/1.0)"}
     HAYVAN_MAP = {
         "TOSUN": "TOSUN", "INEK": "INEK", "MANDA": "MANDA",
@@ -451,7 +467,7 @@ def esk_karkas_scrape() -> list:
         "DANA":  "DANA",  "OGLAK": "OGLAK",
     }
     try:
-        resp = requests.get(url, headers=headers, timeout=15)
+        resp = istek_tekrarla(url, headers=headers, timeout=20)  # 404 -> hata
         resp.encoding = "utf-8"
         soup = BeautifulSoup(resp.text, "html.parser")
         sonuclar = []
@@ -479,6 +495,9 @@ def esk_karkas_scrape() -> list:
                     "birim":          "TL/kg karkas",
                     "cekilme_tarihi": bugun_tr(),
                 })
+        if not sonuclar:
+            # Sayfa acildi ama tablo bulunamadi: sessiz "0 kayit" degil, hata
+            raise Exception("ESK sayfasinda alim fiyat tablosu bulunamadi (yapi/adres degismis olabilir)")
         log_yaz("ESK_KARKAS", "basarili", len(sonuclar))
         print(f"[OK] ESK karkas: {len(sonuclar)} hayvan")
         return sonuclar
