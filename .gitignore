@@ -47,3 +47,6 @@ ss_*.png
 web/.ss/
 
 .vercel
+
+# Imza anahtari ve sifreleri — ASLA commit/deploy edilmez
+_gizli_anahtarlar/
