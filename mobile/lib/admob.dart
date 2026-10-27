@@ -54,14 +54,13 @@ class _AdmobBannerState extends State<AdmobBanner> {
   }
 
   Future<void> _yukle() async {
-    final genislik = MediaQuery.sizeOf(context).width.truncate() - 32;
     if (!await admobBaslat()) {
       if (mounted) setState(() => _hata = true);
       return;
     }
     final reklam = BannerAd(
       adUnitId: _bannerId,
-      size: AdSize.getInlineAdaptiveBannerAdSize(genislik, 250),
+      size: AdSize.banner, // ince şerit 320x50 — içeriği kapatmasın
       request: const AdRequest(keywords: ['tarım', 'çiftçi', 'gübre', 'yem', 'hayvancılık']),
       listener: BannerAdListener(
         onAdLoaded: (ad) async {
