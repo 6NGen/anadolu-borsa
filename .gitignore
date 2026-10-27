@@ -50,3 +50,7 @@ web/.ss/
 
 # Imza anahtari ve sifreleri — ASLA commit/deploy edilmez
 _gizli_anahtarlar/
+
+# Tanitim videosu ara dosyalari (kurgu.py yeniden uretir)
+mobile/store/video/ham/
+mobile/store/video/_gecici/
