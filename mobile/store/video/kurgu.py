@@ -183,44 +183,115 @@ def sahne_klip(duzen, i, kaynak, bas, sure, baslik, alt):
     return out
 
 
-def muzik(sure, yol, bpm=96, sr=44100):
-    """Telifsiz, sentezlenmiş sade arka plan: yumuşak pad (Am-F-C-G) + hafif ritim."""
+def muzik(sure, yol, bpm=78, sr=44100):
+    """Telifsiz, sentezlenmiş sakin fon: sıcak akor zemini + seyrek marimba + yumuşak bas
+    ve kısık ritim. Sol majör, G–D–Em–C (I–V–vi–IV). Stereo, hafif yankı."""
     n = int(sure * sr)
     t = np.arange(n) / sr
     vurus = 60 / bpm
     olcu = vurus * 4
-    akorlar = [(220.0, 261.63, 329.63), (174.61, 220.0, 261.63), (130.81, 164.81, 196.0), (196.0, 246.94, 293.66)]
+    rng = np.random.default_rng(11)
+    hz = lambda m: 440.0 * 2 ** ((m - 69) / 12)  # MIDI → Hz
+
+    # (bas kök, akor notaları) — MIDI
+    akorlar = [(43, [55, 59, 62, 67]),   # G
+               (38, [54, 57, 62, 66]),   # D/F#
+               (40, [52, 55, 59, 64]),   # Em
+               (36, [48, 52, 55, 62])]   # Cadd9
+    ritim_bas, ritim_bit = ACILIS_SURE, sure - KAPANIS_SURE
+
     pad = np.zeros(n)
-    for k in range(int(sure / olcu) + 1):
-        a, b = int(k * olcu * sr), min(n, int((k + 1) * olcu * sr))
+    mar_l, mar_r = np.zeros(n), np.zeros(n)
+    bas = np.zeros(n)
+    dav = np.zeros(n)
+
+    def ekle(hedef, a, sinyal):
         if a >= n:
+            return
+        L = min(len(sinyal), n - a)
+        hedef[a:a + L] += sinyal[:L]
+
+    for k in range(int(sure / olcu) + 2):
+        a0 = k * olcu
+        if a0 >= sure:
             break
-        tt = t[a:b] - t[a]
-        zarf = np.minimum(1, tt / 0.6) * np.minimum(1, (olcu - tt) / 0.5)
-        for f in akorlar[k % 4]:
-            pad[a:b] += zarf * (np.sin(2 * math.pi * f * tt) + 0.3 * np.sin(2 * math.pi * 2 * f * tt))
-    pad *= 0.06
-    ritim = np.zeros(n)
-    rng = np.random.default_rng(7)
-    for k in range(int(sure / vurus) + 1):
-        a = int(k * vurus * sr)
-        if a >= n:
-            break
-        L = min(n - a, int(0.25 * sr))
+        kok, notalar = akorlar[k % 4]
+        # akor zemini: yavaş giriş/çıkış, hafif detune (koro)
+        L = int((olcu + 0.8) * sr)
         tt = np.arange(L) / sr
-        ritim[a:a + L] += 0.35 * np.sin(2 * math.pi * (55 + 60 * np.exp(-tt * 30)) * tt) * np.exp(-tt * 9)
-        h = int((k + 0.5) * vurus * sr)
-        if h < n:
-            L2 = min(n - h, int(0.05 * sr))
-            ritim[h:h + L2] += 0.05 * rng.standard_normal(L2) * np.exp(-np.arange(L2) / sr * 80)
-    ses = pad + ritim * 0.6
-    ses *= np.minimum(1, t / 1.5) * np.minimum(1, (sure - t) / 2.0)
-    ses = np.clip(ses / max(1e-9, np.abs(ses).max()) * 0.5, -1, 1)
+        zarf = np.minimum(1, tt / 0.9) * np.clip((olcu + 0.8 - tt) / 0.8, 0, 1)
+        s = np.zeros(L)
+        for m in notalar:
+            f = hz(m)
+            s += np.sin(2 * np.pi * f * tt) + np.sin(2 * np.pi * f * 1.003 * tt) + 0.12 * np.sin(2 * np.pi * 2 * f * tt)
+        ekle(pad, int(a0 * sr), 0.018 * zarf * s)
+
+        # marimba: seyrek, sekizlik ızgarada yumuşak desen (iki desen dönüşümlü)
+        desen = [(0, 0), (1.5, 2), (2, 1), (3, 3)] if (k // 4) % 2 == 0 else [(0, 1), (1, 2), (2.5, 3), (3.5, 2)]
+        for j, (zaman, idx) in enumerate(desen):
+            m = notalar[idx] + 24
+            f = hz(m)
+            L = int(1.6 * sr)
+            tt = np.arange(L) / sr
+            ton = (np.sin(2 * np.pi * f * tt) * np.exp(-tt * 3.2)
+                   + 0.25 * np.sin(2 * np.pi * 4 * f * tt) * np.exp(-tt * 14)
+                   + 0.06 * np.sin(2 * np.pi * 10 * f * tt) * np.exp(-tt * 30))
+            ton *= np.minimum(1, tt / 0.004)
+            ses_g = 0.10 * (0.85 if j % 2 else 1.0)
+            pan = 0.38 if j % 2 == 0 else 0.62
+            a = int((a0 + zaman * vurus) * sr)
+            ekle(mar_l, a, ses_g * (1 - pan) * 2 * ton)
+            ekle(mar_r, a, ses_g * pan * 2 * ton)
+
+        if a0 < ritim_bas - 0.01 or a0 >= ritim_bit:
+            continue
+        # bas: 1. ve 3. vuruşta uzun, yumuşak
+        for v in (0, 2):
+            f = hz(kok)
+            L = int(vurus * 2 * sr)
+            tt = np.arange(L) / sr
+            zarf = np.minimum(1, tt / 0.02) * np.exp(-tt * 1.6)
+            ekle(bas, int((a0 + v * vurus) * sr), 0.09 * zarf * (np.sin(2 * np.pi * f * tt) + 0.2 * np.sin(2 * np.pi * 2 * f * tt)))
+        # kısık davul: 1 ve 3'te tok vuruş, 2 ve 4'te hafif tık, sekizliklerde fısıltı
+        for v in range(4):
+            a = int((a0 + v * vurus) * sr)
+            if v in (0, 2):
+                L = int(0.3 * sr)
+                tt = np.arange(L) / sr
+                ekle(dav, a, 0.13 * np.sin(2 * np.pi * (48 + 50 * np.exp(-tt * 40)) * tt) * np.exp(-tt * 11))
+            else:
+                L = int(0.06 * sr)
+                g = rng.standard_normal(L)
+                g = np.diff(g, prepend=0)  # tizleştir
+                ekle(dav, a, 0.035 * g * np.exp(-np.arange(L) / sr * 70))
+            for yarim in (0, 0.5):
+                L = int(0.035 * sr)
+                g = np.diff(rng.standard_normal(L), prepend=0)
+                ekle(dav, int((a0 + (v + yarim) * vurus) * sr), 0.010 * g * np.exp(-np.arange(L) / sr * 120))
+
+    # yankı: üstel sönümlü gürültü (sol/sağ ayrı), FFT evrişimi
+    def yanki(x, tohum):
+        r = np.random.default_rng(tohum)
+        L = int(1.8 * sr)
+        ir = r.standard_normal(L) * np.exp(-np.arange(L) / sr / 0.45)
+        ir /= np.sqrt((ir ** 2).sum())
+        N = 1 << int(np.ceil(np.log2(len(x) + L)))
+        return np.fft.irfft(np.fft.rfft(x, N) * np.fft.rfft(ir, N), N)[:len(x)]
+
+    kuru_l = pad + mar_l
+    kuru_r = pad + mar_r
+    sol = kuru_l + 0.22 * yanki(kuru_l, 1) + bas + dav
+    sag = kuru_r + 0.22 * yanki(kuru_r, 2) + bas + dav
+
+    zarf = np.minimum(1, t / 1.5) * np.minimum(1, (sure - t) / 2.5)
+    st = np.stack([sol, sag], axis=1) * zarf[:, None]
+    st = np.tanh(st * 1.2)
+    st = st / max(1e-9, np.abs(st).max()) * 0.7
     with wave.open(str(yol), "wb") as w:
-        w.setnchannels(1)
+        w.setnchannels(2)
         w.setsampwidth(2)
         w.setframerate(sr)
-        w.writeframes((ses * 32767).astype(np.int16).tobytes())
+        w.writeframes((st * 32767).astype(np.int16).tobytes())
 
 
 def birlestir(duzen):
