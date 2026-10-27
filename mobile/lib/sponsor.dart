@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'admob.dart';
 import 'tema.dart';
 import 'veri.dart';
 
@@ -10,7 +11,8 @@ import 'veri.dart';
 // Liste sitedeki tek dosyadan gelir (web/public/sponsorlar.json); yeni reklam
 // için uygulama güncellemesi gerekmez. Reklam kimliği/izleme YOK: yalnızca
 // gösterilir, dokununca firmanın linki tarayıcıda açılır.
-// Aktif reklam yoksa "buraya reklam verin" kartı gösterilir.
+// Aktif sponsor yoksa Google AdMob banner'ı (admob.dart); o da yüklenemezse
+// "buraya reklam verin" kartı gösterilir.
 
 class Sponsor {
   final String firma, baslik, metin, link;
@@ -62,7 +64,7 @@ class SponsorKarti extends StatelessWidget {
         if (!snap.hasData) return const SizedBox.shrink();
         final simdi = DateTime.now();
         final uygun = snap.data!.where((s) => s.aktif(yer, simdi)).toList();
-        if (uygun.isEmpty) return _kart(null);
+        if (uygun.isEmpty) return AdmobBanner(yedek: _kart(null));
         return _kart(uygun[Random().nextInt(uygun.length)]);
       },
     );

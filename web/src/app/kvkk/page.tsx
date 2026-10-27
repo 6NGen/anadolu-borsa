@@ -53,6 +53,14 @@ export default function KvkkPage() {
         teknolojisi kullanılmaz. Bir reklama dokunduğunuzda ilgili firmanın sitesi açılır ve
         o sitenin kendi gizlilik politikası geçerli olur.
       </p>
+      <p style={S.p}>
+        Mobil uygulamada, sponsorlu reklam bulunmayan alanlarda Google AdMob reklamları
+        gösterilir. Google bu reklamlar için cihazınızın reklam kimliğini, IP adresini ve
+        reklam etkileşimlerini (gösterim, tıklama) işleyebilir. Reklam kimliğinizi cihaz
+        ayarlarından (Ayarlar &gt; Google &gt; Reklamlar) sıfırlayabilir veya silebilirsiniz.
+        Ayrıntılar: Google&apos;ın iş ortağı sitelerindeki veri kullanımı politikası
+        (policies.google.com/technologies/partner-sites).
+      </p>
 
       <h2 style={S.h2}>SAKLAMA SÜRESİ</h2>
       <p style={S.p}>

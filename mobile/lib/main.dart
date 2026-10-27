@@ -15,6 +15,7 @@ import 'ekranlar/parite.dart';
 import 'ekranlar/araclar.dart';
 import 'ekranlar/ayarlar.dart';
 import 'ekranlar/urun_sec.dart';
+import 'admob.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ Future<void> main() async {
   await Tercih.yukle();
   await bildirimBaslat();
   gunlukOzetEsitle(); // beklenmez — açılışı yavaşlatmasın
+  admobBaslat(); // beklenmez
   final prefs = await SharedPreferences.getInstance();
   final acik = prefs.getBool('acikTema') ?? false;
   paletUygula(acik);
