@@ -8,7 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 // Uygulama kimliği (~ ile) AndroidManifest.xml'deki APPLICATION_ID'dedir.
 // Debug derlemede her zaman Google'ın test birimi kullanılır (kendi reklamına
 // tıklamak hesabı askıya aldırır).
-const _bannerGercek = 'ca-app-pub-3940256099942544/9214589741'; // TODO: gerçek birim
+const _bannerGercek = 'ca-app-pub-3219214594050063/6923787871'; // Rayiç banner
 const _bannerTest = 'ca-app-pub-3940256099942544/9214589741';
 String get _bannerId => kReleaseMode ? _bannerGercek : _bannerTest;
 

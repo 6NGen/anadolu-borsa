@@ -43,7 +43,7 @@
         <!-- AdMob uygulama kimliği (AdMob > Uygulamalar > Rayiç > Uygulama ayarları) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-3219214594050063~5046891588"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
